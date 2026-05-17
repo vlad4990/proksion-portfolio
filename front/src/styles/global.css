@@ -15,12 +15,20 @@ body {
   min-height: 100%;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-body);
+  font-weight: 700;
   font-size: var(--t-body);
   line-height: var(--lh-body);
+  min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -35,4 +43,9 @@ svg,
 video {
   display: block;
   max-width: 100%;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--fg-strong);
 }

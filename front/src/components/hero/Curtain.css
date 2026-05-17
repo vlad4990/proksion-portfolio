@@ -1,0 +1,37 @@
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--bg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.55s cubic-bezier(.6, .05, .3, 1);
+  will-change: transform;
+}
+
+/* Inline-скрипт из BaseLayout проставляет этот атрибут ещё до отрисовки,
+   если sessionStorage флаг dismissed = "1". React-остров уже знает об
+   этом через useEffect и сразу возвращает null — но скрываем заранее,
+   чтобы не было вспышки занавеса между парсингом DOM и гидрацией. */
+html[data-curtain-dismissed="1"] .curtain {
+  display: none;
+}
+
+.curtain:focus-visible {
+  outline: none;
+}
+
+.curtain--dismissing {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .curtain {
+    transition: opacity 0.2s linear;
+  }
+  .curtain--dismissing {
+    transform: none;
+    opacity: 0;
+  }
+}

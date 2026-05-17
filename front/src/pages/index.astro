@@ -1,9 +1,29 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import HeroComposition from '@/components/hero/HeroComposition.astro';
+import { Curtain } from '@/components/hero/Curtain';
 ---
+
 <BaseLayout title="PROKSION — Kristina · портфолио">
-  <main style="padding: var(--sp-9) var(--page-pad);">
-    <h1 class="h-hero">PROKSION</h1>
-    <p class="t-body">Phase 01 готова. Контент придёт в фазе 03.</p>
+  <Curtain client:load>
+    <HeroComposition />
+  </Curtain>
+
+  <main id="content" class="home-main">
+    <p class="home-main__placeholder">About content — phase 03.</p>
   </main>
 </BaseLayout>
+
+<style>
+  .home-main {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: var(--sp-9) var(--page-pad);
+  }
+
+  .home-main__placeholder {
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: var(--t-body);
+  }
+</style>

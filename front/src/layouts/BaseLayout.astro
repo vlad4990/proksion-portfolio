@@ -21,6 +21,19 @@ const { title, description = 'PROKSION — портфолио Кристины' 
     <meta name="description" content={description} />
     <link rel="preload" href="/fonts/Stengazeta-Regular.ttf" as="font" type="font/ttf" crossorigin />
     <link rel="preload" href="/fonts/Kanit-Cyrillic.ttf" as="font" type="font/ttf" crossorigin />
+    <script is:inline>
+      /* Если занавес уже снимали в этой сессии — пометить html заранее,
+         чтобы CSS скрыл .curtain ещё до гидрации React-острова. */
+      (function () {
+        try {
+          if (sessionStorage.getItem('proksion:curtain:dismissed') === '1') {
+            document.documentElement.dataset.curtainDismissed = '1';
+          }
+        } catch (e) {
+          /* sessionStorage недоступен — рендерим занавес как обычно */
+        }
+      })();
+    </script>
   </head>
   <body>
     <slot />
