@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import HeroComposition from '@/components/hero/HeroComposition.astro';
 import { Curtain } from '@/components/hero/Curtain';
+import About from '@/components/about/About.astro';
 ---
 
 <BaseLayout title="PROKSION — Kristina · портфолио">
@@ -9,21 +10,8 @@ import { Curtain } from '@/components/hero/Curtain';
     <HeroComposition />
   </Curtain>
 
-  <main id="content" class="home-main">
-    <p class="home-main__placeholder">About content — phase 03.</p>
+  <main id="content">
+    <h1 class="sr-only">Кристина — графический дизайнер. PROKSION портфолио.</h1>
+    <About />
   </main>
 </BaseLayout>
-
-<style>
-  .home-main {
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: var(--sp-9) var(--page-pad);
-  }
-
-  .home-main__placeholder {
-    color: var(--fg);
-    font-family: var(--font-body);
-    font-size: var(--t-body);
-  }
-</style>
