@@ -1,0 +1,34 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css"><style>
+  html,body{margin:0;background:var(--bg);padding:24px 32px;color:var(--fg);overflow:hidden;}
+  .bar{display:flex;align-items:center;justify-content:space-between;width:100%;}
+  .word{font-family:'Stengazeta',sans-serif;color:var(--fg-strong);text-transform:uppercase;font-weight:700;font-size:22px;letter-spacing:.04em;}
+  ul{list-style:none;margin:0;padding:0;display:flex;gap:48px;align-items:center;}
+  li{font-family:'Stengazeta',sans-serif;color:var(--fg-muted);text-transform:uppercase;font-weight:700;font-size:22px;letter-spacing:.04em;}
+  li.active{background:#e4e4e4;color:#141414;border-radius:12px;padding:10px 22px;}
+  .year{font-family:'Stengazeta',sans-serif;color:var(--fg-strong);font-weight:700;font-size:14px;letter-spacing:.06em;}
+  /* Tag overlay — show which pieces are tabs vs chrome */
+  .row{position:relative;}
+  .tags{display:flex;justify-content:space-between;margin-top:22px;}
+  .tag{font-family:'Kanit',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:var(--fg-muted);opacity:.55;}
+  .tag.tabs{color:var(--accent);opacity:1;flex:1;text-align:center;}
+  .label{margin-top:14px;font-family:'Kanit',sans-serif;font-size:11px;color:var(--fg-muted);letter-spacing:.04em;font-weight:700;line-height:1.4;}
+  .label b{color:var(--accent);font-weight:700;}
+</style></head><body>
+<div class="row">
+  <div class="bar">
+    <span class="word">PROKSION</span>
+    <ul>
+      <li class="active">ОБО МНЕ</li>
+      <li>ПРОЕКТЫ</li>
+      <li>КОНТАКТЫ</li>
+    </ul>
+    <span class="year">2025</span>
+  </div>
+  <div class="tags">
+    <span class="tag">chrome</span>
+    <span class="tag tabs">— tabs —</span>
+    <span class="tag">chrome</span>
+  </div>
+</div>
+<div class="label"><b>3 таба</b> по центру (Обо мне · Проекты · Контакты). Слева и справа — <b>chrome</b>: вордмарк и год, не интерактивные элементы навигации.</div>
+</body></html>

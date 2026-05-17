@@ -1,0 +1,45 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css"><style>
+  html,body{margin:0;background:var(--bg);color:var(--fg);padding:24px;overflow:hidden;}
+  .grid{
+    column-count:5;
+    column-gap:10px;
+    width:100%;
+  }
+  .tile{
+    width:100%;
+    margin:0 0 10px;
+    break-inside:avoid;
+    background:#1e1e1e;
+    border-radius:0;
+    display:block;
+    overflow:hidden;
+  }
+  .tile.real{background-size:cover;background-position:center;}
+  /* varied placeholder heights */
+  .h-1{height:120px;} .h-2{height:170px;} .h-3{height:90px;} .h-4{height:210px;}
+  .h-5{height:140px;} .h-6{height:80px;}  .h-7{height:160px;}
+  .meta{margin-top:14px;font-family:'Kanit',sans-serif;font-size:11px;color:var(--fg-muted);letter-spacing:.02em;line-height:1.4;opacity:.75;}
+  .meta b{color:var(--accent);}
+</style></head><body>
+<div class="grid">
+  <div class="tile h-2" style="background:#d9d9d9"></div>
+  <div class="tile h-3" style="background:#bfbfbf"></div>
+
+  <div class="tile real h-4" style="background-image:url(../assets/project-success.png)"></div>
+  <div class="tile h-1" style="background:#e4e4e4"></div>
+
+  <div class="tile h-1" style="background:#c4c4c4"></div>
+  <div class="tile h-5" style="background:#d9d9d9"></div>
+
+  <div class="tile real h-7" style="background-image:url(../assets/project-post.png)"></div>
+
+  <div class="tile h-6" style="background:#bfbfbf"></div>
+  <div class="tile h-4" style="background:#e4e4e4"></div>
+
+  <div class="tile h-2" style="background:#d9d9d9"></div>
+  <div class="tile h-1" style="background:#c4c4c4"></div>
+</div>
+<div class="meta">
+  <b>Pinterest-style masonry</b> — колонки фиксированной ширины, высота карточек подгоняется под содержимое, разрыв между плитками 10 px. Без рамок, без теней, без скруглений.
+</div>
+</body></html>

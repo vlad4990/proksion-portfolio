@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css"><style>
+  html,body{margin:0;background:var(--bg);padding:28px 32px;color:var(--fg);overflow:hidden;font-family:'Kanit','Manrope',sans-serif;}
+  .stack{display:flex;flex-direction:column;gap:14px;}
+  .rule{display:flex;align-items:center;gap:14px;font-size:13px;font-weight:700;}
+  .x{width:24px;height:24px;border-radius:50%;background:#1e1e1e;color:var(--accent);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;}
+  .x.ok{background:#a62323;color:#141414;}
+  .label{color:var(--fg-muted);}
+  .meta{color:var(--fg);opacity:.5;font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-left:auto;}
+</style></head><body>
+<div class="stack">
+  <div class="rule"><span class="x">✕</span><span class="label">No drop shadows. Anywhere.</span><span class="meta">box-shadow: none</span></div>
+  <div class="rule"><span class="x">✕</span><span class="label">No borders on cards or surfaces.</span><span class="meta">border: 0</span></div>
+  <div class="rule"><span class="x">✕</span><span class="label">No gradients — solids only.</span><span class="meta">no linear-gradient</span></div>
+  <div class="rule"><span class="x">✕</span><span class="label">No frosted glass / backdrop-blur.</span><span class="meta">no backdrop-filter</span></div>
+  <div class="rule"><span class="x ok">✓</span><span class="label">Hairline 1.3px black on photo-mask edges.</span><span class="meta">stroke: #000</span></div>
+  <div class="rule"><span class="x ok">✓</span><span class="label">2.4px black stroke on outlined hero letters.</span><span class="meta">-webkit-text-stroke</span></div>
+</div>
+</body></html>

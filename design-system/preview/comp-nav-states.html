@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css"><style>
+  html,body{margin:0;background:var(--bg);padding:28px 32px;color:var(--fg);overflow:hidden;font-family:'Stengazeta',sans-serif;}
+  .wrap{display:flex;gap:24px;align-items:center;}
+  /* Stengazeta sits high in the em box (caps top → baseline, then ~20%
+     empty descender region). To balance, give MORE top padding than
+     bottom so the visible glyphs land in the optical centre. */
+  .btn{
+    display:inline-block;
+    padding:14px 32px 10px;
+    border-radius:12px;
+    font-size:22px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    line-height:1;
+  }
+  .btn.default{background:transparent;color:var(--fg-muted);}
+  .btn.hover{background:rgba(228,228,228,.5);color:#141414;}
+  .btn.active{background:#e4e4e4;color:#141414;}
+  .lbl{font-family:'Kanit',sans-serif;font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-top:10px;display:block;text-align:center;}
+  .col{display:flex;flex-direction:column;align-items:center;}
+</style></head><body>
+<div class="wrap">
+  <div class="col"><div class="btn default">ПРОЕКТЫ</div><span class="lbl">default</span></div>
+  <div class="col"><div class="btn hover">ПРОЕКТЫ</div><span class="lbl">hover (50%)</span></div>
+  <div class="col"><div class="btn active">ПРОЕКТЫ</div><span class="lbl">active</span></div>
+</div>
+</body></html>
