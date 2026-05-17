@@ -1,0 +1,6 @@
+/*
+ * Single source of truth — design-system/colors_and_type.css.
+ * This module simply re-exports it so Astro/Vite can bundle from /front.
+ * Do NOT copy or mirror token values here — extend the source file instead.
+ */
+@import url("../../../design-system/colors_and_type.css");

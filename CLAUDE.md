@@ -4,63 +4,90 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-PROKSION — графический-дизайн портфолио для Kristina. Чистый статичный сайт без сборки: один HTML-файл (`Portfolio.html`) загружает React 18 + Babel standalone из unpkg по CDN и подключает `.jsx`-файлы напрямую как `<script type="text/babel">`. Никакого npm/webpack/vite, нет `package.json`, нет тестов.
+PROKSION — графический-дизайн портфолио для Kristina. Текущая работа — миграция оригинального Claude design экспорта (React + Babel standalone на CDN) в собственный стек: Astro во `/front` и (позже) backend во `/back`. Дизайн-система — single source of truth, и фронт собирается строго через её токены и шрифты.
+
+## Monorepo layout
+
+```
+/front          ← Astro 6, TS strict, hybrid (static + один SSR-роут)
+/back           ← планируется; стек не выбран, до фазы post-05
+/design-system  ← single source of truth: токены, шрифты, ассеты, брендбук, ui-kits
+/_legacy        ← оригинальный экспорт из Claude design (App.jsx, Portfolio.html, mobile-wireframes, screenshots, исходные fonts/assets); reference, не редактируется
+/tasks          ← фазы миграции 01–05; каждая папка = task.md + verify.md
+```
 
 ## Running locally
 
-Откройте `Portfolio.html` напрямую в браузере, либо обслужите каталог любым статическим сервером (нужно для корректной загрузки шрифтов/масок):
+Разработка:
 
+```bash
+cd front
+npm install     # один раз
+npm run dev     # http://localhost:4321
 ```
-python3 -m http.server 8000
-# затем http://localhost:8000/Portfolio.html
+
+`public/fonts` и `public/assets` — симлинки на `design-system/fonts` и `design-system/assets`, поэтому изменения в дизайн-системе видны без копирования.
+
+Прод-сборка (запускается из корня репо):
+
+```bash
+docker compose up --build
+# http://localhost:4321
 ```
 
-Babel компилирует JSX в рантайме — изменения в `.jsx` подхватываются простым reload. Mobile-layout проверяется в DevTools при ширине ≤ 768px (брейкпойнт жёстко прошит и в CSS, и в `useIsMobile()`).
+Type-check:
 
-## Architecture
+```bash
+cd front && npm run type-check
+```
 
-### Two layout trees, one app
+## Architecture (front)
 
-`App.jsx` — корневой роутер. Через `useIsMobile()` (matchMedia `max-width: 768px`) выбирает одно из двух полностью отдельных деревьев компонентов:
+### Astro hybrid
 
-- **Desktop** — стейдж 1920×1080/1838, отрисованный в absolute-позиционировании. Inline-скрипт в конце `Portfolio.html` (`fit()`) масштабирует `.stage` и `.nav-host` через `transform: scale(vw/1920)`, чтобы дизайн помещался в любую ширину окна. Компоненты: `TopNav`, `HeroSection`, `AboutSection`, `ProjectsScreen`.
-- **Mobile** — нативный поток без масштабирования, ширина устройства. Компоненты: `MobileHero`, `MobileAbout`, `MobileProjects`, `MobileContacts`, `MobileTabBar`. Используют переменные `--mob-*` из CSS (отступы, высоты хедера/таб-бара, safe-area).
+`astro.config.mjs` использует `output: 'static'` + `@astrojs/node` в standalone-mode. Это hybrid-поведение Astro 5+ (флаг `'hybrid'` убрали в v5): по умолчанию все роуты prerender, отдельные роуты opt-out через `export const prerender = false`.
 
-Mobile-компоненты НЕ являются адаптивными версиями desktop — это отдельные верстки с собственной типографикой (`--t-*-mob`) и отдельной навигацией (нижний таб-бар вместо top-nav). При правках одной страницы обычно нужно править оба дерева.
+Сейчас SSR — только `src/pages/projects/[section]/[subsection].astro`. Все остальные роуты — статика.
 
-### Hero curtain
+### React-острова — только для интерактива
 
-Обе ветки оборачивают первый экран в `.hero-overlay` (fixed, z-index 1000). Phase-машина в `App.jsx`: `visible` → `dismissing` → `gone`. Любой `wheel/touchstart/keydown` (или клик) переводит в `dismissing`; через 600 ms (совпадает с CSS-transition `translateY(-100%)`) → `gone`. Пока не `gone`, `document.documentElement.style.overflow = 'hidden'` блокирует скролл.
+Astro по умолчанию = 0 kb JS. React (`@astrojs/react`) подключается **точечно**, через `client:load` / `client:idle` / `client:visible` — только для реально интерактивных островов (Hero curtain, ProjectsSidebar+Grid, MobileTabBar). Всё остальное — `.astro` без `client:*`. Bundle и скорость отдачи — приоритет.
 
-### Routing
+### Tokens, fonts, breakpoints
 
-In-memory route в state (`'home' | 'projects' | 'contacts'`) с персистом в `localStorage` под ключом `proksion:route`. На mobile-ветке навигация идёт через проп `onNav` из таб-бара; на desktop — `onHome/onAbout/onProjects` из `TopNav` (вкладка «КОНТАКТЫ» на десктопе сейчас no-op).
+Все цвета, типографика, шрифты и брейкпойнты живут в `design-system/colors_and_type.css`. `front/src/styles/tokens.css` импортирует его через `@import`. Не дублируем значения, не вводим inline-hex'ов.
 
-### Globals, not modules
+Брейкпойнты как переменные: `--bp-xs 360`, `--bp-sm 480`, `--bp-md 768`, `--bp-lg 1024`, `--bp-xl 1280`, `--bp-2xl 1440`, `--bp-3xl 1920`. Типографика — дискретные сеты через @media в самом файле токенов; каждый брейк имеет отдельную композицию, не просто scale.
 
-Babel-standalone не поддерживает ES modules. Каждый `.jsx` объявляет функцию и вешает её в `window.<Name>`. Порядок `<script>` в `Portfolio.html` важен: компоненты должны быть зарегистрированы до `App.jsx`. Никаких `import`/`export` — в новых компонентах следуйте той же конвенции (`window.NewComp = NewComp;` в конце файла).
+Шрифты — два: Stengazeta (display) и Kanit Cyrillic (body). Файлы — `design-system/fonts/`, шарятся во фронт через симлинки. `front/src/styles/fonts.css` дублирует `@font-face` с **абсолютными** путями `/fonts/...` (внутри бандла относительные пути ломаются); design-system-версия использует относительные `fonts/...` чтобы preview/ и ui_kits/ работали при прямом открытии.
 
-### Styling
+### Routing (планируется)
 
-Один глобальный `colors_and_type.css`. Дизайн-токены — CSS custom properties в `:root`:
+- `/` — главная, hero + about + projects-preview (фазы 02–03);
+- `/projects` — sidebar + grid (фаза 04);
+- `/projects/[section]/[subsection]` — детальная страница раздела (фаза 04, SSR);
+- `/contacts` — контакты (фаза 05).
 
-- Палитра: `--c-ink-*` (тёмные), `--c-paper-*` (светлые), `--c-red-*` (единственный акцент `#a62323`).
-- Семантика: `--bg`, `--fg`, `--accent`, `--fg-strong`, `--fg-muted`, `--pill`, и т. п. — предпочитайте их сырым hex'ам.
-- Десктоп-шкала: `--t-hero` (100), `--t-header-1` (80), `--t-section` (52), `--t-header-2` (40), `--t-sub-section` (32), `--t-body` (22). Mobile-шкала: `--t-*-mob`.
-- Шрифты — два: `Stengazeta` (display, все заголовки) и `Kanit` (Cyrillic build, тело и UI). Файлы в `fonts/`, подключаются `@font-face`. Никаких других веб-шрифтов в проекте не должно появляться.
+### Backend
 
-Большая часть верстки на desktop — `position: absolute` с пиксельными координатами под стейдж 1920px (см. `HeroSection.jsx`, `AboutSection.jsx`, `ProjectsScreen.jsx`). Это намеренно — макет порт-нулём из Figma. Mobile использует normal-flow + flex, координаты от CSS-переменных.
-
-### Assets
-
-- `assets/` — фото и SVG-маски (`mask-hero.svg`, `mask-about-*.svg`). Маски применяются через `mask-image`/`-webkit-mask-image` к div'у с background-image портрета.
-- `fonts/` — `Stengazeta-Regular.ttf`, `Kanit-Cyrillic.ttf`.
-- `mobile-wireframes/` — отдельные HTML/JSX-эксперименты (Figma-подобный canvas, варианты мокапов). НЕ входят в продакшен-сайт — `Portfolio.html` их не подключает.
-- `screenshots/` — справочные рендеры. `.design-canvas.state.json` — sidecar для design-canvas из `mobile-wireframes/`.
+Сейчас отсутствует. В фазе 04 API уходит через `front/src/lib/api.ts` со stub-данными; контракт спроектирован так, чтобы будущий `/back` подменил один модуль.
 
 ## Conventions
 
-- Тексты UI — русские, в верхнем регистре для display-заголовков (`text-transform: uppercase`). При добавлении строк сохраняйте кириллицу и тон портфолио.
-- React используется только через глобал `React`/`ReactDOM` (UMD). Хуки доступны (`React.useState` и т. д.). Никаких новых зависимостей через CDN без явной необходимости.
-- Inline-стили — преобладающий способ стилизации в `.jsx`. Это сознательный выбор: верстка частично декларативна, и абсолютные координаты живут рядом с разметкой. Не выносите такие стили в CSS-классы без причины.
-- Для общих токенов (цвета, шрифты, типографика, mobile-отступы) используйте `var(--...)` из `colors_and_type.css` — не дублируйте значения.
+- **Бренд — святое.** Только цвета/шрифты/иконки из `design-system/`. Никаких новых hex'ов, эмодзи, градиентов, drop-shadow, glass-морфизма. Подробно — `design-system/README.md`.
+- **Токены — single source of truth.** Размеры/цвета/отступы — через `var(--...)`. Нужного токена нет — добавь его в `design-system/colors_and_type.css`, не сбоку.
+- **TypeScript strict.** `tsconfig.json` наследует `astro/tsconfigs/strict`. Никаких `any`. Алиас `@` → `./src`.
+- **UI-тексты — русские.** Display-заголовки в верхнем регистре (`text-transform: uppercase`).
+- **Адаптив 360–1920** через дискретные сеты, не fluid scale. На каждом брейке композиция пересобирается.
+- **`_legacy/` не редактируем.** Это reference. Mobile-компоненты там не каноничны — фазы 02–05 переосмысливают их, а не копируют 1:1.
+
+## Don't
+
+- Не добавляй зависимости без необходимости (особенно UI-библиотеки и CSS-фреймворки — у нас своя дизайн-система).
+- Не пиши новые компоненты в `_legacy/` и не правь там код. Если оттуда что-то нужно перенести — копируй смысл, переписывай под Astro.
+- Не открывай `screenshots/`, `mobile-wireframes/`, `uploads/` если задача этого явно не требует — они нужны конкретным фазам.
+- Не настраивай CI и не выбирай backend-стек до фазы post-05.
+
+## Текущая фаза
+
+См. `tasks/README.md` — список фаз, очерёдность, общие правила. Каждая папка `tasks/0N-*/` — самодостаточная задача с собственным `task.md` и `verify.md`.

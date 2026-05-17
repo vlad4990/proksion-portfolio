@@ -1,0 +1,9 @@
+**/node_modules
+**/dist
+**/.astro
+_legacy
+screenshots
+uploads
+.git
+.design-canvas.state.json
+tasks

@@ -81,6 +81,7 @@
   --t-header-2:     40px;
   --t-sub-section:  32px;
   --t-body:         22px;
+  --t-port-folio:  380px;  /* giant outlined PORT/FOLIO hero lockup */
 
   /* Back-compat aliases — preview cards / older code still reference these. */
   --t-display-1:    var(--t-header-1);
@@ -231,4 +232,64 @@ html, body {
   padding: 14px 34px;
   display: inline-flex;
   align-items: center;
+}
+
+/* =====================================================================
+   Breakpoints — каноничные
+   Дискретные сеты, не fluid scale. На каждом брейке композиция
+   пересобирается, поэтому фронт делает отдельные @media-блоки.
+   ===================================================================== */
+:root {
+  --bp-xs:  360px;
+  --bp-sm:  480px;
+  --bp-md:  768px;
+  --bp-lg:  1024px;
+  --bp-xl:  1280px;
+  --bp-2xl: 1440px;
+  --bp-3xl: 1920px;
+}
+
+/* =====================================================================
+   Responsive typography — дискретные сеты
+   ≥1280px = base :root (десктоп — без override).
+   ===================================================================== */
+
+/* Tablet (768–1279) — масштаб ~0.7 от десктопа */
+@media (max-width: 1279px) {
+  :root {
+    --t-hero:        72px;
+    --t-header-1:    56px;
+    --t-section:     40px;
+    --t-header-2:    32px;
+    --t-sub-section: 24px;
+    --t-body:        18px;
+    --t-port-folio:  260px;
+  }
+}
+
+/* Mobile (≤767) — пересмотренная mobile-шкала, канонизированная из root colors_and_type.css */
+@media (max-width: 767px) {
+  :root {
+    --t-hero:        44px;
+    --t-header-1:    44px;
+    --t-section:     30px;
+    --t-header-2:    20px;
+    --t-sub-section: 17px;
+    --t-body:        14px;
+    --t-port-folio:  144px;
+
+    /* Mobile layout tokens — применяются <768 */
+    --page-pad:        22px;
+    --mob-header-h:    56px;
+    --mob-tabbar:      64px;
+    --mob-safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* Tiny mobile (<480) — компактный hero lockup */
+@media (max-width: 479px) {
+  :root {
+    --t-hero:        38px;
+    --t-port-folio:  108px;
+  }
 }

@@ -1,0 +1,13 @@
+---
+export const prerender = false;
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const { section, subsection } = Astro.params;
+---
+<BaseLayout title={`PROKSION · ${section} / ${subsection}`}>
+  <main style="padding: var(--sp-9) var(--page-pad);">
+    <p class="t-muted">section: <span class="t-accent">{section}</span></p>
+    <p class="t-muted">subsection: <span class="t-accent">{subsection}</span></p>
+    <p class="t-body">Phase 04 наполнит этот роут.</p>
+  </main>
+</BaseLayout>

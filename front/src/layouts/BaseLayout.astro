@@ -1,0 +1,28 @@
+---
+import '@/styles/tokens.css';
+import '@/styles/fonts.css';
+import '@/styles/breakpoints.css';
+import '@/styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'PROKSION — портфолио Кристины' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="preload" href="/fonts/Stengazeta-Regular.ttf" as="font" type="font/ttf" crossorigin />
+    <link rel="preload" href="/fonts/Kanit-Cyrillic.ttf" as="font" type="font/ttf" crossorigin />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

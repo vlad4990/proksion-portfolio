@@ -1,0 +1,6 @@
+/*
+ * Discrete responsive overrides live in design-system/colors_and_type.css
+ * (already imported through tokens.css). This file is reserved for layout-
+ * level @media rules that don't belong inside the token sheet — phases 02+
+ * will populate it.
+ */

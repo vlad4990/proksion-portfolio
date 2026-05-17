@@ -1,0 +1,10 @@
+services:
+  front:
+    build:
+      context: .
+      dockerfile: front/Dockerfile
+    image: proksion-front:dev
+    ports:
+      - "4321:4321"
+    restart: unless-stopped
+    # back will be added in a later phase; depends_on goes here.

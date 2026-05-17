@@ -1,0 +1,26 @@
+{
+  "name": "proksion-front",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "start": "node ./dist/server/entry.mjs",
+    "type-check": "astro check"
+  },
+  "dependencies": {
+    "astro": "^6.3.3",
+    "@astrojs/react": "^5.0.5",
+    "@astrojs/node": "^10.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "typescript": "^5.7.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0"
+  }
+}

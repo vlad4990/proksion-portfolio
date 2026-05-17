@@ -1,0 +1,25 @@
+/*
+ * @font-face declarations with absolute paths from the site root.
+ *
+ * Duplicated from design-system/colors_and_type.css (which uses paths
+ * relative to its own file, so that design-system/preview/ and
+ * design-system/ui_kits/portfolio/ keep working when opened directly).
+ * Inside the Astro bundle the CSS is served from /_astro/ — relative
+ * `url("fonts/...")` would resolve to /_astro/fonts/... which 404s.
+ *
+ * If you change a font filename, update BOTH files.
+ */
+@font-face {
+  font-family: "Stengazeta";
+  src: url("/fonts/Stengazeta-Regular.ttf") format("truetype");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Kanit";
+  src: url("/fonts/Kanit-Cyrillic.ttf") format("truetype");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
