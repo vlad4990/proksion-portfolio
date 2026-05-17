@@ -1,9 +1,5 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro';
+export const prerender = false;
+import { DEFAULT_SECTION, DEFAULT_SUBSECTION } from '@/lib/projects-tree';
+return Astro.redirect(`/projects/${DEFAULT_SECTION}/${DEFAULT_SUBSECTION}`);
 ---
-<BaseLayout title="PROKSION · проекты">
-  <main style="padding: var(--sp-9) var(--page-pad);">
-    <h1 class="h-hero">ПРОЕКТЫ</h1>
-    <p class="t-body">Phase 04 наполнит этот роут — sidebar + grid.</p>
-  </main>
-</BaseLayout>

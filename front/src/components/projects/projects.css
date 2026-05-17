@@ -1,0 +1,172 @@
+.projects {
+  display: grid;
+  grid-template-columns: 540px minmax(0, 1fr);
+  gap: var(--sp-8);
+  max-width: var(--page-w);
+  margin: 0 auto;
+  padding: calc(var(--sp-10) + var(--sp-7)) var(--page-pad) var(--sp-10);
+}
+
+.projects__sidebar {
+  position: sticky;
+  top: var(--sp-7);
+  align-self: start;
+}
+
+.sidebar-group { margin-bottom: var(--sp-7); }
+
+.sidebar-group__title {
+  position: relative;
+  display: block;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-section);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
+  white-space: nowrap;
+  text-align: left;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.sidebar-group__title:hover { color: var(--fg-strong); }
+.sidebar-group__title--active { color: var(--accent); }
+
+.sidebar-group__marker {
+  position: absolute;
+  left: -32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 19px;
+}
+
+.sidebar-group__children {
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.sidebar-child {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: var(--fg-muted);
+  border: 0;
+  padding: var(--sp-2) 0 var(--sp-2) 60px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-sub-section);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  cursor: pointer;
+  transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+}
+.sidebar-child:hover { color: var(--fg-strong); }
+.sidebar-child--active {
+  background: var(--pill);
+  color: var(--pill-fg);
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+  padding: 10px 36px 10px 140px;
+  margin-left: -80px;
+  width: calc(100% + 80px);
+}
+
+/* Grid — masonry via CSS columns */
+.projects__grid {
+  column-count: 4;
+  column-gap: 14px;
+}
+.projects__grid > .tile {
+  display: block;
+  width: 100%;
+  margin-bottom: 14px;
+  break-inside: avoid;
+  border-radius: var(--radius-tile);
+  cursor: pointer;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.projects__grid > .tile:hover { transform: scale(1.02); }
+
+.tile--skeleton {
+  background: var(--c-skeleton);
+  animation: tile-pulse 1.4s ease-in-out infinite;
+  cursor: default;
+}
+.tile--skeleton:hover { transform: none; }
+
+@keyframes tile-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+/* Tablet (1024–1279) — sidebar уже, 3 столбца */
+@media (max-width: 1279px) {
+  .projects {
+    grid-template-columns: 360px minmax(0, 1fr);
+    gap: var(--sp-7);
+    padding-top: var(--sp-10);
+  }
+  .projects__grid { column-count: 3; }
+  .sidebar-child--active {
+    padding-left: 80px;
+    margin-left: -40px;
+    width: calc(100% + 40px);
+  }
+}
+
+/* Smaller tablet (768–1023) — sidebar схлопывается в горизонтальные chips */
+@media (max-width: 1023px) {
+  .projects { grid-template-columns: 1fr; gap: var(--sp-6); }
+  .projects__sidebar {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+  }
+  .sidebar-group { margin: 0; width: 100%; }
+  .sidebar-group__title { font-size: var(--t-header-2); padding: var(--sp-2) 0; }
+  .sidebar-group__marker { display: none; }
+  .sidebar-group__children {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: var(--sp-3);
+    width: 100%;
+    gap: var(--sp-2);
+  }
+  .sidebar-child {
+    padding: var(--sp-2) var(--sp-4);
+    font-size: var(--t-sub-section);
+    width: auto;
+  }
+  .sidebar-child--active {
+    margin-left: 0;
+    width: auto;
+    padding: var(--sp-2) var(--sp-4);
+    border-radius: var(--radius-card);
+  }
+  .projects__grid { column-count: 2; }
+}
+
+/* Mobile — single column */
+@media (max-width: 767px) {
+  .projects {
+    padding: var(--sp-7) var(--page-pad);
+  }
+  .projects__grid { column-count: 1; }
+  .sidebar-group__title { font-size: var(--t-section); }
+  .sidebar-child { font-size: var(--t-body); }
+}
+
+@media (max-width: 479px) {
+  .sidebar-group__title { font-size: 28px; }
+}

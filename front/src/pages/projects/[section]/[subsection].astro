@@ -1,13 +1,54 @@
 ---
 export const prerender = false;
-import BaseLayout from '@/layouts/BaseLayout.astro';
 
-const { section, subsection } = Astro.params;
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import {
+  DEFAULT_SECTION,
+  DEFAULT_SUBSECTION,
+  findSection,
+  findSubsection,
+  firstChildId,
+  isLeafSection,
+} from '@/lib/projects-tree';
+import { fetchProjects } from '@/lib/api';
+import { ProjectsLayout } from '@/components/projects/ProjectsLayout';
+
+const params = Astro.params as { section?: string; subsection?: string };
+const section = params.section ?? '';
+const subsection = params.subsection ?? '';
+
+const sectionData = findSection(section);
+if (!sectionData) {
+  return Astro.redirect(`/projects/${DEFAULT_SECTION}/${DEFAULT_SUBSECTION}`);
+}
+
+const leaf = isLeafSection(sectionData);
+
+if (leaf) {
+  if (subsection !== 'all') {
+    return Astro.redirect(`/projects/${section}/all`);
+  }
+} else {
+  const subData = findSubsection(section, subsection);
+  if (!subData) {
+    return Astro.redirect(`/projects/${section}/${firstChildId(sectionData)}`);
+  }
+}
+
+const initialTiles = await fetchProjects(section, subsection);
+
+const titleSection = sectionData.label;
+const subLabel = leaf ? '' : findSubsection(section, subsection)?.label ?? '';
+const title = `PROKSION · ${titleSection}${subLabel ? ' · ' + subLabel : ''}`;
 ---
-<BaseLayout title={`PROKSION · ${section} / ${subsection}`}>
-  <main style="padding: var(--sp-9) var(--page-pad);">
-    <p class="t-muted">section: <span class="t-accent">{section}</span></p>
-    <p class="t-muted">subsection: <span class="t-accent">{subsection}</span></p>
-    <p class="t-body">Phase 04 наполнит этот роут.</p>
+
+<BaseLayout title={title}>
+  <main id="content">
+    <ProjectsLayout
+      client:load
+      initialSection={section}
+      initialSubsection={subsection}
+      initialTiles={initialTiles}
+    />
   </main>
 </BaseLayout>
