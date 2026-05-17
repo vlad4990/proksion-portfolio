@@ -1,0 +1,262 @@
+/* =====================================================================
+   PROKSION — Design tokens
+   Kristina's graphic-design portfolio. Editorial, brutalist-leaning,
+   Soviet-poster typography on near-black canvases with a single
+   blood-red accent.
+   ===================================================================== */
+
+/* -- Fonts ----------------------------------------------------------- */
+/* Real brand fonts now ship in /fonts/ — Stengazeta (display) and the
+   Cyrillic build of Kanit (body). Furore / Blue Block / Funever are
+   still substituted with Google Fonts; remove the @import once we have
+   the originals.                                                         */
+@font-face {
+  font-family: "Stengazeta";
+  src: url("fonts/Stengazeta-Regular.ttf") format("truetype");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Kanit";
+  src: url("fonts/Kanit-Cyrillic.ttf") format("truetype");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* === Color — raw palette =========================================== */
+  --c-ink-1000: #141414;      /* page background */
+  --c-ink-900:  #0a0e15;      /* card / inset background */
+  --c-ink-800:  #1e1e1e;      /* hover surface */
+  --c-ink-700:  #434145;      /* secondary surface, panels */
+  --c-ink-500:  #292c40;      /* placeholder / blue-grey card */
+  --c-skeleton: rgba(255,255,255,0.10); /* loading skeleton fill */
+  --c-paper-100:#fcfcfc;      /* near-white */
+  --c-paper-200:#fdebc1;      /* warm cream (rare highlight) */
+  --c-paper-300:#e4e4e4;      /* nav pill / display headline ink */
+  --c-paper-400:#d9d9d9;      /* image fallback fill */
+  --c-paper-500:#c4c4c4;      /* body copy, primary read */
+  --c-paper-600:#bfbfbf;      /* secondary copy, dim heading */
+
+  /* Accent — the brand's single hot color */
+  --c-red-500:  #a62323;      /* primary brand red */
+  --c-red-600:  #9e2b0a;      /* red shifted warm */
+  --c-red-700:  #b11d47;      /* red shifted cool/magenta */
+  --c-red-a70:  rgba(166,35,35,0.7); /* "previous role" / dimmed accent */
+
+  /* Semantic */
+  --bg:           var(--c-ink-1000);
+  --bg-elevated:  var(--c-ink-900);
+  --bg-panel:     var(--c-ink-700);
+  --fg:           var(--c-paper-500);   /* default body */
+  --fg-muted:     var(--c-paper-600);
+  --fg-strong:    var(--c-paper-300);   /* big display headlines */
+  --fg-inverse:   var(--c-ink-1000);
+  --accent:       var(--c-red-500);
+  --accent-dim:   var(--c-red-a70);
+  --border:       #000000;              /* yes, pure black hairlines on dark */
+  --pill:         var(--c-paper-300);
+  --pill-fg:      var(--c-ink-1000);
+
+  /* === Typography — families ========================================= */
+  /* The system uses exactly TWO fonts:                                    */
+  /*   Display — Stengazeta (every headline, the wordmark, nav, the hero) */
+  /*   Body    — Kanit (Cyrillic build, every paragraph and UI label)     */
+  --font-display: "Stengazeta", "Arial Narrow", sans-serif;
+  --font-body:    "Kanit", "Helvetica Neue", sans-serif;
+
+  /* === Typography — scale ===========================================
+     Confirmed scale on the desktop site. Mobile is TBD.
+       hero        100px  — PROKSION wordmark, hero only
+       header-1     80px  — section header (Опыт работы, Образование)
+       section      52px  — Projects-page group head (Press F, Sketchbook)
+       sub-section  32px  — Projects-page item head (Витрины товаров)
+       header-2     40px  — About sub-section head (Графический дизайнер)
+       body         22px  — paragraphs, list rows                           */
+  --t-hero:        100px;
+  --t-header-1:     80px;
+  --t-section:      52px;
+  --t-header-2:     40px;
+  --t-sub-section:  32px;
+  --t-body:         22px;
+
+  /* Back-compat aliases — preview cards / older code still reference these. */
+  --t-display-1:    var(--t-header-1);
+  --t-display-2:    var(--t-section);
+  --t-display-3:    var(--t-header-2);
+  --t-display-4:    var(--t-sub-section);
+  --t-title:        24px;
+  --t-hero-mega:   537px;
+
+  --lh-tight:    0.92;    /* display lockup */
+  --lh-snug:     1.05;    /* sub-headlines */
+  --lh-body:     1.25;    /* body paragraphs */
+
+  --tracking-display: 0.02em;
+  --tracking-caps:    0.04em;
+
+  /* === Layout / system ================================================ */
+  --radius-pill: 12px;     /* nav active pill */
+  --radius-card: 4px;      /* sidebar active row */
+  --radius-tile: 0px;      /* project tiles — sharp */
+  --stroke-hairline: 1px;  /* mask outline */
+  --stroke-display:  2.4px;/* outlined display letterforms */
+
+  /* Frame is 1920 wide, content gutter ≈ 80px */
+  --page-w:    1920px;
+  --page-pad:  80px;
+  --page-bg:   var(--bg);
+
+  /* Spacing scale (rough — Figma uses freeform absolute positioning,
+     but these stops cover ~95% of measured gaps) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+  --sp-9: 96px;
+  --sp-10: 128px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(.2,.7,.2,1);
+  --dur-fast: 120ms;
+  --dur-base: 220ms;
+
+  /* ================================================================
+     MOBILE tokens — applied inside @media (max-width: 768px)
+     No 1920px stage; layout is native flow at device width.
+     ================================================================ */
+
+  /* Breakpoint */
+  --breakpoint-mobile: 768px;
+
+  /* Mobile type scale */
+  --t-port-folio-mob: 144px;    /* PORT/FOLIO hero outlined lockup     */
+  --t-hero-mob:        44px;    /* PROKSION top-bar wordmark            */
+  --t-section-mob:     44px;    /* page title: ОБО МНЕ / ПРОЕКТЫ…     */
+  --t-section-sm-mob:  30px;    /* sub-section: Опыт работы            */
+  --t-job-mob:         17px;    /* company + duration line              */
+  --t-job-role-mob:    13px;    /* role / sub-label                     */
+  --t-chip-mob:        14px;    /* category chips                       */
+  --t-tab-mob:         15px;    /* tab bar labels                       */
+  --t-body-mob:        14px;    /* body copy                            */
+  --t-small-mob:       11px;    /* fine print, meta text                */
+
+  /* Mobile layout */
+  --mob-pad:           22px;    /* horizontal page gutter               */
+  --mob-header-h:      56px;    /* top mini-header height               */
+  --mob-status:        56px;    /* space above header (status bar)      */
+  --mob-content-top:  112px;    /* = status + header                    */
+  --mob-tabbar:        64px;    /* tab bar total height                 */
+  --mob-safe-bottom:   22px;    /* iOS home indicator clearance         */
+}
+
+/* =====================================================================
+   Semantic element styles — use these classes anywhere.
+   ===================================================================== */
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.h-hero-mega {
+  font-family: var(--font-display-mega);
+  font-size: var(--t-hero-mega);
+  line-height: var(--lh-tight);
+  color: var(--fg-strong);
+  letter-spacing: var(--tracking-display);
+  -webkit-text-stroke: var(--stroke-display) var(--border);
+  text-transform: uppercase;
+}
+.h-hero {
+  font-family: var(--font-display);
+  font-size: var(--t-hero);
+  line-height: 1;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-display);
+  font-weight: 700;
+}
+.h-display-1 {
+  font-family: var(--font-display);
+  font-size: var(--t-display-1);
+  line-height: var(--lh-snug);
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-display);
+  font-weight: 700;
+}
+.h-display-2 {
+  font-family: var(--font-display);
+  font-size: var(--t-display-2);
+  line-height: var(--lh-snug);
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-display);
+  font-weight: 700;
+}
+.h-display-3 {
+  font-family: var(--font-display);
+  font-size: var(--t-display-3);
+  line-height: var(--lh-snug);
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-display);
+  font-weight: 700;
+}
+.h-title {
+  font-family: var(--font-body);
+  font-size: var(--t-title);
+  line-height: var(--lh-body);
+  font-weight: 700;
+  color: var(--fg-muted);
+}
+.t-body, p {
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  font-weight: 700;
+  color: var(--fg);
+}
+.t-accent { color: var(--accent); }
+.t-accent-dim { color: var(--accent-dim); }
+.t-muted { color: var(--fg-muted); }
+.t-strong { color: var(--fg-strong); }
+
+/* Navigation entries — used in the top bar */
+.nav-item {
+  font-family: var(--font-display);
+  font-size: var(--t-display-3);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  letter-spacing: var(--tracking-display);
+  font-weight: 700;
+}
+.nav-item.is-active {
+  background: var(--pill);
+  color: var(--pill-fg);
+  border-radius: var(--radius-pill);
+  padding: 14px 34px;
+}
+.nav-item.is-wordmark { color: var(--fg-strong); }
+
+/* Pill — generic */
+.pill {
+  background: var(--pill);
+  color: var(--pill-fg);
+  border-radius: var(--radius-pill);
+  padding: 14px 34px;
+  display: inline-flex;
+  align-items: center;
+}
