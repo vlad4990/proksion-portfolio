@@ -5,7 +5,7 @@ services:
       dockerfile: front/Dockerfile
     image: proksion-front:latest
     ports:
-      - "4321:4321"
+      - "${FRONT_PORT:-4321}:4321"
     restart: unless-stopped
     environment:
       - NODE_ENV=production
