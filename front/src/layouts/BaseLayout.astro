@@ -3,13 +3,21 @@ import '@/styles/tokens.css';
 import '@/styles/fonts.css';
 import '@/styles/breakpoints.css';
 import '@/styles/global.css';
+import TopNav from '@/components/nav/TopNav.astro';
+import MobileTabBar from '@/components/nav/MobileTabBar.astro';
 
 interface Props {
   title: string;
   description?: string;
+  /** Скрыть nav полностью (редкие случаи). По умолчанию — показывать. */
+  hideNav?: boolean;
 }
 
-const { title, description = 'PROKSION — портфолио Кристины' } = Astro.props;
+const {
+  title,
+  description = 'PROKSION — портфолио Кристины, графический дизайнер',
+  hideNav = false,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -19,6 +27,11 @@ const { title, description = 'PROKSION — портфолио Кристины' 
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta name="theme-color" content="#141414" />
     <link rel="preload" href="/fonts/Stengazeta-Regular.ttf" as="font" type="font/ttf" crossorigin />
     <link rel="preload" href="/fonts/Kanit-Cyrillic.ttf" as="font" type="font/ttf" crossorigin />
     <script is:inline>
@@ -36,6 +49,33 @@ const { title, description = 'PROKSION — портфолио Кристины' 
     </script>
   </head>
   <body>
+    <a href="#content" class="skip-link">Перейти к контенту</a>
+    {!hideNav && <TopNav />}
     <slot />
+    {!hideNav && <MobileTabBar />}
   </body>
 </html>
+
+<style is:global>
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 1100;
+    background: var(--pill);
+    color: var(--pill-fg);
+    padding: 12px 18px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-caps);
+    border-radius: var(--radius-pill);
+  }
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    left: 16px;
+    top: 16px;
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+</style>

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-PROKSION — графический-дизайн портфолио для Kristina. Текущая работа — миграция оригинального Claude design экспорта (React + Babel standalone на CDN) в собственный стек: Astro во `/front` и (позже) backend во `/back`. Дизайн-система — single source of truth, и фронт собирается строго через её токены и шрифты.
+PROKSION — графический-дизайн портфолио для Kristina. Изначально это был экспорт из Claude design (React + Babel standalone на CDN); миграция фаз 01–05 завершена: фронт переведён на Astro 6 во `/front`, дизайн-система остаётся single source of truth. Backend (`/back`) откладывается до post-05 — пока API из `/projects/*` уходит через stub-модуль в `front/src/lib/api.ts`.
 
 ## Monorepo layout
 
@@ -25,6 +25,8 @@ cd front
 npm install     # один раз
 npm run dev     # http://localhost:4321
 ```
+
+Для отладки в Chrome (MCP) запускай dev на 5005: `npm run dev -- --port 5005`.
 
 `public/fonts` и `public/assets` — симлинки на `design-system/fonts` и `design-system/assets`, поэтому изменения в дизайн-системе видны без копирования.
 
@@ -51,7 +53,7 @@ cd front && npm run type-check
 
 ### React-острова — только для интерактива
 
-Astro по умолчанию = 0 kb JS. React (`@astrojs/react`) подключается **точечно**, через `client:load` / `client:idle` / `client:visible` — только для реально интерактивных островов (Hero curtain, ProjectsSidebar+Grid, MobileTabBar). Всё остальное — `.astro` без `client:*`. Bundle и скорость отдачи — приоритет.
+Astro по умолчанию = 0 kb JS. React (`@astrojs/react`) подключается **точечно**, через `client:load` / `client:idle` / `client:visible` — только для реально интерактивных островов: Hero `Curtain` (sessionStorage-флаг, single sweep per session) и `ProjectsLayout` (Sidebar + Grid c skeleton-фазой). Навигация (`TopNav`, `MobileTabBar`) — `.astro` без `client:*`, активный пункт вычисляется на сервере по `Astro.url.pathname`. Всё остальное — статические `.astro`. Bundle и скорость отдачи — приоритет.
 
 ### Tokens, fonts, breakpoints
 
@@ -61,16 +63,21 @@ Astro по умолчанию = 0 kb JS. React (`@astrojs/react`) подключ
 
 Шрифты — два: Stengazeta (display) и Kanit Cyrillic (body). Файлы — `design-system/fonts/`, шарятся во фронт через симлинки. `front/src/styles/fonts.css` дублирует `@font-face` с **абсолютными** путями `/fonts/...` (внутри бандла относительные пути ломаются); design-system-версия использует относительные `fonts/...` чтобы preview/ и ui_kits/ работали при прямом открытии.
 
-### Routing (планируется)
+### Routing
 
-- `/` — главная, hero + about + projects-preview (фазы 02–03);
-- `/projects` — sidebar + grid (фаза 04);
-- `/projects/[section]/[subsection]` — детальная страница раздела (фаза 04, SSR);
-- `/contacts` — контакты (фаза 05).
+- `/` — главная: hero (`HeroComposition` под `Curtain`) → `About` (опыт, образование, маскированные фото).
+- `/projects` — редирект на `DEFAULT_SECTION/DEFAULT_SUBSECTION` (из `src/lib/projects-tree.ts`, SSR).
+- `/projects/[section]/[subsection]` — SSR-роут (`prerender = false`): sidebar + grid, контент тайлов через `front/src/lib/api.ts`.
+- `/contacts` — список контактных каналов (`front/src/data/contacts.ts`, prerender).
+- Sitemap: `/sitemap-index.xml` (через `@astrojs/sitemap`), `robots.txt` в `front/public/`. Домен в `astro.config.mjs` сейчас плейсхолдер `https://proksion.ru` — заменить перед деплоем.
+
+### Layout и навигация
+
+`BaseLayout.astro` ставит `<head>` (preload шрифтов, OG/Twitter мета, `theme-color`), inline-скрипт раннего флага занавеса, skip-link и общую nav (`<TopNav />` + `<MobileTabBar />`). На десктопе `TopNav` — sticky-top (z 50); на mobile он скрыт, его заменяет fixed-bottom `MobileTabBar` (z 200) с safe-area-инсетом. `Curtain` (z 1000) перекрывает nav на главной до dismiss.
 
 ### Backend
 
-Сейчас отсутствует. В фазе 04 API уходит через `front/src/lib/api.ts` со stub-данными; контракт спроектирован так, чтобы будущий `/back` подменил один модуль.
+Сейчас отсутствует. API из `/projects/*` идёт через `front/src/lib/api.ts` со stub-данными; контракт спроектирован так, чтобы будущий `/back` подменил один модуль. План на post-05: положить сервис в `/back`, добавить в `docker-compose.yml` рядом с `front`.
 
 ## Conventions
 
@@ -88,6 +95,16 @@ Astro по умолчанию = 0 kb JS. React (`@astrojs/react`) подключ
 - Не открывай `screenshots/`, `mobile-wireframes/`, `uploads/` если задача этого явно не требует — они нужны конкретным фазам.
 - Не настраивай CI и не выбирай backend-стек до фазы post-05.
 
-## Текущая фаза
+## Миграция
 
-См. `tasks/README.md` — список фаз, очерёдность, общие правила. Каждая папка `tasks/0N-*/` — самодостаточная задача с собственным `task.md` и `verify.md`.
+Фазы 01–05 завершены — сайт готов к продакшну (минус подмена домена и реальных контактов). История по фазам — в `tasks/0N-*/`; `tasks/README.md` — обзор.
+
+| Фаза | Что появилось |
+|---|---|
+| 01 | Astro-каркас, токены, шрифты, Docker, пустые роуты |
+| 02 | Hero + Curtain (sessionStorage single-sweep) |
+| 03 | About: контент `/`, JobEntry/Education, маскированные фото |
+| 04 | `/projects` SSR-роут с sidebar + grid и stub-API |
+| 05 | TopNav + MobileTabBar, `/contacts`, sitemap/robots, healthcheck, финальный аудит |
+
+Дальнейшие шаги (post-05): домен в `astro.config.mjs`, реальные ссылки в `front/src/data/contacts.ts`, backend в `/back`, reverse-proxy с SSL у пользователя на сервере.

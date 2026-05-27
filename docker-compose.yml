@@ -3,8 +3,21 @@ services:
     build:
       context: .
       dockerfile: front/Dockerfile
-    image: proksion-front:dev
+    image: proksion-front:latest
     ports:
       - "4321:4321"
     restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      # node 22 alpine — fetch встроен, не нужен wget/curl
+      test:
+        - "CMD"
+        - "node"
+        - "-e"
+        - "fetch('http://localhost:4321/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     # back will be added in a later phase; depends_on goes here.

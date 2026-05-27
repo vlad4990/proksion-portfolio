@@ -160,7 +160,7 @@
 /* Mobile — single column */
 @media (max-width: 767px) {
   .projects {
-    padding: var(--sp-7) var(--page-pad);
+    padding: var(--sp-7) var(--page-pad) calc(var(--mob-tabbar) + var(--sp-7));
   }
   .projects__grid { column-count: 1; }
   .sidebar-group__title { font-size: var(--t-section); }
