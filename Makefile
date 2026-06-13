@@ -48,7 +48,8 @@ preview: ## Отдать собранный front/dist/ локально (vite p
 # Docker (прод-контейнеры монорепы)
 # ──────────────────────────────────────────────────────────────────────────────
 
-up: ## Поднять контейнеры (build + detached); front = nginx со статикой на FRONT_PORT
+up: ## Поднять контейнеры (build + detached); front = nginx со статикой на FRONT_PORT (3000)
+	@if [ ! -f .env ]; then cp .env.example .env && echo "[up] .env не найден — создан из .env.example"; fi
 	docker compose up -d --build
 
 down: ## Остановить контейнеры

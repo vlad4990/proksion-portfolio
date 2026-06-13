@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     image: proksion-front:latest
     ports:
-      - "${FRONT_PORT:-8080}:80"
+      - "${FRONT_PORT:-3000}:80"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/"]
@@ -20,7 +20,7 @@ services:
   #     context: ./back
   #     dockerfile: Dockerfile
   #   ports:
-  #     - "${BACK_PORT:-3000}:3000"
+  #     - "${BACK_PORT:-3001}:3001"
   #   restart: unless-stopped
   #   depends_on:
   #     - front
