@@ -1,0 +1,94 @@
+/* HeroSection — first-paint "curtain" panel.
+   Left half: PROKSION wordmark (red) + outlined PORT/FOLIO lockup.
+   Right half: portrait photo column. */
+.screen {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hero canvas — locked to 1.7 aspect, fit & centered in the viewport. */
+.canvas {
+  position: relative;
+  aspect-ratio: 1.7;
+  width: min(100vw, 1920px);
+  max-width: 100vw;
+  max-height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Right column — portrait */
+.portrait {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 55%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
+  display: block;
+}
+
+/* Left text block — wordmark + PORT/FOLIO lockup (overflows over photo). */
+.textBlock {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: fit-content;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-size: var(--t-hero-wordmark);
+  letter-spacing: 0.027em;
+  line-height: 1;
+}
+
+.portfolio {
+  margin-top: 44px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #e8e8e8;
+  text-transform: uppercase;
+  line-height: 0.88;
+  letter-spacing: 0.01em;
+  -webkit-text-stroke: var(--stroke-portfolio) #000000;
+  font-size: var(--t-hero-portfolio);
+}
+
+.portfolioLine2 {
+  margin-top: -0.02em;
+}
+
+/* Red pixel marker — "enter" hint, centered under PORTFOLIO. */
+.marker {
+  margin-top: -60px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.marker img {
+  width: 30px;
+  height: auto;
+  transform: rotate(90deg);
+  transform-origin: center center;
+  animation: pkBob 1.6s ease-in-out infinite;
+}

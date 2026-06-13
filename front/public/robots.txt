@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://proksion.ru/sitemap-index.xml

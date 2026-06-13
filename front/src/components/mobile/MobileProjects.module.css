@@ -1,0 +1,155 @@
+/* MobileProjects — "ПРОЕКТЫ" (mobile). Mini-header, horizontal group
+   chips, underline sub-tabs, full-width project tiles. */
+.page {
+  background: var(--bg);
+  min-height: 100dvh;
+  position: relative;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--mob-content-top);
+  background: var(--bg);
+  border-bottom: 1px solid var(--hairline-soft);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 14px;
+  z-index: 100;
+}
+
+.headerWordmark {
+  font-family: var(--font-display);
+  font-size: var(--t-hero-mob);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--accent);
+  line-height: 1;
+}
+
+.content {
+  padding-top: calc(var(--mob-content-top) + 20px);
+  padding-bottom: calc(var(--mob-tabbar) + 24px);
+}
+
+.title {
+  margin: 0 0 18px;
+  padding: 0 var(--mob-pad);
+  font-family: var(--font-display);
+  font-size: var(--t-section-mob);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
+  line-height: 1;
+}
+
+/* ── Horizontal group chips ────────────────────────────────── */
+.chips {
+  display: flex;
+  gap: 8px;
+  padding: 0 var(--mob-pad);
+  margin-bottom: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex: 0 0 auto;
+  font-family: var(--font-display);
+  font-size: var(--t-chip-mob);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  padding: 9px 16px;
+  background: transparent;
+  color: var(--fg-muted);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-tile);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--dur-base) var(--ease-out),
+              color var(--dur-base) var(--ease-out);
+}
+
+.chipActive {
+  background: var(--pill);
+  color: var(--pill-fg);
+  border: none;
+}
+
+/* ── Sub-category underline tabs ───────────────────────────── */
+.subTabs {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 var(--mob-pad);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.subTabs::-webkit-scrollbar {
+  display: none;
+}
+
+.subTab {
+  flex: 0 0 auto;
+  padding: 10px 14px 11px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color var(--dur-base) var(--ease-out);
+}
+
+.subTabActive {
+  border-bottom-color: var(--accent);
+}
+
+.subTabLabel {
+  font-family: var(--font-display);
+  font-size: var(--t-chip-mob);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  white-space: nowrap;
+  color: var(--fg-muted);
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.subTabLabelActive {
+  color: var(--fg-strong);
+}
+
+/* ── Project tiles ─────────────────────────────────────────── */
+.tiles {
+  padding: 0 var(--mob-pad);
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tile {
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.tile:active {
+  opacity: 0.85;
+}

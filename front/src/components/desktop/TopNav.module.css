@@ -1,0 +1,81 @@
+/* TopNav — fixed top bar shared across the desktop site. */
+.nav {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  z-index: 50;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  font-weight: 700;
+}
+
+.wordmark {
+  flex: 0 0 auto;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: var(--t-nav-wordmark);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
+.item {
+  display: inline-block;
+  background: transparent;
+  border: 0;
+  color: var(--fg-muted);
+  border-radius: var(--radius-pill);
+  padding: var(--nav-item-pad);
+  font-size: var(--t-nav-item);
+  font-family: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  font-weight: inherit;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--dur-base) var(--ease-out),
+              color var(--dur-base) var(--ease-out);
+}
+
+.item:hover {
+  color: var(--fg-strong);
+}
+
+.itemActive {
+  background: var(--pill);
+  color: var(--pill-fg);
+}
+
+.itemActive:hover {
+  color: var(--pill-fg);
+}
+
+.year {
+  flex: 0 0 auto;
+  color: var(--fg-muted);
+  font-size: 20px;
+}

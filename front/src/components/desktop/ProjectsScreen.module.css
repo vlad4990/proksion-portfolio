@@ -1,0 +1,154 @@
+/* ProjectsScreen — left rail (collapsible categories) + right masonry. */
+.section {
+  position: relative;
+  background: var(--bg);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 28%) 1fr;
+  gap: var(--gutter);
+  align-items: start;
+  padding-top: calc(var(--nav-h) + var(--sp-section-top));
+  padding-bottom: var(--sp-section-bottom);
+}
+
+/* На широких экранах контент «Проектов» занимает всю ширину — снимаем cap из .page.
+   .section .grid (0,2,0) перебивает .page (0,1,0); gutter из .page сохраняется. */
+.section .grid {
+  max-width: none;
+}
+
+/* ── Sidebar group ─────────────────────────────────────────── */
+.group {
+  margin-bottom: 40px;
+}
+
+.groupHead {
+  position: relative;
+  display: block;
+  background: transparent;
+  border: 0;
+  padding: 6px 0;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-section);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
+  white-space: nowrap;
+  text-align: left;
+  outline: none;
+  transition: color 180ms var(--ease-out);
+}
+
+.groupHead:hover {
+  color: var(--fg-strong);
+}
+
+.groupHead:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.groupHeadActive {
+  color: var(--accent);
+}
+
+.groupHeadActive:hover {
+  color: var(--accent);
+}
+
+.groupMarker {
+  position: absolute;
+  left: -32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 19px;
+}
+
+.children {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ── Sidebar child ─────────────────────────────────────────── */
+.child {
+  align-self: stretch;
+  width: auto;
+  margin-left: 0;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  background: transparent;
+  color: var(--fg-muted);
+  border: 0;
+  border-radius: var(--radius-card);
+  padding: 0 0 0 60px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-sub-section);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  cursor: pointer;
+  white-space: nowrap;
+  outline: none;
+  transition: background 180ms var(--ease-out), color 180ms var(--ease-out);
+}
+
+.child:focus-visible {
+  color: var(--fg-strong);
+}
+
+.childActive {
+  width: calc(100% + var(--gutter));
+  margin-left: calc(var(--gutter) * -1);
+  background: var(--pill);
+  color: var(--pill-fg);
+  padding: 0 36px 0 calc(var(--gutter) + 60px);
+}
+
+/* ── Masonry grid ──────────────────────────────────────────── */
+.masonry {
+  column-count: 4;
+  column-gap: 20px;
+}
+
+@media (max-width: 1399.98px) {
+  .masonry {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 1099.98px) {
+  .masonry {
+    column-count: 2;
+  }
+}
+
+.tile {
+  display: block;
+  width: 100%;
+  margin-bottom: 20px;
+  break-inside: avoid;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  outline: none;
+  transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+
+.tile:hover {
+  transform: scale(1.02);
+}
+
+.tile:focus-visible {
+  box-shadow: 0 0 0 3px var(--accent);
+}

@@ -1,6 +1,246 @@
-/*
- * Single source of truth — design-system/colors_and_type.css.
- * This module simply re-exports it so Astro/Vite can bundle from /front.
- * Do NOT copy or mirror token values here — extend the source file instead.
- */
-@import url("../../../design-system/colors_and_type.css");
+/* =====================================================================
+   PROKSION — Design tokens
+   Kristina's graphic-design portfolio. Editorial, brutalist-leaning,
+   Soviet-poster typography on near-black canvases with a single
+   blood-red accent.
+
+   Все значения дизайн-системы — глобальные CSS Custom Properties.
+   Компоненты читают их через var(--token) внутри своих CSS Modules.
+   ===================================================================== */
+
+/* -- Fonts ----------------------------------------------------------- */
+@font-face {
+  font-family: "Stengazeta";
+  src: url("/fonts/Stengazeta-Regular.ttf") format("truetype");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Kanit";
+  src: url("/fonts/Kanit-Cyrillic.ttf") format("truetype");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: block;
+}
+
+:root {
+  /* === Color — raw palette =========================================== */
+  --c-ink-1000: #141414;      /* page background */
+  --c-ink-900:  #0a0e15;      /* card / inset background */
+  --c-ink-800:  #1e1e1e;      /* hover surface */
+  --c-ink-700:  #434145;      /* secondary surface, panels */
+  --c-ink-500:  #292c40;      /* placeholder / blue-grey card */
+  --c-skeleton: rgba(255, 255, 255, 0.10); /* loading skeleton fill */
+  --c-paper-100: #fcfcfc;     /* near-white */
+  --c-paper-200: #fdebc1;     /* warm cream (rare highlight) */
+  --c-paper-300: #e4e4e4;     /* nav pill / display headline ink */
+  --c-paper-400: #d9d9d9;     /* image fallback fill */
+  --c-paper-500: #c4c4c4;     /* body copy, primary read */
+  --c-paper-600: #bfbfbf;     /* secondary copy, dim heading */
+
+  /* Accent — the brand's single hot color */
+  --c-red-500:  #a62323;      /* primary brand red */
+  --c-red-600:  #9e2b0a;      /* red shifted warm */
+  --c-red-700:  #b11d47;      /* red shifted cool/magenta */
+  --c-red-a70:  rgba(166, 35, 35, 0.7); /* "previous role" / dimmed accent */
+
+  /* Semantic */
+  --bg:           var(--c-ink-1000);
+  --bg-elevated:  var(--c-ink-900);
+  --bg-panel:     var(--c-ink-700);
+  --fg:           var(--c-paper-500);   /* default body */
+  --fg-muted:     var(--c-paper-600);
+  --fg-strong:    var(--c-paper-300);   /* big display headlines */
+  --fg-inverse:   var(--c-ink-1000);
+  --fg-dim:       #8c8c8c;               /* dimmed value text */
+  --accent:       var(--c-red-500);
+  --accent-dim:   var(--c-red-a70);
+  --hairline:     rgba(255, 255, 255, 0.10);
+  --hairline-soft: rgba(255, 255, 255, 0.06);
+  --border:       #000000;              /* yes, pure black hairlines on dark */
+  --pill:         var(--c-paper-300);
+  --pill-fg:      var(--c-ink-1000);
+
+  /* === Typography — families ========================================= */
+  --font-display: "Stengazeta", "Arial Narrow", sans-serif;
+  --font-body:    "Kanit", "Helvetica Neue", sans-serif;
+
+  /* === Typography — scale (desktop) ================================== */
+  --t-hero:        100px;
+  --t-header-1:     80px;
+  --t-section:      52px;
+  --t-header-2:     40px;
+  --t-sub-section:  32px;
+  --t-body:         22px;
+  --t-title:        24px;
+
+  --lh-tight:    0.92;    /* display lockup */
+  --lh-snug:     1.05;    /* sub-headlines */
+  --lh-body:     1.25;    /* body paragraphs */
+
+  --tracking-display: 0.02em;
+  --tracking-caps:    0.04em;
+
+  /* === Responsive chrome + display lockups ===========================
+     Base values here = LARGE desktop (≥1400px). The media queries below
+     step every responsive token down for 1100–1399 and 768–1099. Mobile
+     (<768px) renders a separate tree with --*-mob tokens. */
+  --gutter:             64px;   /* page side gutter                 */
+  --nav-h:             120px;   /* top-bar height                  */
+
+  --t-nav-wordmark:     44px;   /* PROKSION in the top bar         */
+  --t-nav-item:         28px;   /* ОБО МНЕ / ПРОЕКТЫ / КОНТАКТЫ    */
+  --nav-item-pad: 12px 22px 9px;/* active-pill padding             */
+  --t-hero-wordmark:    96px;   /* PROKSION on the curtain         */
+  --t-hero-portfolio:  520px;   /* PORT / FOLIO outlined lockup    */
+  --stroke-portfolio:    5px;   /* its outline width               */
+  --t-contacts-head:   132px;   /* «Контакты» headline             */
+  --t-contact-arrow:    32px;   /* ↗ glyph in contact rows         */
+
+  /* Responsive vertical rhythm */
+  --sp-section-top:     64px;   /* gap under nav to first content  */
+  --sp-section-bottom: 120px;   /* page bottom padding             */
+  --sp-block:           80px;   /* big block separation            */
+  --sp-block-sm:        48px;   /* medium block separation         */
+  --sp-xl:             160px;   /* extra-large vertical gap         */
+
+  /* === Layout / system =============================================== */
+  --radius-pill: 0px;      /* nav active pill — sharp */
+  --radius-card: 0px;      /* sidebar active row — sharp */
+  --radius-tile: 0px;      /* project tiles — sharp */
+  --stroke-hairline: 1px;  /* mask outline */
+  --stroke-display:  2.4px;/* outlined display letterforms */
+
+  --page-max: 1920px;      /* desktop canvas cap */
+
+  /* Motion */
+  --ease-out: cubic-bezier(.2, .7, .2, 1);
+  --dur-fast: 120ms;
+  --dur-base: 220ms;
+
+  /* === MOBILE tokens — used by the mobile component tree ============= */
+  --breakpoint-mobile: 768px;
+
+  /* Mobile type scale */
+  --t-port-folio-mob: 144px;   /* PORT/FOLIO hero outlined lockup     */
+  --t-hero-mob:        44px;   /* PROKSION top-bar wordmark           */
+  --t-section-mob:     44px;   /* page title: ОБО МНЕ / ПРОЕКТЫ…       */
+  --t-section-sm-mob:  30px;   /* sub-section: Опыт работы            */
+  --t-job-mob:         17px;   /* company + duration line             */
+  --t-job-role-mob:    13px;   /* role / sub-label                    */
+  --t-chip-mob:        14px;   /* category chips                      */
+  --t-tab-mob:         15px;   /* tab bar labels                      */
+  --t-body-mob:        14px;   /* body copy                           */
+  --t-small-mob:       11px;   /* fine print, meta text               */
+
+  /* Mobile layout */
+  --mob-pad:           22px;   /* horizontal page gutter              */
+  --mob-header-h:      56px;   /* top mini-header height              */
+  --mob-status:        56px;   /* space above header (status bar)     */
+  --mob-content-top:  112px;   /* = status + header                   */
+  --mob-tabbar:        64px;   /* tab bar total height                */
+  --mob-safe-bottom:   22px;   /* iOS home indicator clearance        */
+}
+
+/* =====================================================================
+   RESPONSIVE TOKEN TIERS — 4 ranges total.
+     • ≥1400px ........ base values in :root above (large desktop)
+     • 1100–1399px .... medium desktop
+     • 768–1099px ..... small desktop / landscape tablet
+     • <768px ......... mobile component tree (--*-mob tokens)
+   Only these custom properties change between tiers; every component
+   reads them, so layout is fixed within a tier and steps at the edges. */
+
+/* ── 1100–1399px : medium desktop ───────────────────────────── */
+@media (min-width: 1100px) and (max-width: 1399.98px) {
+  :root {
+    --gutter:             48px;
+    --nav-h:              96px;
+
+    --t-header-1:         60px;
+    --t-section:          42px;
+    --t-header-2:         32px;
+    --t-sub-section:      26px;
+    --t-body:             18px;
+    --t-title:            20px;
+
+    --t-nav-wordmark:     36px;
+    --t-nav-item:         22px;
+    --nav-item-pad: 10px 18px 8px;
+    --t-hero-wordmark:    72px;
+    --t-hero-portfolio:  340px;
+    --stroke-portfolio:    4px;
+    --t-contacts-head:   100px;
+    --t-contact-arrow:    26px;
+
+    --sp-section-top:     48px;
+    --sp-section-bottom:  96px;
+    --sp-block:           60px;
+    --sp-block-sm:        36px;
+    --sp-xl:             110px;
+  }
+}
+
+/* ── 768–1099px : small desktop / landscape tablet ──────────────── */
+@media (min-width: 768px) and (max-width: 1099.98px) {
+  :root {
+    --gutter:             48px;
+    --nav-h:              76px;
+
+    --t-header-1:         48px;
+    --t-section:          34px;
+    --t-header-2:         26px;
+    --t-sub-section:      22px;
+    --t-body:             16px;
+    --t-title:            17px;
+
+    --t-nav-wordmark:     28px;
+    --t-nav-item:         18px;
+    --nav-item-pad: 8px 14px 6px;
+    --t-hero-wordmark:    52px;
+    --t-hero-portfolio:  220px;
+    --stroke-portfolio:    3px;
+    --t-contacts-head:    72px;
+    --t-contact-arrow:    22px;
+
+    --sp-section-top:     32px;
+    --sp-section-bottom:  72px;
+    --sp-block:           44px;
+    --sp-block-sm:        28px;
+    --sp-xl:              72px;
+  }
+}
+
+/* =====================================================================
+   Base / reset
+   ===================================================================== */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Reserve space for the scrollbar at all times so short pages (Contacts)
+   don't widen the viewport and nudge the fixed header sideways. */
+html { scrollbar-gutter: stable; }
+body { min-height: 100vh; }
+
+::selection { background: var(--accent); color: var(--fg-strong); }
+
+@keyframes pkBob {
+  0%, 100% { transform: rotate(90deg) translateX(0); }
+  50%      { transform: rotate(90deg) translateX(8px); }
+}

@@ -1,0 +1,10 @@
+/* Centered fluid content column shared by every desktop section.
+   Width is fluid up to the canvas cap; side gutters are fixed per tier. */
+.page {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  box-sizing: border-box;
+}

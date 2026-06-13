@@ -1,0 +1,83 @@
+/* MobileHero — full-viewport curtain. Portrait top ~60% with gradient
+   fade, PROKSION (red) + PORT/FOLIO (white) overlapping from below. */
+.hero {
+  width: 100vw;
+  height: 100vh;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.portrait {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  overflow: hidden;
+}
+
+.portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+}
+
+.wordmark {
+  position: absolute;
+  top: 57%;
+  left: var(--mob-pad);
+  font-family: var(--font-display);
+  font-size: var(--t-hero-mob);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--accent);
+  line-height: 1;
+  z-index: 2;
+}
+
+.portfolio {
+  position: absolute;
+  top: calc(57% + var(--t-hero-mob) + 6px);
+  left: var(--mob-pad);
+  right: 0;
+  z-index: 2;
+}
+
+.portfolio span {
+  font-family: var(--font-display);
+  font-size: var(--t-port-folio-mob);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: #fff;
+  line-height: 0.84;
+  display: block;
+}
+
+.hint {
+  position: absolute;
+  bottom: 28px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--t-small-mob);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  z-index: 3;
+}

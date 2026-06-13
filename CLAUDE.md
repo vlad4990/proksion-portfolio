@@ -4,16 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-PROKSION — графический-дизайн портфолио для Kristina. Изначально это был экспорт из Claude design (React + Babel standalone на CDN); миграция фаз 01–05 завершена: фронт переведён на Astro 6 во `/front`, дизайн-система остаётся single source of truth. Backend (`/back`) откладывается до post-05 — пока API из `/projects/*` уходит через stub-модуль в `front/src/lib/api.ts`.
+PROKSION — графический-дизайн портфолио для Kristina. Изначально это был экспорт из Claude design (React + Babel standalone на CDN). Фронт переписан в самостоятельный **SPA на Vite 6 + React 18 + TypeScript strict** во `/front` (раньше был Astro 6 — миграция отменена в пользу чистого Vite+React). Backend (`/back`) пока не существует; контент проектов — заглушки внутри компонентов. `design-system/` остаётся брендбуком-референсом.
 
 ## Monorepo layout
 
 ```
-/front          ← Astro 6, TS strict, hybrid (static + один SSR-роут)
-/back           ← планируется; стек не выбран, до фазы post-05
-/design-system  ← single source of truth: токены, шрифты, ассеты, брендбук, ui-kits
-/_legacy        ← оригинальный экспорт из Claude design (App.jsx, Portfolio.html, mobile-wireframes, screenshots, исходные fonts/assets); reference, не редактируется
-/tasks          ← фазы миграции 01–05; каждая папка = task.md + verify.md
+/front          ← Vite 6 + React 18 SPA, TS strict (актуальный фронт)
+/back           ← планируется; стек не выбран
+/design-system  ← брендбук-референс: токены, шрифты, ассеты, ui-kits (single source of truth по бренду)
+/_legacy        ← оригинальный экспорт из Claude design (App.jsx, Portfolio.html, mobile-wireframes, screenshots, fonts/assets); reference, не редактируется
+/tasks          ← история Astro-фаз миграции 01–05 (исторические, стек с тех пор сменился)
 ```
 
 ## Running locally
@@ -23,88 +23,52 @@ PROKSION — графический-дизайн портфолио для Krist
 ```bash
 cd front
 npm install     # один раз
-npm run dev     # http://localhost:4321
+npm run dev     # http://localhost:5173 (Vite)
 ```
 
-Для отладки в Chrome (MCP) запускай dev на 5005: `npm run dev -- --port 5005`.
+Для отладки в Chrome (MCP) запускай dev на 5005: `npm run dev -- --port 5005` (расширение пользователя разрешает только этот порт).
 
-`public/fonts` и `public/assets` — симлинки на `design-system/fonts` и `design-system/assets`, поэтому изменения в дизайн-системе видны без копирования.
-
-Прод-сборка (запускается из корня репо):
+Сборка / type-check:
 
 ```bash
-docker compose up --build
-# http://localhost:4321
+cd front
+npm run build    # tsc --noEmit (strict) + vite build → front/dist/  (статика)
+npm run preview  # отдать прод-сборку локально
 ```
 
-Type-check:
+Тестов, линтера и форматтера нет — проверка корректности = `npm run build`.
 
-```bash
-cd front && npm run type-check
-```
+> ⚠️ Docker-путь устарел. `docker-compose.yml` и `Makefile` остались от Astro-эпохи (ожидают `front/Dockerfile`, который удалён, и порт 4321/SSR). Для текущего Vite-SPA прод — это статический `front/dist/`; контейнеризацию/compose надо переделать под отдачу статики перед деплоем.
 
 ## Architecture (front)
 
-### Astro hybrid
+Детали — в `front/CLAUDE.md`. Кратко:
 
-`astro.config.mjs` использует `output: 'static'` + `@astrojs/node` в standalone-mode. Это hybrid-поведение Astro 5+ (флаг `'hybrid'` убрали в v5): по умолчанию все роуты prerender, отдельные роуты opt-out через `export const prerender = false`.
-
-Сейчас SSR — только `src/pages/projects/[section]/[subsection].astro`. Все остальные роуты — статика.
-
-### React-острова — только для интерактива
-
-Astro по умолчанию = 0 kb JS. React (`@astrojs/react`) подключается **точечно**, через `client:load` / `client:idle` / `client:visible` — только для реально интерактивных островов: Hero `Curtain` (sessionStorage-флаг, single sweep per session) и `ProjectsLayout` (Sidebar + Grid c skeleton-фазой). Навигация (`TopNav`, `MobileTabBar`) — `.astro` без `client:*`, активный пункт вычисляется на сервере по `Astro.url.pathname`. Всё остальное — статические `.astro`. Bundle и скорость отдачи — приоритет.
-
-### Tokens, fonts, breakpoints
-
-Все цвета, типографика, шрифты и брейкпойнты живут в `design-system/colors_and_type.css`. `front/src/styles/tokens.css` импортирует его через `@import`. Не дублируем значения, не вводим inline-hex'ов.
-
-Брейкпойнты как переменные: `--bp-xs 360`, `--bp-sm 480`, `--bp-md 768`, `--bp-lg 1024`, `--bp-xl 1280`, `--bp-2xl 1440`, `--bp-3xl 1920`. Типографика — дискретные сеты через @media в самом файле токенов; каждый брейк имеет отдельную композицию, не просто scale.
-
-Шрифты — два: Stengazeta (display) и Kanit Cyrillic (body). Файлы — `design-system/fonts/`, шарятся во фронт через симлинки. `front/src/styles/fonts.css` дублирует `@font-face` с **абсолютными** путями `/fonts/...` (внутри бандла относительные пути ломаются); design-system-версия использует относительные `fonts/...` чтобы preview/ и ui_kits/ работали при прямом открытии.
-
-### Routing
-
-- `/` — главная: hero (`HeroComposition` под `Curtain`) → `About` (опыт, образование, маскированные фото).
-- `/projects` — редирект на `DEFAULT_SECTION/DEFAULT_SUBSECTION` (из `src/lib/projects-tree.ts`, SSR).
-- `/projects/[section]/[subsection]` — SSR-роут (`prerender = false`): sidebar + grid, контент тайлов через `front/src/lib/api.ts`.
-- `/contacts` — список контактных каналов (`front/src/data/contacts.ts`, prerender).
-- Sitemap: `/sitemap-index.xml` (через `@astrojs/sitemap`), `robots.txt` в `front/public/`. Домен в `astro.config.mjs` сейчас плейсхолдер `https://proksion.ru` — заменить перед деплоем.
-
-### Layout и навигация
-
-`BaseLayout.astro` ставит `<head>` (preload шрифтов, OG/Twitter мета, `theme-color`), inline-скрипт раннего флага занавеса, skip-link и общую nav (`<TopNav />` + `<MobileTabBar />`). На десктопе `TopNav` — sticky-top (z 50); на mobile он скрыт, его заменяет fixed-bottom `MobileTabBar` (z 200) с safe-area-инсетом. `Curtain` (z 1000) перекрывает nav на главной до dismiss.
+- **SPA на Vite + React + react-router** (URL-роутинг). Точка входа `src/main.tsx` → `BrowserRouter` → `App`. Маршруты: `/`, `/projects`, `/projects/:cat/:sub`, `/contacts`, catch-all → `/`.
+- **Двойное дерево компонентов** `components/desktop/*` и `components/mobile/*`, выбор через `useIsMobile()` (`matchMedia('(max-width: 767.98px)')`). Это не один responsive-layout — разные компоненты; фичи делаются в обоих деревьях.
+- **Занавес-герой** — fixed-оверлей (z 1000), показывается только при свежей загрузке `/`, снимается первым вводом/кликом.
+- **Стайлинг** — CSS Modules + единственный глобал `src/styles/tokens.css` (токены + `@font-face`, шрифты в `front/public/fonts/`). Респонсив — дискретные токен-тиры через `@media` (база `:root` ≥1400, 1100–1399, 768–1099, `<768` — мобильное дерево с `--*-mob`), без `scale()`/`clamp()`.
 
 ### Backend
 
-Сейчас отсутствует. API из `/projects/*` идёт через `front/src/lib/api.ts` со stub-данными; контракт спроектирован так, чтобы будущий `/back` подменил один модуль. План на post-05: положить сервис в `/back`, добавить в `docker-compose.yml` рядом с `front`.
+Сейчас отсутствует. Контент проектов — статические заглушки в компонентах. Появится позже в `/back` рядом с фронтом.
 
 ## Conventions
 
 - **Бренд — святое.** Только цвета/шрифты/иконки из `design-system/`. Никаких новых hex'ов, эмодзи, градиентов, drop-shadow, glass-морфизма. Подробно — `design-system/README.md`.
-- **Токены — single source of truth.** Размеры/цвета/отступы — через `var(--...)`. Нужного токена нет — добавь его в `design-system/colors_and_type.css`, не сбоку.
-- **TypeScript strict.** `tsconfig.json` наследует `astro/tsconfigs/strict`. Никаких `any`. Алиас `@` → `./src`.
+- **Токены — через `var(--...)`.** Размеры/цвета/отступы не хардкодим. Рабочий источник токенов для фронта — `front/src/styles/tokens.css` (значения инлайнены из дизайн-системы; синхронизируй смысл с `design-system/`).
+- **TypeScript strict.** `front/tsconfig.json` — `strict` + `noUnusedLocals`/`noUnusedParameters`. Никаких `any`.
 - **UI-тексты — русские.** Display-заголовки в верхнем регистре (`text-transform: uppercase`).
-- **Адаптив 360–1920** через дискретные сеты, не fluid scale. На каждом брейке композиция пересобирается.
-- **`_legacy/` не редактируем.** Это reference. Mobile-компоненты там не каноничны — фазы 02–05 переосмысливают их, а не копируют 1:1.
+- **Адаптив 360–1920** через дискретные сеты, не fluid scale. На каждом тире композиция пересобирается.
+- **`_legacy/` не редактируем.** Это reference.
 
 ## Don't
 
 - Не добавляй зависимости без необходимости (особенно UI-библиотеки и CSS-фреймворки — у нас своя дизайн-система).
-- Не пиши новые компоненты в `_legacy/` и не правь там код. Если оттуда что-то нужно перенести — копируй смысл, переписывай под Astro.
-- Не открывай `screenshots/`, `mobile-wireframes/`, `uploads/` если задача этого явно не требует — они нужны конкретным фазам.
-- Не настраивай CI и не выбирай backend-стек до фазы post-05.
+- Не пиши новые компоненты в `_legacy/` и не правь там код. Если оттуда что-то нужно перенести — копируй смысл, переписывай под текущий React-стек.
+- Не открывай `screenshots/`, `mobile-wireframes/`, `uploads/` если задача этого явно не требует.
+- Не возвращай Astro/SSR и не настраивай CI/backend-стек без явной просьбы.
 
-## Миграция
+## История
 
-Фазы 01–05 завершены — сайт готов к продакшну (минус подмена домена и реальных контактов). История по фазам — в `tasks/0N-*/`; `tasks/README.md` — обзор.
-
-| Фаза | Что появилось |
-|---|---|
-| 01 | Astro-каркас, токены, шрифты, Docker, пустые роуты |
-| 02 | Hero + Curtain (sessionStorage single-sweep) |
-| 03 | About: контент `/`, JobEntry/Education, маскированные фото |
-| 04 | `/projects` SSR-роут с sidebar + grid и stub-API |
-| 05 | TopNav + MobileTabBar, `/contacts`, sitemap/robots, healthcheck, финальный аудит |
-
-Дальнейшие шаги (post-05): домен в `astro.config.mjs`, реальные ссылки в `front/src/data/contacts.ts`, backend в `/back`, reverse-proxy с SSL у пользователя на сервере.
+`tasks/0N-*/` — история ранней миграции на Astro (фазы 01–05). Эта реализация была заменена on Vite+React SPA, поэтому фазовые task.md — исторический контекст, а не описание текущего кода. Канон по фронту — `front/CLAUDE.md` и сам код во `/front`.

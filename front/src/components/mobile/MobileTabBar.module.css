@@ -1,0 +1,53 @@
+/* MobileTabBar — fixed bottom navigation. Three tabs. Active: red text +
+   3px red indicator at top edge. env(safe-area-inset-bottom) for iPhone. */
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--mob-tabbar) + env(safe-area-inset-bottom, 0px));
+  background: var(--bg);
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  z-index: 200;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.tab {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.indicator {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 0;
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: var(--t-tab-mob);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: var(--fg-muted);
+  line-height: 1;
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.labelActive {
+  color: var(--accent);
+}
