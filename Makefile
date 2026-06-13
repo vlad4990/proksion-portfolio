@@ -1,7 +1,11 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help install up down restart ps logs logs-front logs-back \
-        dev dev-front dev-back build type-check clean
+.PHONY: help install dev dev-front build type-check preview \
+        up down restart ps logs logs-front clean clean-all
+
+# Порты (можно переопределить через окружение или .env)
+FRONT_DEV_PORT     ?= 5005
+FRONT_PREVIEW_PORT ?= 4173
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Help
@@ -15,21 +19,42 @@ help: ## Показать список команд
 # Setup
 # ──────────────────────────────────────────────────────────────────────────────
 
-install: ## Установить зависимости (front + back, если /back уже существует)
+install: ## Установить зависимости фронта (front)
 	cd front && npm install
-	@if [ -d back ]; then cd back && bun install; else echo "[install] /back пока нет, пропускаю"; fi
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Docker (production контейнеры)
+# Dev (локально)
 # ──────────────────────────────────────────────────────────────────────────────
 
-up: ## Поднять все контейнеры в docker (build + detached)
+dev: dev-front ## Алиас на dev-front (back пока нет)
+
+dev-front: ## Vite dev-сервер на FRONT_DEV_PORT (по умолчанию 5005, нужен для Chrome MCP)
+	cd front && npm run dev -- --port $(FRONT_DEV_PORT) --host
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Build & check
+# ──────────────────────────────────────────────────────────────────────────────
+
+build: ## Собрать прод-статику фронта → front/dist/ (tsc --noEmit + vite build)
+	cd front && npm run build
+
+type-check: ## TypeScript-проверка фронта без сборки (tsc --noEmit, strict)
+	cd front && npx tsc --noEmit
+
+preview: ## Отдать собранный front/dist/ локально (vite preview)
+	cd front && npm run preview -- --port $(FRONT_PREVIEW_PORT) --host
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Docker (прод-контейнеры монорепы)
+# ──────────────────────────────────────────────────────────────────────────────
+
+up: ## Поднять контейнеры (build + detached); front = nginx со статикой на FRONT_PORT
 	docker compose up -d --build
 
 down: ## Остановить контейнеры
 	docker compose down
 
-restart: ## Рестарт всех контейнеров
+restart: ## Рестарт контейнеров
 	docker compose restart
 
 ps: ## Статус контейнеров
@@ -41,37 +66,12 @@ logs: ## Хвост логов всех сервисов
 logs-front: ## Хвост логов front
 	docker compose logs -f front
 
-logs-back: ## Хвост логов back (появится когда /back будет в compose)
-	docker compose logs -f back
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Dev (локально, без docker)
-# ──────────────────────────────────────────────────────────────────────────────
-
-dev: ## Запустить весь dev-стек параллельно (front + back)
-	@$(MAKE) -j2 dev-front dev-back
-
-dev-front: ## Astro dev на FRONT_DEV_PORT (по умолчанию 5005)
-	cd front && npm run dev -- --port $${FRONT_DEV_PORT:-5005} --host
-
-dev-back: ## ElysiaJS dev (пропускается если /back ещё нет)
-	@if [ -d back ]; then cd back && bun run dev; \
-	else echo "[dev-back] /back пока нет, пропускаю"; fi
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Build & check
-# ──────────────────────────────────────────────────────────────────────────────
-
-build: ## Собрать front (и back, если есть)
-	cd front && npm run build
-	@if [ -d back ]; then cd back && bun run build; else echo "[build] /back пока нет, пропускаю"; fi
-
-type-check: ## TypeScript проверка front
-	cd front && npm run type-check
-
 # ──────────────────────────────────────────────────────────────────────────────
 # Cleanup
 # ──────────────────────────────────────────────────────────────────────────────
 
-clean: ## docker compose down -v (удаляет volumes)
-	docker compose down -v
+clean: ## Удалить прод-сборку (front/dist)
+	rm -rf front/dist
+
+clean-all: clean ## clean + удалить node_modules фронта
+	rm -rf front/node_modules

@@ -1,23 +1,26 @@
 services:
   front:
     build:
-      context: .
-      dockerfile: front/Dockerfile
+      context: ./front
+      dockerfile: Dockerfile
     image: proksion-front:latest
     ports:
-      - "${FRONT_PORT:-4321}:4321"
+      - "${FRONT_PORT:-8080}:80"
     restart: unless-stopped
-    environment:
-      - NODE_ENV=production
     healthcheck:
-      # node 22 alpine — fetch встроен, не нужен wget/curl
-      test:
-        - "CMD"
-        - "node"
-        - "-e"
-        - "fetch('http://localhost:4321/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 15s
-    # back will be added in a later phase; depends_on goes here.
+      start_period: 10s
+
+  # ── Будущие сервисы монорепы добавляются сюда ──
+  # back:
+  #   build:
+  #     context: ./back
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "${BACK_PORT:-3000}:3000"
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - front
