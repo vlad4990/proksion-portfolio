@@ -1,0 +1,37 @@
+# Адрес сайта берётся из переменной окружения SITE_ADDRESS (см. docker-compose/.env):
+#   прод     → SITE_ADDRESS=proksion.ru  → Caddy сам выпустит и продлит HTTPS
+#   локально → SITE_ADDRESS=:80           → обычный HTTP, без сертификатов
+# Если переменная не задана — по умолчанию :80.
+{$SITE_ADDRESS::80} {
+	encode gzip zstd
+
+	# Бэкенда пока нет. Когда появится сервис `back` (Bun) — раскомментируй блок.
+	# handle-блоки взаимоисключающие и матчатся сверху вниз, поэтому /api/*
+	# перехватится здесь раньше статики ниже. handle_path срезает префикс /api.
+	# handle_path /api/* {
+	# 	reverse_proxy back:3001
+	# }
+
+	# Статика React-SPA — всё, что не попало в /api/*.
+	handle {
+		root * /srv
+
+		# Хешированные ассеты Vite — кэшируем на год (immutable).
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+
+		# index.html не кэшируем — новые сборки подхватываются сразу.
+		header /index.html Cache-Control "no-cache"
+
+		# SPA-fallback: deep-link'и react-router (/projects/:cat/:sub и т.п.) → index.html
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+# Внутренний health-эндпоинт для healthcheck в docker-compose.
+# Наружу не публикуется — слушается только внутри контейнера.
+:8081 {
+	respond /health "ok" 200
+	respond 404
+}

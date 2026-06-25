@@ -1,21 +1,23 @@
 # ──────────────────────────────────────────────────────────────────────────────
-# Build: собираем статику Vite-SPA
+# Build: собираем статику Vite-SPA на Bun
 # ──────────────────────────────────────────────────────────────────────────────
-FROM node:22-alpine AS build
+FROM oven/bun:1-alpine AS build
 WORKDIR /app
 
+# Сначала только манифесты — слой с зависимостями кэшируется,
+# пока package.json/lock не менялись. Bun сам мигрирует npm-lock в свой формат.
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN bun install
 
 COPY . .
-RUN npm run build        # tsc --noEmit (strict) + vite build → /app/dist
+RUN bun run build        # tsc --noEmit (strict) + vite build → /app/dist
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Runtime: отдаём dist через nginx (SPA-fallback для react-router)
+# Runtime: отдаём dist через Caddy (авто-HTTPS Let's Encrypt + SPA-fallback)
 # ──────────────────────────────────────────────────────────────────────────────
-FROM nginx:1.27-alpine AS runtime
+FROM caddy:2-alpine AS runtime
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY --from=build /app/dist /srv
 
-EXPOSE 80
+EXPOSE 80 443

@@ -4,23 +4,35 @@ services:
       context: ./front
       dockerfile: Dockerfile
     image: proksion-front:latest
+    environment:
+      # Прод: домен → Caddy сам выпустит и продлит HTTPS (Let's Encrypt).
+      # Локально: оставь :80 в .env → Caddy отдаёт обычный HTTP.
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
     ports:
-      - "${FRONT_PORT:-3000}:80"
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      # Сертификаты и состояние Caddy переживают пересоздание контейнера —
+      # иначе при каждом перезапуске будет заново долбиться в Let's Encrypt (есть лимиты).
+      - caddy_data:/data
+      - caddy_config:/config
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8081/health"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
 
-  # ── Будущие сервисы монорепы добавляются сюда ──
+  # ── Будущий бэкенд (Bun) монорепы добавляется сюда ──
   # back:
   #   build:
   #     context: ./back
   #     dockerfile: Dockerfile
-  #   ports:
-  #     - "${BACK_PORT:-3001}:3001"
   #   restart: unless-stopped
-  #   depends_on:
-  #     - front
+  #   # Порт наружу НЕ публикуем — Caddy ходит на back:3001 по имени сервиса
+  #   # (раскомментируй handle_path /api/* в front/Caddyfile).
+
+volumes:
+  caddy_data:
+  caddy_config:

@@ -41,10 +41,10 @@ npm run preview  # отдать прод-сборку локально
 
 ### Docker (прод-контейнеры монорепы)
 
-`docker-compose.yml` в корне — оркестратор монорепы (сейчас один сервис `front`, под будущие сервисы зарезервированы закомментированные блоки). `front` собирается многостадийным `front/Dockerfile` (node:22-alpine build → nginx:1.27-alpine runtime) и отдаёт статику `dist/` через nginx с SPA-fallback (`front/nginx.conf` — deep-link react-router идёт на `index.html`). Внешний порт — `FRONT_PORT` (по умолчанию 8080 → :80 внутри).
+`docker-compose.yml` в корне — оркестратор монорепы (сейчас один сервис `front`, под будущий `back` зарезервирован закомментированный блок). `front` собирается многостадийным `front/Dockerfile` (**oven/bun:1-alpine** build → **caddy:2-alpine** runtime) и отдаёт статику `dist/` через Caddy с SPA-fallback (`front/Caddyfile` — `try_files {path} /index.html`, deep-link react-router идёт на `index.html`). Bun используется только как build-тул; на проде рантайма JS нет — это статика. Адрес сайта — `SITE_ADDRESS` (`proksion.ru` в проде → Caddy сам выпускает/продлевает HTTPS Let's Encrypt; `:80` локально → обычный HTTP). Внешние порты — `HTTP_PORT`/`HTTPS_PORT` (80/443). Сертификаты переживают пересоздание через volume `caddy_data`. Healthcheck — внутренний `:8081/health` в `Caddyfile`. Бэкенд (`/api/*`) появится отдельным bun-сервисом — под него уже есть закомментированные блоки `handle_path /api/*` (Caddyfile) и `back` (compose).
 
 ```bash
-make up          # docker compose up -d --build → http://localhost:8080
+make up          # docker compose up -d --build → https://proksion.ru (прод) / http://localhost (локально)
 make logs-front  # хвост логов
 make down        # остановить
 ```
