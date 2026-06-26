@@ -16,11 +16,17 @@ export function MobileTabBar({ active, onAbout, onProjects, onContacts }: Mobile
   ]
 
   return (
-    <nav className={styles.bar}>
+    <nav className={styles.bar} data-test="tab-bar">
       {tabs.map((t) => {
         const isActive = t.id === active
         return (
-          <button key={t.id} type="button" className={styles.tab} onClick={t.action}>
+          <button
+            key={t.id}
+            type="button"
+            className={styles.tab}
+            onClick={t.action}
+            data-test={`tab-${t.id}`}
+          >
             {isActive && <span className={styles.indicator} />}
             <span className={`${styles.label}${isActive ? ` ${styles.labelActive}` : ''}`}>
               {t.label}

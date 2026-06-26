@@ -54,7 +54,7 @@ const EDUCATION = [
 
 function JobEntry({ company, role, duration, bullets, dim }: Job) {
   return (
-    <div className={styles.job}>
+    <div className={styles.job} data-test="about-job">
       <div className={styles.jobHead}>
         <span className={dim ? styles.companyDim : styles.company}>{company}</span>
         <span className={styles.role}>{role}</span>
@@ -71,7 +71,7 @@ function JobEntry({ company, role, duration, bullets, dim }: Job) {
 
 function EducationEntry({ degree, school }: { degree: string; school: string }) {
   return (
-    <div className={styles.edu}>
+    <div className={styles.edu} data-test="about-education">
       <div className={styles.eduDegree}>{degree}</div>
       <div className={styles.eduSchool}>{school}</div>
     </div>
@@ -80,26 +80,26 @@ function EducationEntry({ degree, school }: { degree: string; school: string }) 
 
 export function AboutSection() {
   return (
-    <section id="about" className={styles.section} data-screen-label="01 About">
+    <section id="about" className={styles.section} data-screen-label="01 About" data-test="about">
       <div className={`${layout.page} ${styles.grid}`}>
-        <div className={styles.photos}>
+        <div className={styles.photos} data-test="about-photos">
           <img className={styles.photo1} src={photoMasked1} alt="" />
           <img className={styles.photo2} src={photoMasked2} alt="" />
         </div>
 
-        <div>
-          <p className={styles.intro}>
+        <div data-test="about-body">
+          <p className={styles.intro} data-test="about-intro">
             С детства я рисую, играю в компьютер, занимаюсь музыкой и полностью
             погружена в творчество по сей день: люблю комиксы, фильмы, путешествия,
             активно веду скетчбук, пробую себя в разных хобби.
           </p>
 
-          <h2 className={styles.heading}>Опыт работы</h2>
+          <h2 className={styles.heading} data-test="about-experience-heading">Опыт работы</h2>
           {JOBS.map((job) => (
             <JobEntry key={job.company} {...job} />
           ))}
 
-          <h2 className={styles.heading}>Образование</h2>
+          <h2 className={styles.heading} data-test="about-education-heading">Образование</h2>
           {EDUCATION.map((e) => (
             <EducationEntry key={e.degree} {...e} />
           ))}

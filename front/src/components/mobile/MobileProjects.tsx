@@ -66,15 +66,15 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
     ?? null
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <span className={styles.headerWordmark}>PROKSION</span>
+    <div className={styles.page} data-test="projects">
+      <header className={styles.header} data-test="mobile-header">
+        <span className={styles.headerWordmark} data-test="mobile-wordmark">PROKSION</span>
       </header>
 
-      <div className={styles.content}>
-        <h1 className={styles.title}>ПРОЕКТЫ</h1>
+      <div className={styles.content} data-test="projects-content">
+        <h1 className={styles.title} data-test="projects-title">ПРОЕКТЫ</h1>
 
-        <div className={styles.chips}>
+        <div className={styles.chips} data-test="projects-chips">
           {GROUPS.map((g) => {
             const isActive = g.id === currentGroup.id
             return (
@@ -85,6 +85,7 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
                 onClick={() =>
                   navigate(`/projects/${g.slug}` + (g.subs[0] ? `/${g.subs[0].slug}` : ''))
                 }
+                data-test="projects-chip"
               >
                 {g.label}
               </button>
@@ -93,7 +94,7 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
         </div>
 
         {currentGroup.subs.length > 0 && (
-          <div className={styles.subTabs}>
+          <div className={styles.subTabs} data-test="projects-subtabs">
             {currentGroup.subs.map((s) => {
               const isActive = s.id === activeSub
               return (
@@ -102,6 +103,7 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
                   type="button"
                   className={`${styles.subTab}${isActive ? ` ${styles.subTabActive}` : ''}`}
                   onClick={() => navigate(`/projects/${currentGroup.slug}/${s.slug}`)}
+                  data-test="projects-subtab"
                 >
                   <span
                     className={`${styles.subTabLabel}${
@@ -116,12 +118,12 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
           </div>
         )}
 
-        <div className={styles.tiles}>
+        <div className={styles.tiles} data-test="projects-tiles">
           {TILES.map((t, i) => {
             const style: CSSProperties = t.image
               ? { height: t.h, backgroundImage: `url(${t.image})` }
               : { height: t.h, background: t.color }
-            return <div key={i} className={styles.tile} style={style} />
+            return <div key={i} className={styles.tile} style={style} data-test="projects-tile" />
           })}
         </div>
       </div>

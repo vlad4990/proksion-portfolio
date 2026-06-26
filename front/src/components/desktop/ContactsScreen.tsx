@@ -25,6 +25,7 @@ function ContactRow({ index, label, value, href, download }: Row) {
       download={download}
       target={isExternal ? '_blank' : undefined}
       rel="noreferrer"
+      data-test="contacts-row"
     >
       <span className={styles.index}>{index}</span>
       <span className={styles.label}>{label}</span>
@@ -36,37 +37,37 @@ function ContactRow({ index, label, value, href, download }: Row) {
 
 export function ContactsScreen() {
   return (
-    <section id="contacts" className={styles.section} data-screen-label="03 Contacts">
+    <section id="contacts" className={styles.section} data-screen-label="03 Contacts" data-test="contacts">
       <div className={`${layout.page} ${styles.grid}`}>
-        <div>
-          <div className={styles.kicker}>[ Связь ]</div>
+        <div data-test="contacts-info">
+          <div className={styles.kicker} data-test="contacts-kicker">[ Связь ]</div>
 
-          <h1 className={styles.headline}>
+          <h1 className={styles.headline} data-test="contacts-title">
             Контак-
             <br />
             ты
           </h1>
 
-          <p className={styles.note}>
+          <p className={styles.note} data-test="contacts-note">
             Открыта к проектным и full-time предложениям. Напишите по любому из
             каналов — обычно отвечаю в течение суток.
           </p>
 
-          <div className={styles.status}>
+          <div className={styles.status} data-test="contacts-status">
             <span className={styles.statusDot} />
             <span className={styles.statusLabel}>Доступна для работы</span>
           </div>
 
-          <div className={styles.meta}>МОСКВА · 2025</div>
+          <div className={styles.meta} data-test="contacts-meta">МОСКВА · 2025</div>
         </div>
 
-        <div>
+        <div data-test="contacts-channels">
           {ROWS.map((r) => (
             <ContactRow key={r.label} {...r} />
           ))}
-          <div className={styles.closingRule} />
+          <div className={styles.closingRule} data-test="contacts-rule" />
 
-          <div className={styles.footnote}>
+          <div className={styles.footnote} data-test="contacts-footnote">
             Предпочитаю Telegram для быстрых вопросов и почту — для брифов и
             вложений.
           </div>

@@ -101,6 +101,7 @@ export default function App() {
             onClick={dismissHero}
             role="button"
             aria-label="Войти на сайт"
+            data-test="hero-overlay"
           >
             <MobileHero />
           </div>
@@ -150,7 +151,11 @@ export default function App() {
         </div>
       )}
 
-      <div className={styles.navHost} style={{ display: showNav ? 'block' : 'none' }}>
+      <div
+        className={styles.navHost}
+        style={{ display: showNav ? 'block' : 'none' }}
+        data-test="nav-host"
+      >
         <TopNav
           route={route}
           onHome={onHome}
@@ -160,8 +165,8 @@ export default function App() {
         />
       </div>
 
-      <div className={styles.stageWrap}>
-        <div className={styles.stage}>
+      <div className={styles.stageWrap} data-test="stage-wrap">
+        <div className={styles.stage} data-test="stage">
           <Routes>
             <RouterRoute path="/" element={<AboutSection />} />
             <RouterRoute path="/projects" element={<ProjectsScreen />} />

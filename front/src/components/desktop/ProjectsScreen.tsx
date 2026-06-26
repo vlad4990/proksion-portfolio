@@ -81,16 +81,21 @@ function SidebarGroup({
   children: ReactNode
 }) {
   return (
-    <div className={styles.group}>
+    <div className={styles.group} data-test="projects-group">
       <button
         type="button"
         onClick={onClickGroup}
         className={`${styles.groupHead}${active ? ` ${styles.groupHeadActive}` : ''}`}
+        data-test="projects-group-head"
       >
         {active && <img className={styles.groupMarker} src={markerPixel} alt="" />}
         {title}
       </button>
-      {active && <div className={styles.children}>{children}</div>}
+      {active && (
+        <div className={styles.children} data-test="projects-group-children">
+          {children}
+        </div>
+      )}
     </div>
   )
 }
@@ -109,6 +114,7 @@ function SidebarChild({
       type="button"
       onClick={onClick}
       className={`${styles.child}${active ? ` ${styles.childActive}` : ''}`}
+      data-test="projects-child"
     >
       {label}
     </button>
@@ -125,9 +131,9 @@ export function ProjectsScreen() {
     ?? null
 
   return (
-    <section className={styles.section} data-screen-label="03 Projects">
+    <section className={styles.section} data-screen-label="03 Projects" data-test="projects">
       <div className={`${layout.page} ${styles.grid}`}>
-        <div>
+        <div data-test="projects-sidebar">
           {GROUPS.map((g) => (
             <SidebarGroup
               key={g.id}
@@ -149,12 +155,14 @@ export function ProjectsScreen() {
           ))}
         </div>
 
-        <div className={styles.masonry}>
+        <div className={styles.masonry} data-test="projects-tiles">
           {TILES.map((t, i) => {
             const style: CSSProperties = t.image
               ? { height: t.h, backgroundImage: `url(${t.image})` }
               : { height: t.h, background: t.fill }
-            return <div key={i} className={styles.tile} tabIndex={0} style={style} />
+            return (
+              <div key={i} className={styles.tile} tabIndex={0} style={style} data-test="projects-tile" />
+            )
           })}
         </div>
       </div>

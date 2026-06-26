@@ -50,7 +50,7 @@ const EDUCATION = [
 
 function MobileJobEntry({ company, role, duration, bullets, dim }: Job) {
   return (
-    <div className={styles.job}>
+    <div className={styles.job} data-test="about-job">
       <div className={styles.jobHead}>
         <span className={dim ? styles.companyDim : styles.company}>{company}</span>
         <span className={styles.duration}>{duration}</span>
@@ -67,7 +67,7 @@ function MobileJobEntry({ company, role, duration, bullets, dim }: Job) {
 
 function MobileEduEntry({ degree, school }: { degree: string; school: string }) {
   return (
-    <div className={styles.edu}>
+    <div className={styles.edu} data-test="about-education">
       <div className={styles.eduDegree}>{degree}</div>
       <div className={styles.eduSchool}>{school}</div>
     </div>
@@ -76,35 +76,35 @@ function MobileEduEntry({ degree, school }: { degree: string; school: string }) 
 
 export function MobileAbout({ onNav }: { onNav: (r: Route) => void }) {
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <span className={styles.headerWordmark}>PROKSION</span>
+    <div className={styles.page} data-test="about">
+      <header className={styles.header} data-test="mobile-header">
+        <span className={styles.headerWordmark} data-test="mobile-wordmark">PROKSION</span>
       </header>
 
-      <div className={styles.content}>
-        <h1 className={styles.title}>
+      <div className={styles.content} data-test="about-content">
+        <h1 className={styles.title} data-test="about-title">
           ОБО
           <br />
           МНЕ
         </h1>
 
-        <p className={styles.intro}>
+        <p className={styles.intro} data-test="about-intro">
           С детства я рисую, играю в компьютер, занимаюсь музыкой и полностью
           погружена в творчество по сей день — комиксы, фильмы, путешествия,
           активно веду скетчбук, пробую себя в разных хобби.
         </p>
 
-        <h2 className={styles.heading}>Опыт работы</h2>
+        <h2 className={styles.heading} data-test="about-experience-heading">Опыт работы</h2>
         {JOBS.map((job) => (
           <MobileJobEntry key={job.company} {...job} />
         ))}
 
-        <h2 className={`${styles.heading} ${styles.headingSpaced}`}>Образование</h2>
+        <h2 className={`${styles.heading} ${styles.headingSpaced}`} data-test="about-education-heading">Образование</h2>
         {EDUCATION.map((e) => (
           <MobileEduEntry key={e.degree} {...e} />
         ))}
 
-        <div className={styles.footer}>
+        <div className={styles.footer} data-test="about-photos">
           <img className={styles.footerBack} src={photoMasked2} alt="" />
           <img className={styles.footerFront} src={photoMasked1} alt="" />
         </div>
