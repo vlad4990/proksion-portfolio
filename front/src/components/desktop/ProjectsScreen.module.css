@@ -145,3 +145,13 @@
 .tile:focus-visible {
   box-shadow: 0 0 0 3px var(--accent);
 }
+
+/* ── Empty / error states ──────────────────────────────────── */
+.message {
+  margin: 0;
+  padding: 8px 0;
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: 1.4;
+  color: var(--fg-muted);
+}

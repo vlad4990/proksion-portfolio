@@ -162,3 +162,12 @@
 .tile:active {
   opacity: 0.85;
 }
+
+/* ── Empty / error states ──────────────────────────────────── */
+.message {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--t-body-mob);
+  line-height: 1.4;
+  color: var(--fg-muted);
+}

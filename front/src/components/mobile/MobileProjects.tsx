@@ -1,76 +1,64 @@
-import { useParams, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 import Masonry from 'react-masonry-css'
-import projectSuccess from '../../assets/project-success.png'
-import projectPost from '../../assets/project-post.png'
+import { useProjects } from '../../api/useProjects'
+import type { Tile } from '../../api/types'
 import type { Route } from '../../types'
 import { MobileTabBar } from './MobileTabBar'
 import styles from './MobileProjects.module.css'
 
-interface Group {
-  id: string
-  slug: string
-  label: string
-  subs: { id: string; slug: string; label: string }[]
+// Высоты скелетон-плейсхолдеров (тон --c-skeleton) на время загрузки тайлов.
+const SKELETON_HEIGHTS = [180, 140, 200, 160, 150, 190]
+
+const BREAKPOINT_COLS = { default: 2 }
+
+/** Тайлы из API: aspect-ratio из w/h резервирует место — без скачков layout. */
+function TileGrid({ tiles }: { tiles: Tile[] }) {
+  return (
+    <Masonry
+      breakpointCols={BREAKPOINT_COLS}
+      className={styles.masonry}
+      columnClassName={styles.masonryColumn}
+    >
+      {tiles.map((t) => (
+        <img
+          key={t.id}
+          src={t.src}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className={styles.tile}
+          style={{ aspectRatio: `${t.w} / ${t.h}` }}
+          data-test="projects-tile"
+        />
+      ))}
+    </Masonry>
+  )
 }
 
-const GROUPS: Group[] = [
-  {
-    id: 'pressf',
-    slug: 'press-f',
-    label: 'Press F',
-    subs: [
-      { id: 'banners', slug: 'bannery', label: 'Баннера' },
-      { id: 'vitriny', slug: 'vitriny', label: 'Витрины товаров' },
-      { id: 'posts', slug: 'posty', label: 'Посты в соц.сети' },
-    ],
-  },
-  {
-    id: 'kupikod',
-    slug: 'kupikod',
-    label: 'KUPIKOD',
-    subs: [
-      { id: 'k-ban', slug: 'bannery', label: 'Баннера' },
-      { id: 'k-yt', slug: 'youtube', label: 'YouTube обложки' },
-    ],
-  },
-  {
-    id: 'drawing',
-    slug: 'risovanie',
-    label: 'Рисование',
-    subs: [
-      { id: 'd-paint', slug: 'zhivopis', label: 'Живопись' },
-      { id: 'd-draw', slug: 'risunok', label: 'Рисунок' },
-      { id: 'd-dig', slug: 'digital', label: 'Диджитал арт' },
-    ],
-  },
-  { id: 'sketch', slug: 'sketchbook', label: 'Sketchbook', subs: [] },
-  { id: 'uiux', slug: 'uiux', label: 'UI/UX', subs: [] },
-]
-
-// Тайл masonry. Будущая форма проекта из CDN — достаточно { id, src } (только URL):
-// высота берётся из картинки (height:auto). w/h — опционально, если CDN их отдаёт →
-// aspect-ratio резервирует место (нет скачков при загрузке). Остальное — заглушки.
-type Tile =
-  | { id: string; src: string; w?: number; h?: number }
-  | { id: string; color: string; ph: number }
-
-const TILES: Tile[] = [
-  { id: 't1', src: projectSuccess, w: 3840, h: 2160 },
-  { id: 't2', color: '#3a3a3a', ph: 160 },
-  { id: 't3', src: projectPost, w: 3840, h: 2160 },
-  { id: 't4', color: '#2e2e2e', ph: 180 },
-  { id: 't5', color: '#444', ph: 140 },
-  { id: 't6', color: '#383838', ph: 200 },
-]
+/** Скелетон листинга: плейсхолдеры тона --c-skeleton в той же masonry-раскладке. */
+function TileSkeleton() {
+  return (
+    <Masonry
+      breakpointCols={BREAKPOINT_COLS}
+      className={styles.masonry}
+      columnClassName={styles.masonryColumn}
+    >
+      {SKELETON_HEIGHTS.map((h, i) => (
+        <div
+          key={i}
+          className={styles.tile}
+          style={{ height: h }}
+          data-test="projects-tile-skeleton"
+          aria-hidden="true"
+        />
+      ))}
+    </Masonry>
+  )
+}
 
 export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
-  const { cat, sub } = useParams()
   const navigate = useNavigate()
-
-  const currentGroup = GROUPS.find((g) => g.slug === cat) ?? GROUPS[0]
-  const activeSub = currentGroup.subs.find((s) => s.slug === sub)?.id
-    ?? currentGroup.subs[0]?.id
-    ?? null
+  const { categories, tiles, tilesStatus, activeCategory, activeSubSlug } = useProjects()
 
   return (
     <div className={styles.page} data-test="projects">
@@ -82,34 +70,37 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
         <h1 className={styles.title} data-test="projects-title">ПРОЕКТЫ</h1>
 
         <div className={styles.chips} data-test="projects-chips">
-          {GROUPS.map((g) => {
-            const isActive = g.id === currentGroup.id
+          {categories.map((g) => {
+            const isActive = g.id === activeCategory?.id
             return (
               <button
                 key={g.id}
                 type="button"
                 className={`${styles.chip}${isActive ? ` ${styles.chipActive}` : ''}`}
                 onClick={() =>
-                  navigate(`/projects/${g.slug}` + (g.subs[0] ? `/${g.subs[0].slug}` : ''))
+                  navigate(
+                    `/projects/${g.slug}` +
+                      (g.subcategories[0] ? `/${g.subcategories[0].slug}` : ''),
+                  )
                 }
                 data-test="projects-chip"
               >
-                {g.label}
+                {g.title}
               </button>
             )
           })}
         </div>
 
-        {currentGroup.subs.length > 0 && (
+        {activeCategory && activeCategory.subcategories.length > 0 && (
           <div className={styles.subTabs} data-test="projects-subtabs">
-            {currentGroup.subs.map((s) => {
-              const isActive = s.id === activeSub
+            {activeCategory.subcategories.map((s) => {
+              const isActive = s.slug === activeSubSlug
               return (
                 <button
                   key={s.id}
                   type="button"
                   className={`${styles.subTab}${isActive ? ` ${styles.subTabActive}` : ''}`}
-                  onClick={() => navigate(`/projects/${currentGroup.slug}/${s.slug}`)}
+                  onClick={() => navigate(`/projects/${activeCategory.slug}/${s.slug}`)}
                   data-test="projects-subtab"
                 >
                   <span
@@ -117,7 +108,7 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
                       isActive ? ` ${styles.subTabLabelActive}` : ''
                     }`}
                   >
-                    {s.label}
+                    {s.title}
                   </span>
                 </button>
               )
@@ -126,33 +117,18 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
         )}
 
         <div className={styles.tiles} data-test="projects-tiles">
-          <Masonry
-            breakpointCols={{ default: 2 }}
-            className={styles.masonry}
-            columnClassName={styles.masonryColumn}
-          >
-            {TILES.map((t) =>
-              'src' in t ? (
-                <img
-                  key={t.id}
-                  src={t.src}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  className={styles.tile}
-                  style={t.w && t.h ? { aspectRatio: `${t.w} / ${t.h}` } : undefined}
-                  data-test="projects-tile"
-                />
-              ) : (
-                <div
-                  key={t.id}
-                  className={styles.tile}
-                  style={{ height: t.ph, background: t.color }}
-                  data-test="projects-tile"
-                />
-              ),
-            )}
-          </Masonry>
+          {tilesStatus === 'loading' && <TileSkeleton />}
+          {tilesStatus === 'error' && (
+            <p className={styles.message} data-test="projects-error">
+              Не удалось загрузить работы. Обновите страницу.
+            </p>
+          )}
+          {tilesStatus === 'ready' && tiles.length === 0 && (
+            <p className={styles.message} data-test="projects-empty">
+              Здесь пока пусто.
+            </p>
+          )}
+          {tilesStatus === 'ready' && tiles.length > 0 && <TileGrid tiles={tiles} />}
         </div>
       </div>
 
