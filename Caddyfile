@@ -1,0 +1,66 @@
+# Корневой Caddyfile — единый edge: TLS + маршрутизация всего приложения.
+# Адрес берётся из SITE_ADDRESS (см. docker-compose/.env):
+#   прод     → SITE_ADDRESS=proksion.ru → Caddy сам выпустит и продлит HTTPS (Let's Encrypt)
+#   локально → SITE_ADDRESS=:80          → обычный HTTP, без сертификатов
+# Если переменная не задана — по умолчанию :80.
+#
+# handle/handle_path-блоки взаимоисключающие, Caddy матчит их по специфичности
+# (более длинный префикс — раньше), bare `handle` (без матчера) — последним.
+# Маршруты не конфликтуют: /api/admin/* — это эндпоинты API админки, /admin/* — её статика.
+{$SITE_ADDRESS::80} {
+	encode gzip zstd
+
+	# /api/* → бэкенд (Bun/Elysia). handle_path срезает префикс /api,
+	# поэтому роуты в back объявлены от корня (/health → снаружи /api/health).
+	handle_path /api/* {
+		reverse_proxy back:3001
+	}
+
+	# /media/* → MinIO (public-read картинки). НЕ срезаем префикс: путь /media/<bucket>/...
+	# и есть S3 path-style (bucket `media`). Кэшируем агрессивно — ключи иммутабельны.
+	handle /media/* {
+		reverse_proxy minio:9000
+		header Cache-Control "public, max-age=31536000, immutable"
+	}
+
+	# /admin → /admin/ (чтобы заход без слеша не падал в catch-all фронта).
+	redir /admin /admin/ 308
+
+	# /admin/* → статика админки. handle_path срезает /admin, root указывает в /srv/admin,
+	# поэтому /admin/assets/x.js → /srv/admin/assets/x.js, а deep-link → /srv/admin/index.html.
+	handle_path /admin/* {
+		root * /srv/admin
+
+		# Хешированные ассеты Vite — кэшируем на год (immutable).
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+		header /index.html Cache-Control "no-cache"
+
+		# SPA-fallback админки → /srv/admin/index.html
+		try_files {path} /index.html
+		file_server
+	}
+
+	# Всё остальное — статика публичного фронта.
+	handle {
+		root * /srv
+
+		# Хешированные ассеты Vite — кэшируем на год (immutable).
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+
+		# index.html не кэшируем — новые сборки подхватываются сразу.
+		header /index.html Cache-Control "no-cache"
+
+		# SPA-fallback: deep-link'и react-router (/projects/:cat/:sub и т.п.) → index.html
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+# Внутренний health-эндпоинт для healthcheck в docker-compose.
+# Наружу не публикуется — слушается только внутри контейнера.
+:8081 {
+	respond /health "ok" 200
+	respond 404
+}

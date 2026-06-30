@@ -1,10 +1,11 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help install dev dev-front build type-check preview \
-        up down restart ps logs logs-front clean clean-all
+.PHONY: help install dev dev-front dev-admin dev-back build type-check preview \
+        up down restart ps logs logs-caddy logs-front logs-back logs-minio clean clean-all
 
 # Порты (можно переопределить через окружение или .env)
 FRONT_DEV_PORT     ?= 5005
+ADMIN_DEV_PORT     ?= 5006
 FRONT_PREVIEW_PORT ?= 4173
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -19,17 +20,25 @@ help: ## Показать список команд
 # Setup
 # ──────────────────────────────────────────────────────────────────────────────
 
-install: ## Установить зависимости фронта (front)
+install: ## Установить зависимости всех проектов (front, admin — npm; back — bun)
 	cd front && npm install
+	cd admin && npm install
+	cd back && bun install
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Dev (локально)
 # ──────────────────────────────────────────────────────────────────────────────
 
-dev: dev-front ## Алиас на dev-front (back пока нет)
+dev: dev-front ## Алиас на dev-front (публичный фронт)
 
-dev-front: ## Vite dev-сервер на FRONT_DEV_PORT (по умолчанию 5005, нужен для Chrome MCP)
+dev-front: ## Vite dev-сервер публичного фронта на FRONT_DEV_PORT (5005, нужен для Chrome MCP)
 	cd front && npm run dev -- --port $(FRONT_DEV_PORT) --host
+
+dev-admin: ## Vite dev-сервер админки на ADMIN_DEV_PORT (5006; 5005 держит публичный фронт)
+	cd admin && npm run dev -- --port $(ADMIN_DEV_PORT) --host
+
+dev-back: ## Локальный запуск bun-бэкенда (watch) на BACK_PORT (по умолчанию 3001)
+	cd back && bun run dev
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Build & check
@@ -48,7 +57,7 @@ preview: ## Отдать собранный front/dist/ локально (vite p
 # Docker (прод-контейнеры монорепы)
 # ──────────────────────────────────────────────────────────────────────────────
 
-up: ## Поднять контейнеры (build + detached); front = Caddy со статикой на HTTP_PORT/HTTPS_PORT (80/443)
+up: ## Поднять контейнеры (build + detached): caddy (edge) + back + minio; Caddy на HTTP_PORT/HTTPS_PORT (80/443)
 	@if [ ! -f .env ]; then cp .env.example .env && echo "[up] .env не найден — создан из .env.example"; fi
 	docker compose up -d --build
 
@@ -64,8 +73,16 @@ ps: ## Статус контейнеров
 logs: ## Хвост логов всех сервисов
 	docker compose logs -f
 
-logs-front: ## Хвост логов front
-	docker compose logs -f front
+logs-caddy: ## Хвост логов caddy (edge)
+	docker compose logs -f caddy
+
+logs-front: logs-caddy ## Алиас на logs-caddy (исторический)
+
+logs-back: ## Хвост логов back (bun)
+	docker compose logs -f back
+
+logs-minio: ## Хвост логов minio
+	docker compose logs -f minio
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Cleanup
