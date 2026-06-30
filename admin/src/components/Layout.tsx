@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -31,9 +32,9 @@ export function Layout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-muted/20">
       <header className="border-b bg-background">
         <div className="container flex h-14 items-center justify-between">
-          <span className="text-sm font-semibold uppercase tracking-wide">
+          <Link to="/" className="text-sm font-semibold uppercase tracking-wide hover:opacity-80">
             PROKSION · Админка
-          </span>
+          </Link>
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
             {identity && <span>{identity.sub}</span>}
             <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>

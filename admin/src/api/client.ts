@@ -53,6 +53,15 @@ export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): voi
   unauthorizedHandler = handler
 }
 
+/**
+ * Дёрнуть зарегистрированный обработчик 401. Нужен модулям, которые не идут через `apiRequest`
+ * (напр. multipart-загрузка через XHR в src/api/upload.ts), чтобы протухшая сессия так же
+ * централизованно разлогинивала.
+ */
+export function notifyUnauthorized(): void {
+  unauthorizedHandler?.()
+}
+
 async function parseJson(res: Response): Promise<unknown> {
   const text = await res.text()
   if (text === '') return null
