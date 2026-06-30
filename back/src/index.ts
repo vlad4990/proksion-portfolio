@@ -2,6 +2,8 @@ import { Elysia } from 'elysia'
 import { loadConfig } from './config.ts'
 import { openDb } from './db/index.ts'
 import { publicRoutes } from './routes/public.ts'
+import { adminAuthRoutes } from './routes/admin/auth.ts'
+import { loadAuthConfig } from './auth/config.ts'
 import { loadS3Config } from './storage/s3.ts'
 import { bootstrapStorage } from './storage/bootstrap.ts'
 
@@ -14,6 +16,15 @@ import { bootstrapStorage } from './storage/bootstrap.ts'
 
 const config = loadConfig()
 const db = openDb(config.databasePath)
+
+// Auth-слой (§7): один редактор, JWT в httpOnly-cookie, guard на /admin/*.
+const authConfig = loadAuthConfig()
+if (!authConfig.jwtSecret || !authConfig.passwordHash) {
+  console.warn(
+    '[back] auth disabled: set JWT_SECRET и ADMIN_PASSWORD_HASH в .env ' +
+      '(хэш: `bun run hash <password>`). Логин в админку будет отклонён.',
+  )
+}
 
 // Bootstrap хранилища (§5): создать bucket `media` и поставить public-read на images/*.
 // Best-effort: если MinIO ещё не поднялся — логируем и продолжаем (сайт/health работают,
@@ -29,6 +40,7 @@ bootstrapStorage(s3Config)
 
 new Elysia()
   .use(publicRoutes(db))
+  .use(adminAuthRoutes(authConfig))
   .listen({ port: config.backPort, hostname: '0.0.0.0' }, (server) => {
     console.log(`[back] public API listening on http://${server?.hostname}:${server?.port}`)
   })
