@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router'
-import type { CSSProperties } from 'react'
+import Masonry from 'react-masonry-css'
 import projectSuccess from '../../assets/project-success.png'
 import projectPost from '../../assets/project-post.png'
 import type { Route } from '../../types'
@@ -47,13 +47,20 @@ const GROUPS: Group[] = [
   { id: 'uiux', slug: 'uiux', label: 'UI/UX', subs: [] },
 ]
 
-const TILES: { h: number; image?: string; color?: string }[] = [
-  { image: projectSuccess, h: 240 },
-  { color: '#3a3a3a', h: 160 },
-  { image: projectPost, h: 200 },
-  { color: '#2e2e2e', h: 180 },
-  { color: '#444', h: 140 },
-  { color: '#383838', h: 200 },
+// Тайл masonry. Будущая форма проекта из CDN — достаточно { id, src } (только URL):
+// высота берётся из картинки (height:auto). w/h — опционально, если CDN их отдаёт →
+// aspect-ratio резервирует место (нет скачков при загрузке). Остальное — заглушки.
+type Tile =
+  | { id: string; src: string; w?: number; h?: number }
+  | { id: string; color: string; ph: number }
+
+const TILES: Tile[] = [
+  { id: 't1', src: projectSuccess, w: 3840, h: 2160 },
+  { id: 't2', color: '#3a3a3a', ph: 160 },
+  { id: 't3', src: projectPost, w: 3840, h: 2160 },
+  { id: 't4', color: '#2e2e2e', ph: 180 },
+  { id: 't5', color: '#444', ph: 140 },
+  { id: 't6', color: '#383838', ph: 200 },
 ]
 
 export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
@@ -119,12 +126,33 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
         )}
 
         <div className={styles.tiles} data-test="projects-tiles">
-          {TILES.map((t, i) => {
-            const style: CSSProperties = t.image
-              ? { height: t.h, backgroundImage: `url(${t.image})` }
-              : { height: t.h, background: t.color }
-            return <div key={i} className={styles.tile} style={style} data-test="projects-tile" />
-          })}
+          <Masonry
+            breakpointCols={{ default: 2 }}
+            className={styles.masonry}
+            columnClassName={styles.masonryColumn}
+          >
+            {TILES.map((t) =>
+              'src' in t ? (
+                <img
+                  key={t.id}
+                  src={t.src}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className={styles.tile}
+                  style={t.w && t.h ? { aspectRatio: `${t.w} / ${t.h}` } : undefined}
+                  data-test="projects-tile"
+                />
+              ) : (
+                <div
+                  key={t.id}
+                  className={styles.tile}
+                  style={{ height: t.ph, background: t.color }}
+                  data-test="projects-tile"
+                />
+              ),
+            )}
+          </Masonry>
         </div>
       </div>
 

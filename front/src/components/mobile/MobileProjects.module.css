@@ -132,20 +132,29 @@
   color: var(--fg-strong);
 }
 
-/* ── Project tiles ─────────────────────────────────────────── */
+/* ── Project tiles (react-masonry-css, 2 columns) ──────────── */
 .tiles {
   padding: 0 var(--mob-pad);
   margin-top: 20px;
+}
+
+.masonry {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  width: auto;
+  margin-left: calc(var(--tile-gap-mob) * -1); /* offsets columns' padding-left */
+}
+
+.masonryColumn {
+  padding-left: var(--tile-gap-mob);
+  background-clip: padding-box;
 }
 
 .tile {
+  display: block;
   width: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  height: auto; /* image tiles size to their natural aspect ratio — no cropping */
+  margin-bottom: var(--tile-gap-mob);
+  background: var(--c-skeleton); /* neutral tone shown behind a CDN image while it loads */
   cursor: pointer;
   transition: opacity var(--dur-base) var(--ease-out);
 }

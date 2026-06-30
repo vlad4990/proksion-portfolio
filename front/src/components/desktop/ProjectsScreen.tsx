@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router'
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import Masonry from 'react-masonry-css'
 import markerPixel from '../../assets/icon-marker-pixel.svg'
 import projectSuccess from '../../assets/project-success.png'
 import projectPost from '../../assets/project-post.png'
@@ -48,25 +49,32 @@ const GROUPS: Group[] = [
   { id: 'uiux', slug: 'uiux', label: 'UI/UX кейсы', children: [] },
 ]
 
-// Pinterest-style masonry tiles. Real projects use imagery; the rest are
-// tonal placeholders that read as future cases.
-const TILES: { h: number; fill?: string; image?: string }[] = [
-  { h: 320, fill: '#d9d9d9' },
-  { h: 240, fill: '#bfbfbf' },
-  { h: 420, image: projectSuccess },
-  { h: 280, fill: '#e4e4e4' },
-  { h: 200, fill: '#c4c4c4' },
-  { h: 360, fill: '#d9d9d9' },
-  { h: 320, image: projectPost },
-  { h: 180, fill: '#bfbfbf' },
-  { h: 440, fill: '#e4e4e4' },
-  { h: 260, fill: '#d9d9d9' },
-  { h: 320, fill: '#c4c4c4' },
-  { h: 220, fill: '#bfbfbf' },
-  { h: 380, fill: '#d9d9d9' },
-  { h: 200, fill: '#e4e4e4' },
-  { h: 300, fill: '#c4c4c4' },
-  { h: 240, fill: '#d9d9d9' },
+// Тайл masonry. Будущая форма проекта из CDN — достаточно { id, src } (только URL):
+// высота берётся из самой картинки (height:auto), заранее её знать не нужно. Опциональные
+// натуральные размеры w/h — если CDN их отдаёт: тогда резервируем место через aspect-ratio
+// и при загрузке нет скачков layout. Остальное — тональные заглушки с фиксированной высотой
+// (пока реальных проектов нет).
+type Tile =
+  | { id: string; src: string; w?: number; h?: number }
+  | { id: string; fill: string; ph: number }
+
+const TILES: Tile[] = [
+  { id: 't1', fill: '#d9d9d9', ph: 320 },
+  { id: 't2', fill: '#bfbfbf', ph: 240 },
+  { id: 't3', src: projectSuccess },
+  { id: 't4', fill: '#e4e4e4', ph: 280 },
+  { id: 't5', fill: '#c4c4c4', ph: 200 },
+  { id: 't6', fill: '#d9d9d9', ph: 360 },
+  { id: 't7', src: projectPost },
+  { id: 't8', fill: '#bfbfbf', ph: 180 },
+  { id: 't9', fill: '#e4e4e4', ph: 440 },
+  { id: 't10', fill: '#d9d9d9', ph: 260 },
+  { id: 't11', fill: '#c4c4c4', ph: 320 },
+  { id: 't12', fill: '#bfbfbf', ph: 220 },
+  { id: 't13', fill: '#d9d9d9', ph: 380 },
+  { id: 't14', fill: '#e4e4e4', ph: 200 },
+  { id: 't15', fill: '#c4c4c4', ph: 300 },
+  { id: 't16', fill: '#d9d9d9', ph: 240 },
 ]
 
 function SidebarGroup({
@@ -155,15 +163,36 @@ export function ProjectsScreen() {
           ))}
         </div>
 
-        <div className={styles.masonry} data-test="projects-tiles">
-          {TILES.map((t, i) => {
-            const style: CSSProperties = t.image
-              ? { height: t.h, backgroundImage: `url(${t.image})` }
-              : { height: t.h, background: t.fill }
-            return (
-              <div key={i} className={styles.tile} tabIndex={0} style={style} data-test="projects-tile" />
-            )
-          })}
+        <div data-test="projects-tiles">
+          <Masonry
+            breakpointCols={{ default: 4, 1399: 3, 1099: 2 }}
+            className={styles.masonry}
+            columnClassName={styles.masonryColumn}
+          >
+            {TILES.map((t) =>
+              'src' in t ? (
+                <img
+                  key={t.id}
+                  src={t.src}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className={styles.tile}
+                  tabIndex={0}
+                  style={t.w && t.h ? { aspectRatio: `${t.w} / ${t.h}` } : undefined}
+                  data-test="projects-tile"
+                />
+              ) : (
+                <div
+                  key={t.id}
+                  className={styles.tile}
+                  tabIndex={0}
+                  style={{ height: t.ph, background: t.fill }}
+                  data-test="projects-tile"
+                />
+              ),
+            )}
+          </Masonry>
         </div>
       </div>
     </section>

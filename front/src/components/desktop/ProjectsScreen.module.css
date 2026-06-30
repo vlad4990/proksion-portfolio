@@ -114,32 +114,25 @@
   padding: 0 36px 0 calc(var(--gutter) + 60px);
 }
 
-/* ── Masonry grid ──────────────────────────────────────────── */
+/* ── Masonry grid (react-masonry-css) ──────────────────────── */
+/* Column count is driven by the component's breakpointCols (4/3/2). */
 .masonry {
-  column-count: 4;
-  column-gap: 20px;
+  display: flex;
+  width: auto;
+  margin-left: calc(var(--tile-gap) * -1); /* offsets columns' padding-left */
 }
 
-@media (max-width: 1399.98px) {
-  .masonry {
-    column-count: 3;
-  }
-}
-
-@media (max-width: 1099.98px) {
-  .masonry {
-    column-count: 2;
-  }
+.masonryColumn {
+  padding-left: var(--tile-gap);
+  background-clip: padding-box;
 }
 
 .tile {
   display: block;
   width: 100%;
-  margin-bottom: 20px;
-  break-inside: avoid;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  height: auto; /* image tiles size to their natural aspect ratio — no cropping */
+  margin-bottom: var(--tile-gap);
+  background: var(--c-skeleton); /* neutral tone shown behind a CDN image while it loads */
   cursor: pointer;
   outline: none;
   transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
