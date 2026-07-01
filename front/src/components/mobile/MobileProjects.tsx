@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router'
+import type { KeyboardEvent } from 'react'
 import Masonry from 'react-masonry-css'
 import { useProjects } from '../../api/useProjects'
+import { useOpenWork } from '../../hooks/useOpenWork'
 import type { Tile } from '../../api/types'
 import type { Route } from '../../types'
 import { MobileTabBar } from './MobileTabBar'
@@ -11,8 +13,15 @@ const SKELETON_HEIGHTS = [180, 140, 200, 160, 150, 190]
 
 const BREAKPOINT_COLS = { default: 2 }
 
-/** Тайлы из API: aspect-ratio из w/h резервирует место — без скачков layout. */
-function TileGrid({ tiles }: { tiles: Tile[] }) {
+/** Тайлы из API: aspect-ratio из w/h резервирует место — без скачков layout.
+ *  Тап/Enter/Space → открыть модалку работы (onOpen с id тайла). */
+function TileGrid({ tiles, onOpen }: { tiles: Tile[]; onOpen: (id: number) => void }) {
+  const onKey = (e: KeyboardEvent<HTMLImageElement>, id: number) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onOpen(id)
+    }
+  }
   return (
     <Masonry
       breakpointCols={BREAKPOINT_COLS}
@@ -27,6 +36,11 @@ function TileGrid({ tiles }: { tiles: Tile[] }) {
           loading="lazy"
           decoding="async"
           className={styles.tile}
+          tabIndex={0}
+          role="button"
+          aria-label="Открыть работу"
+          onClick={() => onOpen(t.id)}
+          onKeyDown={(e) => onKey(e, t.id)}
           style={{ aspectRatio: `${t.w} / ${t.h}` }}
           data-test="projects-tile"
         />
@@ -58,6 +72,7 @@ function TileSkeleton() {
 
 export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
   const navigate = useNavigate()
+  const openWork = useOpenWork()
   const { categories, tiles, tilesStatus, activeCategory, activeSubSlug } = useProjects()
 
   return (
@@ -128,7 +143,9 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
               Здесь пока пусто.
             </p>
           )}
-          {tilesStatus === 'ready' && tiles.length > 0 && <TileGrid tiles={tiles} />}
+          {tilesStatus === 'ready' && tiles.length > 0 && (
+            <TileGrid tiles={tiles} onOpen={openWork} />
+          )}
         </div>
       </div>
 

@@ -3,7 +3,7 @@
 // Только чтение; мутации — задача админки. Ошибки нормализуем в ApiError, чтобы UI
 // показал состояние «ошибка», а не белый экран.
 
-import type { CategoryNav, SubcategoryListing, WorksPage } from './types'
+import type { CategoryNav, SubcategoryListing, WorkDetailById, WorksPage } from './types'
 
 /** Базовый префикс публичного API (срезается Caddy/прокси перед бэкендом). */
 export const API_BASE = '/api'
@@ -43,4 +43,13 @@ export function getSubcategoryListing(cat: string, sub: string): Promise<Subcate
 /** Глобальный листинг всех работ (`/projects`), offset/limit-пагинация. */
 export function getWorks(offset = 0, limit = 60): Promise<WorksPage> {
   return getJson<WorksPage>(`/works?offset=${offset}&limit=${limit}`)
+}
+
+/**
+ * Полная работа ПО ID для модалки (задача 10, вариант B): описание + картинки карусели +
+ * слаги пути `cat`/`sub`. Сегмент `:work` в URL модалки — это id (не slug). Несуществующий/
+ * невалидный id → ApiError со `status` 404 (UI редиректит на листинг, см. useWorkDetail).
+ */
+export function getWorkById(id: number | string): Promise<WorkDetailById> {
+  return getJson<WorkDetailById>(`/works/by-id/${encodeURIComponent(String(id))}`)
 }

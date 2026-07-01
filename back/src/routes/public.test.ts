@@ -162,6 +162,46 @@ describe('public routes (seeded)', () => {
     expect((await get(app, `/works/nope/x/y`)).status).toBe(404)
   })
 
+  test('GET /works/by-id/:id → detail by id with cat/sub slugs + same detail shape', async () => {
+    const cat = repos.category.list()[0]!
+    const sub = repos.subcategory.list(cat.id)[0]!
+    const work = repos.work.list(sub.id)[0]!
+    const { status, body } = await get(app, `/works/by-id/${work.id}`)
+    expect(status).toBe(200)
+    expect(body.id).toBe(work.id)
+    expect(body.slug).toBe(work.slug)
+    expect(body.cat).toBe(cat.slug)
+    expect(body.sub).toBe(sub.slug)
+    expect(Array.isArray(body.images)).toBe(true)
+    expect(body.images.length).toBe(repos.image.list(work.id).length)
+    // тот же контент, что и by-slug эндпоинт (описание + картинки)
+    const bySlug = (await get(app, `/works/${cat.slug}/${sub.slug}/${work.slug}`)).body
+    expect(body.description).toBe(bySlug.description)
+    expect(body.images).toEqual(bySlug.images)
+  })
+
+  test('GET /works/by-id/:id → resolves cat/sub for a work in a non-first subcategory', async () => {
+    // берём работу из последней категории/подкатегории — проверяем корректный резолв пути
+    const cat = repos.category.list().at(-1)!
+    const sub = repos.subcategory.list(cat.id).at(-1)!
+    const work = repos.work.list(sub.id).at(-1)!
+    const { status, body } = await get(app, `/works/by-id/${work.id}`)
+    expect(status).toBe(200)
+    expect(body.cat).toBe(cat.slug)
+    expect(body.sub).toBe(sub.slug)
+  })
+
+  test('GET /works/by-id/:id → 404 for nonexistent id', async () => {
+    expect((await get(app, '/works/by-id/999999')).status).toBe(404)
+  })
+
+  test('GET /works/by-id/:id → 404 for non-numeric / invalid id', async () => {
+    expect((await get(app, '/works/by-id/abc')).status).toBe(404)
+    expect((await get(app, '/works/by-id/1.5')).status).toBe(404)
+    expect((await get(app, '/works/by-id/0')).status).toBe(404)
+    expect((await get(app, '/works/by-id/-3')).status).toBe(404)
+  })
+
   test('GET /works → paginated tiles with total/limit/offset', async () => {
     const { status, body } = await get(app, '/works')
     expect(status).toBe(200)

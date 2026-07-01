@@ -56,3 +56,51 @@ export interface WorksPage {
   limit: number
   offset: number
 }
+
+// ── Деталь работы (модалка, задача 10) ────────────────────────────────────────
+// Зеркалят back/src/dto.ts + back/src/media-url.ts. Форма СТАБИЛЬНА — менять синхронно
+// с бэкендом. Эндпоинт: GET /api/works/:cat/:sub/:work.
+
+/** Форматы вариантов картинки — AVIF/WebP + JPEG-fallback для `<picture>` (спека §5). */
+export type ImageFormat = 'avif' | 'webp' | 'jpg'
+/** Размерные варианты: `thumb` — листинг, `full` — модалка. */
+export type ImageVariant = 'thumb' | 'full'
+/** URL'ы одного размерного варианта во всех форматах. */
+export type VariantUrls = Record<ImageFormat, string>
+/** Полный блок вариантов картинки: thumb/full × avif/webp/jpg. */
+export type ImageVariants = Record<ImageVariant, VariantUrls>
+
+/**
+ * Картинка карусели: все варианты/форматы + метаданные. `w/h` — натуральные размеры
+ * (фронт ставит aspect-ratio → нет скачков layout). `lqip` — крошечный base64-плейсхолдер,
+ * приходит только если задан. `id` — для пиннинга слайда через `?img=<imageId>`.
+ */
+export interface ImageDetail {
+  id: number
+  w: number
+  h: number
+  alt: string | null
+  sort_order: number
+  lqip?: string
+  variants: ImageVariants
+}
+
+/** Полная работа: описание + упорядоченные картинки карусели. */
+export interface WorkDetail {
+  id: number
+  slug: string
+  title: string | null
+  description: string | null
+  cover_image_id: number | null
+  images: ImageDetail[]
+}
+
+/**
+ * Деталь работы по id (эндпоинт `/api/works/by-id/:id`, задача 10, вариант B). Всё из
+ * `WorkDetail` + слаги пути `cat`/`sub`: по клику из глобального листинга `/projects` у тайла
+ * есть только id, и из этого ответа строится канонический URL `/projects/:cat/:sub/:id`.
+ */
+export interface WorkDetailById extends WorkDetail {
+  cat: string
+  sub: string
+}

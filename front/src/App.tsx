@@ -9,10 +9,13 @@ import { AboutSection } from './components/desktop/AboutSection'
 import { ProjectsScreen } from './components/desktop/ProjectsScreen'
 import { ContactsScreen } from './components/desktop/ContactsScreen'
 
+import { WorkModal } from './components/desktop/WorkModal'
+
 import { MobileHero } from './components/mobile/MobileHero'
 import { MobileAbout } from './components/mobile/MobileAbout'
 import { MobileProjects } from './components/mobile/MobileProjects'
 import { MobileContacts } from './components/mobile/MobileContacts'
+import { MobileWorkModal } from './components/mobile/MobileWorkModal'
 
 import styles from './App.module.css'
 
@@ -60,9 +63,12 @@ export default function App() {
     return () => clearTimeout(t)
   }, [heroPhase])
 
-  // Lock scroll while the curtain is up
+  // Lock scroll while the curtain is up. When 'gone' we DON'T touch overflow — the work
+  // modal (useScrollLock) manages it then; clearing here would clobber the modal's lock
+  // (parent effects run after child effects on mount).
   useEffect(() => {
-    document.documentElement.style.overflow = heroPhase === 'gone' ? '' : 'hidden'
+    if (heroPhase === 'gone') return
+    document.documentElement.style.overflow = 'hidden'
     return () => {
       document.documentElement.style.overflow = ''
     }
@@ -114,6 +120,15 @@ export default function App() {
             <RouterRoute
               path="/projects/:cat/:sub"
               element={<MobileProjects onNav={navigate} />}
+            />
+            <RouterRoute
+              path="/projects/:cat/:sub/:work"
+              element={
+                <>
+                  <MobileProjects onNav={navigate} />
+                  <MobileWorkModal />
+                </>
+              }
             />
             <RouterRoute path="/contacts" element={<MobileContacts onNav={navigate} />} />
             <RouterRoute path="*" element={<Navigate to="/" replace />} />
@@ -171,6 +186,15 @@ export default function App() {
             <RouterRoute path="/" element={<AboutSection />} />
             <RouterRoute path="/projects" element={<ProjectsScreen />} />
             <RouterRoute path="/projects/:cat/:sub" element={<ProjectsScreen />} />
+            <RouterRoute
+              path="/projects/:cat/:sub/:work"
+              element={
+                <>
+                  <ProjectsScreen />
+                  <WorkModal />
+                </>
+              }
+            />
             <RouterRoute path="/contacts" element={<ContactsScreen />} />
             <RouterRoute path="*" element={<Navigate to="/" replace />} />
           </Routes>

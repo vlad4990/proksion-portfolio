@@ -15,9 +15,11 @@ import {
   toSubcategoryNav,
   toSubcategoryRef,
   toWorkDetail,
+  toWorkDetailById,
   type CategoryNav,
   type SubcategoryListing,
   type WorkDetail,
+  type WorkDetailById,
   type WorksPage,
 } from '../dto.ts'
 
@@ -38,6 +40,12 @@ function parseOffset(raw: string | undefined): number {
   const n = Number(raw)
   if (!Number.isInteger(n) || n < 0) return 0
   return n
+}
+
+/** id работы: положительное целое; иначе `null` (→ 404). */
+function parseId(raw: string): number | null {
+  const n = Number(raw)
+  return Number.isInteger(n) && n > 0 ? n : null
 }
 
 /** Навигация: все категории с вложенными подкатегориями и счётчиками работ. */
@@ -106,6 +114,38 @@ export function publicRoutes(db: Database) {
         offset,
       }
       return page
+    })
+
+    // Полная работа ПО ID (вариант B задачи 10): для клика из листинга (у тайла есть id).
+    // Тот же контент, что и by-slug, ПЛЮС слаги cat/sub — чтобы фронт построил канонический
+    // URL /projects/:cat/:sub/:id даже с глобального листинга, где cat/sub у тайла нет.
+    // Путь — `/works/by-id/:id`, а НЕ `/works/:id`: роутер (memoirist) запрещает разные имена
+    // параметра в одной позиции, а слот 2 под /works уже занят `:cat` (эндпоинт by-slug).
+    // Статический сегмент `by-id` снимает конфликт, оставляя эндпоинт в неймспейсе /works.
+    .get('/works/by-id/:id', ({ params, set }) => {
+      const id = parseId(params.id)
+      if (id === null) {
+        set.status = 404
+        return { error: 'not_found', resource: 'work', id: params.id }
+      }
+      const work = repos.work.getById(id)
+      if (!work) {
+        set.status = 404
+        return { error: 'not_found', resource: 'work', id }
+      }
+      const subcategory = repos.subcategory.getById(work.subcategory_id)
+      const category = subcategory ? repos.category.getById(subcategory.category_id) : null
+      if (!subcategory || !category) {
+        set.status = 404
+        return { error: 'not_found', resource: 'work', id }
+      }
+      const detail: WorkDetailById = toWorkDetailById(
+        work,
+        repos.image.list(work.id),
+        category.slug,
+        subcategory.slug,
+      )
+      return detail
     })
 
     // Полная работа: описание + все картинки (варианты/форматы/w/h/alt/sort_order/lqip).

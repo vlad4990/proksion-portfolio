@@ -8,6 +8,7 @@ import {
   toSubcategoryRef,
   toTile,
   toWorkDetail,
+  toWorkDetailById,
 } from './dto.ts'
 
 function makeWork(over: Partial<Work> = {}): Work {
@@ -77,6 +78,22 @@ describe('toWorkDetail', () => {
     expect(detail.description).toBe('D')
     expect(detail.cover_image_id).toBe(9)
     expect(detail.images.map((i) => i.id)).toEqual([9, 10])
+  })
+})
+
+describe('toWorkDetailById', () => {
+  test('same detail shape plus cat/sub slugs (для клика из глобального листинга)', () => {
+    const w = makeWork({ id: 5, slug: 's', title: 'T', description: 'D', cover_image_id: 9 })
+    const imgs = [makeImage({ id: 9, sort_order: 0 }), makeImage({ id: 10, sort_order: 1 })]
+    const detail = toWorkDetailById(w, imgs, 'brending', 'logotipy')
+    // всё, что есть в toWorkDetail
+    expect(detail.id).toBe(5)
+    expect(detail.slug).toBe('s')
+    expect(detail.description).toBe('D')
+    expect(detail.images.map((i) => i.id)).toEqual([9, 10])
+    // плюс слаги пути
+    expect(detail.cat).toBe('brending')
+    expect(detail.sub).toBe('logotipy')
   })
 })
 

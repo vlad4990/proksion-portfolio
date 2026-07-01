@@ -40,6 +40,16 @@ export interface WorkDetail {
   images: ImageDetail[]
 }
 
+/**
+ * Деталь работы, адресуемой по id (задача 10, вариант B). Всё из `WorkDetail` + слаги пути
+ * `cat`/`sub`: клик из ГЛОБАЛЬНОГО листинга `/projects` знает только id тайла, поэтому
+ * фронт резолвит канонический URL `/projects/:cat/:sub/:id` из этого ответа.
+ */
+export interface WorkDetailById extends WorkDetail {
+  cat: string
+  sub: string
+}
+
 /** Плоская метаинформация категории (без вложенных детей). */
 export interface CategoryRef {
   id: number
@@ -111,6 +121,16 @@ export function toWorkDetail(work: Work, images: Image[]): WorkDetail {
     cover_image_id: work.cover_image_id,
     images: images.map(toImageDetail),
   }
+}
+
+/** Как `toWorkDetail`, но с добавленными слагами пути (`cat`/`sub`) для адресации по id. */
+export function toWorkDetailById(
+  work: Work,
+  images: Image[],
+  catSlug: string,
+  subSlug: string,
+): WorkDetailById {
+  return { ...toWorkDetail(work, images), cat: catSlug, sub: subSlug }
 }
 
 export function toCategoryRef(category: Category): CategoryRef {

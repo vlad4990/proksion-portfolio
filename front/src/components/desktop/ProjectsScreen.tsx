@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router'
-import type { ReactNode } from 'react'
+import type { KeyboardEvent, ReactNode } from 'react'
 import Masonry from 'react-masonry-css'
 import markerPixel from '../../assets/icon-marker-pixel.svg'
 import { useProjects } from '../../api/useProjects'
+import { useOpenWork } from '../../hooks/useOpenWork'
 import type { CategoryNav, Tile } from '../../api/types'
 import layout from '../../styles/layout.module.css'
 import styles from './ProjectsScreen.module.css'
@@ -64,8 +65,15 @@ function SidebarChild({
 
 const BREAKPOINT_COLS = { default: 4, 1399: 3, 1099: 2 }
 
-/** Тайлы из API: место зарезервировано через aspect-ratio (w/h) — нет скачков layout. */
-function TileGrid({ tiles }: { tiles: Tile[] }) {
+/** Тайлы из API: место зарезервировано через aspect-ratio (w/h) — нет скачков layout.
+ *  Клик/Enter/Space → открыть модалку работы (onOpen с id тайла). */
+function TileGrid({ tiles, onOpen }: { tiles: Tile[]; onOpen: (id: number) => void }) {
+  const onKey = (e: KeyboardEvent<HTMLImageElement>, id: number) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onOpen(id)
+    }
+  }
   return (
     <Masonry
       breakpointCols={BREAKPOINT_COLS}
@@ -81,6 +89,10 @@ function TileGrid({ tiles }: { tiles: Tile[] }) {
           decoding="async"
           className={styles.tile}
           tabIndex={0}
+          role="button"
+          aria-label="Открыть работу"
+          onClick={() => onOpen(t.id)}
+          onKeyDown={(e) => onKey(e, t.id)}
           style={{ aspectRatio: `${t.w} / ${t.h}` }}
           data-test="projects-tile"
         />
@@ -112,6 +124,7 @@ function TileSkeleton() {
 
 export function ProjectsScreen() {
   const navigate = useNavigate()
+  const openWork = useOpenWork()
   const { categories, tiles, tilesStatus, activeCategory, activeSubSlug } = useProjects()
 
   const goToGroup = (g: CategoryNav) =>
@@ -152,7 +165,9 @@ export function ProjectsScreen() {
               Здесь пока пусто.
             </p>
           )}
-          {tilesStatus === 'ready' && tiles.length > 0 && <TileGrid tiles={tiles} />}
+          {tilesStatus === 'ready' && tiles.length > 0 && (
+            <TileGrid tiles={tiles} onOpen={openWork} />
+          )}
         </div>
       </div>
     </section>

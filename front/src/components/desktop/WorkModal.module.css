@@ -1,0 +1,227 @@
+/* WorkModal (desktop) — fullscreen overlay over the listing. Two regions: carousel stage
+   (image + arrows + counter) and a meta column (title / description / caption).
+   Brand-strict: only tokens, sharp corners, single accent, CSS-drawn glyphs (no emoji). */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500; /* above fixed nav (100), below hero curtain (1000; absent on work URLs) */
+  background: var(--bg);
+  cursor: pointer; /* backdrop closes */
+}
+
+.dialog {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: var(--nav-h) var(--gutter) var(--sp-section-bottom);
+  cursor: default;
+  outline: none;
+}
+
+/* ── Close (top-right, CSS-drawn ✕) ─────────────────────────── */
+.close {
+  position: absolute;
+  top: var(--gutter);
+  right: var(--gutter);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--fg-strong);
+  outline: none;
+  transition: color 180ms var(--ease-out);
+  z-index: 2;
+}
+
+.close:hover,
+.close:focus-visible {
+  color: var(--accent);
+}
+
+.close:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.closeGlyph {
+  position: relative;
+  display: block;
+  width: 26px;
+  height: 26px;
+}
+
+.closeGlyph::before,
+.closeGlyph::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+}
+
+.closeGlyph::before {
+  transform: rotate(45deg);
+}
+
+.closeGlyph::after {
+  transform: rotate(-45deg);
+}
+
+/* ── Body: stage + meta ─────────────────────────────────────── */
+.body {
+  display: flex;
+  gap: var(--gutter);
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+}
+
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.meta {
+  flex: 0 0 30%;
+  max-width: 440px;
+  min-width: 240px;
+  overflow-y: auto;
+  align-self: stretch;
+  padding-top: 4px;
+}
+
+/* ── Carousel image ─────────────────────────────────────────── */
+.picture {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  background-color: var(--c-skeleton); /* neutral tone (or LQIP) while full loads */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+/* ── Prev / next (CSS-drawn chevrons) ───────────────────────── */
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--fg-strong);
+  outline: none;
+  transition: color 180ms var(--ease-out);
+}
+
+.nav:hover,
+.nav:focus-visible {
+  color: var(--accent);
+}
+
+.nav:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.navPrev {
+  left: 0;
+}
+
+.navNext {
+  right: 0;
+}
+
+.chevron {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+}
+
+.navPrev .chevron {
+  transform: rotate(-135deg);
+  margin-left: 6px;
+}
+
+.navNext .chevron {
+  transform: rotate(45deg);
+  margin-right: 6px;
+}
+
+/* ── Slide counter ──────────────────────────────────────────── */
+.counter {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--t-body);
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
+}
+
+/* ── Meta text ──────────────────────────────────────────────── */
+.title {
+  margin: 0 0 24px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-section);
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-strong);
+}
+
+.description {
+  margin: 0 0 24px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  color: var(--fg);
+  white-space: pre-line;
+}
+
+.caption {
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--t-title);
+  line-height: var(--lh-body);
+  color: var(--fg-muted);
+}
+
+/* ── Loading / error ────────────────────────────────────────── */
+.message {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  color: var(--fg-muted);
+}
