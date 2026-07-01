@@ -109,6 +109,7 @@
   --radius-pill: 0px;      /* nav active pill — sharp */
   --radius-card: 0px;      /* sidebar active row — sharp */
   --radius-tile: 0px;      /* project tiles — sharp */
+  --tile-gap: 20px;        /* gutter between masonry tiles (desktop) */
   --stroke-hairline: 1px;  /* mask outline */
   --stroke-display:  2.4px;/* outlined display letterforms */
 
@@ -136,6 +137,7 @@
 
   /* Mobile layout */
   --mob-pad:           22px;   /* horizontal page gutter              */
+  --tile-gap-mob:      12px;   /* gutter between masonry tiles        */
   --mob-header-h:      56px;   /* top mini-header height              */
   --mob-status:        56px;   /* space above header (status bar)     */
   --mob-content-top:  112px;   /* = status + header                   */

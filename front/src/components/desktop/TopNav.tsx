@@ -20,18 +20,19 @@ export function TopNav({ route, onHome, onAbout, onProjects, onContacts }: TopNa
   ]
 
   return (
-    <nav className={`${layout.page} ${styles.nav}`}>
-      <button type="button" className={styles.wordmark} onClick={onHome}>
+    <nav className={`${layout.page} ${styles.nav}`} data-test="top-nav">
+      <button type="button" className={styles.wordmark} onClick={onHome} data-test="nav-wordmark">
         PROKSION
       </button>
 
-      <ul className={styles.list}>
+      <ul className={styles.list} data-test="nav-list">
         {items.map((it) => (
           <li key={it.id}>
             <button
               type="button"
               className={`${styles.item}${it.active ? ` ${styles.itemActive}` : ''}`}
               onClick={it.onClick}
+              data-test={`nav-${it.id}`}
             >
               {it.label}
             </button>
@@ -39,7 +40,7 @@ export function TopNav({ route, onHome, onAbout, onProjects, onContacts }: TopNa
         ))}
       </ul>
 
-      <span className={styles.year}>2025</span>
+      <span className={styles.year} data-test="nav-year">2025</span>
     </nav>
   )
 }

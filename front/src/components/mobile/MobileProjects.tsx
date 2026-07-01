@@ -1,114 +1,129 @@
-import { useParams, useNavigate } from 'react-router'
-import type { CSSProperties } from 'react'
-import projectSuccess from '../../assets/project-success.png'
-import projectPost from '../../assets/project-post.png'
+import { useNavigate } from 'react-router'
+import type { KeyboardEvent } from 'react'
+import Masonry from 'react-masonry-css'
+import { useProjects } from '../../api/useProjects'
+import { useOpenWork } from '../../hooks/useOpenWork'
+import type { Tile } from '../../api/types'
 import type { Route } from '../../types'
 import { MobileTabBar } from './MobileTabBar'
 import styles from './MobileProjects.module.css'
 
-interface Group {
-  id: string
-  slug: string
-  label: string
-  subs: { id: string; slug: string; label: string }[]
+// Высоты скелетон-плейсхолдеров (тон --c-skeleton) на время загрузки тайлов.
+const SKELETON_HEIGHTS = [180, 140, 200, 160, 150, 190]
+
+const BREAKPOINT_COLS = { default: 2 }
+
+/** Тайлы из API: aspect-ratio из w/h резервирует место — без скачков layout.
+ *  Тап/Enter/Space → открыть модалку работы (onOpen с id тайла). */
+function TileGrid({ tiles, onOpen }: { tiles: Tile[]; onOpen: (id: number) => void }) {
+  const onKey = (e: KeyboardEvent<HTMLImageElement>, id: number) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onOpen(id)
+    }
+  }
+  return (
+    <Masonry
+      breakpointCols={BREAKPOINT_COLS}
+      className={styles.masonry}
+      columnClassName={styles.masonryColumn}
+    >
+      {tiles.map((t) => (
+        <img
+          key={t.id}
+          src={t.src}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className={styles.tile}
+          tabIndex={0}
+          role="button"
+          aria-label="Открыть работу"
+          onClick={() => onOpen(t.id)}
+          onKeyDown={(e) => onKey(e, t.id)}
+          style={{ aspectRatio: `${t.w} / ${t.h}` }}
+          data-test="projects-tile"
+        />
+      ))}
+    </Masonry>
+  )
 }
 
-const GROUPS: Group[] = [
-  {
-    id: 'pressf',
-    slug: 'press-f',
-    label: 'Press F',
-    subs: [
-      { id: 'banners', slug: 'bannery', label: 'Баннера' },
-      { id: 'vitriny', slug: 'vitriny', label: 'Витрины товаров' },
-      { id: 'posts', slug: 'posty', label: 'Посты в соц.сети' },
-    ],
-  },
-  {
-    id: 'kupikod',
-    slug: 'kupikod',
-    label: 'KUPIKOD',
-    subs: [
-      { id: 'k-ban', slug: 'bannery', label: 'Баннера' },
-      { id: 'k-yt', slug: 'youtube', label: 'YouTube обложки' },
-    ],
-  },
-  {
-    id: 'drawing',
-    slug: 'risovanie',
-    label: 'Рисование',
-    subs: [
-      { id: 'd-paint', slug: 'zhivopis', label: 'Живопись' },
-      { id: 'd-draw', slug: 'risunok', label: 'Рисунок' },
-      { id: 'd-dig', slug: 'digital', label: 'Диджитал арт' },
-    ],
-  },
-  { id: 'sketch', slug: 'sketchbook', label: 'Sketchbook', subs: [] },
-  { id: 'uiux', slug: 'uiux', label: 'UI/UX', subs: [] },
-]
-
-const TILES: { h: number; image?: string; color?: string }[] = [
-  { image: projectSuccess, h: 240 },
-  { color: '#3a3a3a', h: 160 },
-  { image: projectPost, h: 200 },
-  { color: '#2e2e2e', h: 180 },
-  { color: '#444', h: 140 },
-  { color: '#383838', h: 200 },
-]
+/** Скелетон листинга: плейсхолдеры тона --c-skeleton в той же masonry-раскладке. */
+function TileSkeleton() {
+  return (
+    <Masonry
+      breakpointCols={BREAKPOINT_COLS}
+      className={styles.masonry}
+      columnClassName={styles.masonryColumn}
+    >
+      {SKELETON_HEIGHTS.map((h, i) => (
+        <div
+          key={i}
+          className={styles.tile}
+          style={{ height: h }}
+          data-test="projects-tile-skeleton"
+          aria-hidden="true"
+        />
+      ))}
+    </Masonry>
+  )
+}
 
 export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
-  const { cat, sub } = useParams()
   const navigate = useNavigate()
-
-  const currentGroup = GROUPS.find((g) => g.slug === cat) ?? GROUPS[0]
-  const activeSub = currentGroup.subs.find((s) => s.slug === sub)?.id
-    ?? currentGroup.subs[0]?.id
-    ?? null
+  const openWork = useOpenWork()
+  const { categories, tiles, tilesStatus, activeCategory, activeSubSlug } = useProjects()
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <span className={styles.headerWordmark}>PROKSION</span>
+    <div className={styles.page} data-test="projects">
+      <header className={styles.header} data-test="mobile-header">
+        <span className={styles.headerWordmark} data-test="mobile-wordmark">PROKSION</span>
       </header>
 
-      <div className={styles.content}>
-        <h1 className={styles.title}>ПРОЕКТЫ</h1>
+      <div className={styles.content} data-test="projects-content">
+        <h1 className={styles.title} data-test="projects-title">ПРОЕКТЫ</h1>
 
-        <div className={styles.chips}>
-          {GROUPS.map((g) => {
-            const isActive = g.id === currentGroup.id
+        <div className={styles.chips} data-test="projects-chips">
+          {categories.map((g) => {
+            const isActive = g.id === activeCategory?.id
             return (
               <button
                 key={g.id}
                 type="button"
                 className={`${styles.chip}${isActive ? ` ${styles.chipActive}` : ''}`}
                 onClick={() =>
-                  navigate(`/projects/${g.slug}` + (g.subs[0] ? `/${g.subs[0].slug}` : ''))
+                  navigate(
+                    `/projects/${g.slug}` +
+                      (g.subcategories[0] ? `/${g.subcategories[0].slug}` : ''),
+                  )
                 }
+                data-test="projects-chip"
               >
-                {g.label}
+                {g.title}
               </button>
             )
           })}
         </div>
 
-        {currentGroup.subs.length > 0 && (
-          <div className={styles.subTabs}>
-            {currentGroup.subs.map((s) => {
-              const isActive = s.id === activeSub
+        {activeCategory && activeCategory.subcategories.length > 0 && (
+          <div className={styles.subTabs} data-test="projects-subtabs">
+            {activeCategory.subcategories.map((s) => {
+              const isActive = s.slug === activeSubSlug
               return (
                 <button
                   key={s.id}
                   type="button"
                   className={`${styles.subTab}${isActive ? ` ${styles.subTabActive}` : ''}`}
-                  onClick={() => navigate(`/projects/${currentGroup.slug}/${s.slug}`)}
+                  onClick={() => navigate(`/projects/${activeCategory.slug}/${s.slug}`)}
+                  data-test="projects-subtab"
                 >
                   <span
                     className={`${styles.subTabLabel}${
                       isActive ? ` ${styles.subTabLabelActive}` : ''
                     }`}
                   >
-                    {s.label}
+                    {s.title}
                   </span>
                 </button>
               )
@@ -116,13 +131,21 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
           </div>
         )}
 
-        <div className={styles.tiles}>
-          {TILES.map((t, i) => {
-            const style: CSSProperties = t.image
-              ? { height: t.h, backgroundImage: `url(${t.image})` }
-              : { height: t.h, background: t.color }
-            return <div key={i} className={styles.tile} style={style} />
-          })}
+        <div className={styles.tiles} data-test="projects-tiles">
+          {tilesStatus === 'loading' && <TileSkeleton />}
+          {tilesStatus === 'error' && (
+            <p className={styles.message} data-test="projects-error">
+              Не удалось загрузить работы. Обновите страницу.
+            </p>
+          )}
+          {tilesStatus === 'ready' && tiles.length === 0 && (
+            <p className={styles.message} data-test="projects-empty">
+              Здесь пока пусто.
+            </p>
+          )}
+          {tilesStatus === 'ready' && tiles.length > 0 && (
+            <TileGrid tiles={tiles} onOpen={openWork} />
+          )}
         </div>
       </div>
 
