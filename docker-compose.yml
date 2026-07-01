@@ -67,9 +67,11 @@ services:
     volumes:
       # SQLite + стейдж бэкапа (DATABASE_PATH=/data/db.sqlite, снимок в /data/backup-stage — §9).
       - app_data:/data
-      # rclone.conf (токен облака) — read-only volume. Токен облака живёт ТОЛЬКО здесь: не в
-      # образе и не в репозитории (§10). Готовится один раз на сервере — см. docs/deploy.md.
-      - rclone_config:/config:ro
+      # rclone.conf (токен облака) — volume. Токен облака живёт ТОЛЬКО здесь: не в образе и не в
+      # репозитории (§10). Готовится один раз на сервере — см. docs/deploy.md. Монтируется НЕ :ro:
+      # rclone для OAuth-облаков (Yandex) обновляет access_token по refresh_token и должен дописать
+      # его обратно в rclone.conf; при :ro это падает с "read-only file system" на каждом push.
+      - rclone_config:/config
     depends_on:
       # restore-on-boot синкает картинки в MinIO — ждём его готовности (§9).
       minio:

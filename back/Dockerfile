@@ -9,6 +9,12 @@ FROM rclone/rclone:1 AS rclone
 # (см. шаг verify ниже); fallback на @napi-rs/image НЕ потребовался.
 FROM oven/bun:1
 
+# CA-сертификаты: rclone (Go-бинарь) проверяет TLS облака бэкапа (Yandex/Dropbox/GDrive) по
+# системному CA-бандлу, а базовый oven/bun:1 его не содержит. Без этого off-site push/lsd падает
+# с `x509: certificate signed by unknown authority`. minio-remote идёт по HTTP и сертификатов не требует.
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 # rclone-бинарь для off-site бэкапа (задача 11). Токен облака сюда НЕ попадает — он в rclone.conf,
 # который монтируется секретом/volume в рантайме (RCLONE_CONFIG). Дымовая проверка: бинарь запускается.
 COPY --from=rclone /usr/local/bin/rclone /usr/local/bin/rclone
