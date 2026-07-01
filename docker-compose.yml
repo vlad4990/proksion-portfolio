@@ -41,9 +41,27 @@ services:
     image: proksion-back:latest
     environment:
       BACK_PORT: ${BACK_PORT:-3001}
+      DATABASE_PATH: ${DATABASE_PATH:-/data/db.sqlite}
+      # MinIO — бэкенд ходит на minio:9000 по имени сервиса (S3-клиент + restore-синк картинок).
+      S3_ENDPOINT: ${S3_ENDPOINT:-http://minio:9000}
+      S3_BUCKET: ${S3_BUCKET:-media}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-proksion}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-change-me-please}
+      # Off-site бэкап (задача 11, §9). ТОКЕН ОБЛАКА — в rclone.conf (volume ниже), не здесь.
+      BACKUP_ENABLED: ${BACKUP_ENABLED:-false}
+      BACKUP_DEBOUNCE_MINUTES: ${BACKUP_DEBOUNCE_MINUTES:-10}
+      BACKUP_REMOTE: ${BACKUP_REMOTE:-cloud:proksion}
+      RCLONE_CONFIG: ${RCLONE_CONFIG:-/config/rclone.conf}
+      BACKUP_HISTORY_KEEP: ${BACKUP_HISTORY_KEEP:-14}
     volumes:
-      # Задел под SQLite + стейдж бэкапа (DATABASE_PATH=/data/db.sqlite — задачи 02/11).
+      # SQLite + стейдж бэкапа (DATABASE_PATH=/data/db.sqlite, снимок в /data/backup-stage — §9).
       - app_data:/data
+      # rclone.conf (токен облака) — read-only. Полный секрет-хардненинг (docker secret) — задача 12.
+      - rclone_config:/config:ro
+    depends_on:
+      # restore-on-boot синкает картинки в MinIO — ждём его готовности (§9).
+      minio:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "bun", "-e", "const r = await fetch('http://127.0.0.1:3001/health').catch(() => null); process.exit(r && r.ok ? 0 : 1)"]
@@ -76,3 +94,6 @@ volumes:
   caddy_config:
   minio_data:
   app_data:
+  # rclone.conf с токеном облака. Готовится один раз (см. back/src/backup/README.md) и живёт
+  # только на сервере — в репозиторий/образ не попадает. Задача 12 переведёт на docker secret.
+  rclone_config:
