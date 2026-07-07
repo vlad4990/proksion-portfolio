@@ -20,6 +20,21 @@ interface WorkImageProps {
   imgClassName?: string
 }
 
+/**
+ * Скрытый прелоадер соседнего слайда: тот же `<picture>` avif/webp/jpg, что и у видимого
+ * слайда, — браузер сам выбирает и скачивает ПРАВИЛЬНЫЙ формат в кэш (голый `new Image()`
+ * знал бы только jpg). Модалки рендерят его для next/prev — листание мгновенное.
+ */
+export function PreloadImage({ image }: { image: ImageDetail }) {
+  return (
+    <picture hidden aria-hidden="true" data-test="work-preload">
+      <source type="image/avif" srcSet={image.variants.full.avif} />
+      <source type="image/webp" srcSet={image.variants.full.webp} />
+      <img src={image.variants.full.jpg} alt="" />
+    </picture>
+  )
+}
+
 export function WorkImage({ image, className, imgClassName }: WorkImageProps) {
   const [loaded, setLoaded] = useState(false)
   const imgRef = useRef<HTMLImageElement>(null)
