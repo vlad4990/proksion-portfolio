@@ -21,9 +21,9 @@ export interface ProjectsData {
   /** Тайлы текущего вида (все работы либо работы подкатегории). */
   tiles: Tile[]
   tilesStatus: LoadStatus
-  /** Активная категория (по slug из URL, иначе первая). `undefined`, пока нет категорий. */
+  /** Активная категория строго по slug из URL; `undefined` на «всех работах» (`/projects`). */
   activeCategory: CategoryNav | undefined
-  /** Slug активной подкатегории (по URL, иначе первая активной категории). */
+  /** Slug активной подкатегории (по URL, иначе первая выбранной категории). */
   activeSubSlug: string | undefined
   /** Сырые параметры маршрута. */
   cat: string | undefined
@@ -78,7 +78,9 @@ export function useProjects(): ProjectsData {
     }
   }, [cat, sub])
 
-  const activeCategory = categories.find((c) => c.slug === cat) ?? categories[0]
+  // Без fallback на первую категорию: на `/projects` показаны ВСЕ работы, и подсвечивать
+  // какую-то категорию как активную было бы враньём (для этого есть пункт «Все работы»).
+  const activeCategory = categories.find((c) => c.slug === cat)
   const activeSubSlug =
     activeCategory?.subcategories.find((s) => s.slug === sub)?.slug ??
     activeCategory?.subcategories[0]?.slug

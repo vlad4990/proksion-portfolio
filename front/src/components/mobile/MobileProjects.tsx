@@ -73,7 +73,8 @@ function TileSkeleton() {
 export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
   const navigate = useNavigate()
   const openWork = useOpenWork()
-  const { categories, tiles, tilesStatus, activeCategory, activeSubSlug } = useProjects()
+  const { categories, tiles, tilesStatus, activeCategory, activeSubSlug, cat } = useProjects()
+  const allActive = !cat
 
   return (
     <div className={styles.page} data-test="projects">
@@ -85,6 +86,14 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
         <h1 className={styles.title} data-test="projects-title">ПРОЕКТЫ</h1>
 
         <div className={styles.chips} data-test="projects-chips">
+          <button
+            type="button"
+            className={`${styles.chip}${allActive ? ` ${styles.chipActive}` : ''}`}
+            onClick={() => navigate('/projects')}
+            data-test="projects-chip-all"
+          >
+            ВСЕ
+          </button>
           {categories.map((g) => {
             const isActive = g.id === activeCategory?.id
             return (

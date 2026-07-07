@@ -125,7 +125,8 @@ function TileSkeleton() {
 export function ProjectsScreen() {
   const navigate = useNavigate()
   const openWork = useOpenWork()
-  const { categories, tiles, tilesStatus, activeCategory, activeSubSlug } = useProjects()
+  const { categories, tiles, tilesStatus, activeCategory, activeSubSlug, cat } = useProjects()
+  const allActive = !cat
 
   const goToGroup = (g: CategoryNav) =>
     navigate(`/projects/${g.slug}` + (g.subcategories[0] ? `/${g.subcategories[0].slug}` : ''))
@@ -134,6 +135,17 @@ export function ProjectsScreen() {
     <section className={styles.section} data-screen-label="03 Projects" data-test="projects">
       <div className={`${layout.page} ${styles.grid}`}>
         <div data-test="projects-sidebar">
+          <div className={styles.group} data-test="projects-group">
+            <button
+              type="button"
+              onClick={() => navigate('/projects')}
+              className={`${styles.groupHead}${allActive ? ` ${styles.groupHeadActive}` : ''}`}
+              data-test="projects-all"
+            >
+              {allActive && <img className={styles.groupMarker} src={markerPixel} alt="" />}
+              ВСЕ РАБОТЫ
+            </button>
+          </div>
           {categories.map((g) => (
             <SidebarGroup
               key={g.id}
