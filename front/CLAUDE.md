@@ -20,7 +20,7 @@ npm run preview  # serve the production build locally
 
 SPA на **Vite 6 + React 18 + TypeScript strict**. Зависимостей минимум: `react`, `react-dom`, `react-router` (7.x) и `react-masonry-css` (~2 КБ, без транзитивных зависимостей; собственные TS-типы — листинг тайлов проектов). Никаких UI-библиотек и CSS-фреймворков — своя дизайн-система на CSS-токенах. Точка входа — `src/main.tsx` (`BrowserRouter` → `App`).
 
-**Данные — из API** (`src/api/`: `client.ts` тонкие fetch-обёртки, `types.ts`, хуки `useProjects`/`useWorkDetail`). База — `/api` (в dev проксируется на `back:3001`, в проде Caddy `handle_path /api/*`). Картинки — same-origin `/media/*`. Dev-proxy `/api`+`/media` настроен в `vite.config.ts` (dev-сервер на 5005). Статических массивов контента больше нет.
+**Данные — из API** (`src/api/`: `client.ts` тонкие fetch-обёртки, `types.ts`, хуки `useProjects`/`useWorkDetail`). Хуки держат **сессионный кэш** (модульные Map'ы: категории, тайлы по виду листинга, деталь по id) — повторная навигация и закрытие модалки не перезапрашивают данные и не мигают скелетонами; ревалидации нет (контент меняется редко, свежее — со следующей загрузкой страницы). База — `/api` (в dev проксируется на `back:3001`, в проде Caddy `handle_path /api/*`). Картинки — same-origin `/media/*`. Dev-proxy `/api`+`/media` настроен в `vite.config.ts` (dev-сервер на 5005). Статических массивов контента больше нет.
 
 > Исторически фронт был на Astro + React islands; миграция на чистый Vite+React SPA завершена — никаких `.astro`, SSR и `@astrojs/*` больше нет.
 

@@ -5,6 +5,11 @@
 // Навигация (категории + подкатегории) грузится один раз; тайлы — по маршруту:
 //   `/projects`            → все работы (GET /works)
 //   `/projects/:cat/:sub`  → работы подкатегории (GET /categories/:cat/:sub)
+//
+// СЕССИОННЫЙ КЭШ (модульный, живёт до перезагрузки страницы): повторные заходы на
+// «Проекты» и закрытие модалки не перезапрашивают данные и не мигают скелетонами —
+// состояние инициализируется из кэша синхронно. Ревалидации нет осознанно: контент
+// меняется редко (через админку), свежие данные приходят со следующей загрузкой страницы.
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
@@ -13,6 +18,32 @@ import type { CategoryNav, Tile } from './types'
 
 /** Состояние асинхронной загрузки части данных. */
 export type LoadStatus = 'loading' | 'error' | 'ready'
+
+let categoriesCache: CategoryNav[] | null = null
+
+interface TilesCacheEntry {
+  tiles: Tile[]
+  /** Полное число работ листинга (для «Показать ещё» глобального листинга). */
+  total: number
+}
+
+/** Ключ — вид листинга: 'all' (все работы) либо `${cat}/${sub}`. */
+const tilesCache = new Map<string, TilesCacheEntry>()
+
+const tilesKey = (cat: string | undefined, sub: string | undefined): string =>
+  cat && sub ? `${cat}/${sub}` : 'all'
+
+interface TilesState extends TilesCacheEntry {
+  key: string
+  status: LoadStatus
+}
+
+const initialTilesState = (key: string): TilesState => {
+  const cached = tilesCache.get(key)
+  return cached
+    ? { key, tiles: cached.tiles, total: cached.total, status: 'ready' }
+    : { key, tiles: [], total: 0, status: 'loading' }
+}
 
 export interface ProjectsData {
   /** Навигация: категории с подкатегориями (для сайдбара/чипов). */
@@ -32,18 +63,25 @@ export interface ProjectsData {
 
 export function useProjects(): ProjectsData {
   const { cat, sub } = useParams()
+  const key = tilesKey(cat, sub)
 
-  const [categories, setCategories] = useState<CategoryNav[]>([])
-  const [categoriesStatus, setCategoriesStatus] = useState<LoadStatus>('loading')
-  const [tiles, setTiles] = useState<Tile[]>([])
-  const [tilesStatus, setTilesStatus] = useState<LoadStatus>('loading')
+  const [categories, setCategories] = useState<CategoryNav[]>(() => categoriesCache ?? [])
+  const [categoriesStatus, setCategoriesStatus] = useState<LoadStatus>(() =>
+    categoriesCache ? 'ready' : 'loading',
+  )
+  const [tilesState, setTilesState] = useState<TilesState>(() => initialTilesState(key))
 
-  // Навигация — один раз.
+  // Смена вида листинга — синхронно в рендере (render-phase update): ни кадра
+  // со старыми тайлами, кэшированный вид появляется мгновенно.
+  if (tilesState.key !== key) setTilesState(initialTilesState(key))
+
+  // Навигация — один раз на сессию.
   useEffect(() => {
+    if (categoriesCache) return
     let cancelled = false
-    setCategoriesStatus('loading')
     getCategories()
       .then((data) => {
+        categoriesCache = data
         if (cancelled) return
         setCategories(data)
         setCategoriesStatus('ready')
@@ -56,27 +94,29 @@ export function useProjects(): ProjectsData {
     }
   }, [])
 
-  // Тайлы — на каждое изменение маршрута.
+  // Тайлы — только при кэш-промахе текущего ключа.
   useEffect(() => {
+    if (tilesState.key !== key || tilesState.status !== 'loading') return
     let cancelled = false
-    setTilesStatus('loading')
     const load =
       cat && sub
-        ? getSubcategoryListing(cat, sub).then((listing) => listing.works)
-        : getWorks().then((page) => page.items)
+        ? getSubcategoryListing(cat, sub).then(
+            (listing): TilesCacheEntry => ({ tiles: listing.works, total: listing.works.length }),
+          )
+        : getWorks().then((page): TilesCacheEntry => ({ tiles: page.items, total: page.total }))
     load
       .then((data) => {
+        tilesCache.set(key, data)
         if (cancelled) return
-        setTiles(data)
-        setTilesStatus('ready')
+        setTilesState({ key, ...data, status: 'ready' })
       })
       .catch(() => {
-        if (!cancelled) setTilesStatus('error')
+        if (!cancelled) setTilesState({ key, tiles: [], total: 0, status: 'error' })
       })
     return () => {
       cancelled = true
     }
-  }, [cat, sub])
+  }, [key, tilesState.key, tilesState.status, cat, sub])
 
   // Без fallback на первую категорию: на `/projects` показаны ВСЕ работы, и подсвечивать
   // какую-то категорию как активную было бы враньём (для этого есть пункт «Все работы»).
@@ -88,8 +128,8 @@ export function useProjects(): ProjectsData {
   return {
     categories,
     categoriesStatus,
-    tiles,
-    tilesStatus,
+    tiles: tilesState.tiles,
+    tilesStatus: tilesState.status,
     activeCategory,
     activeSubSlug,
     cat,
