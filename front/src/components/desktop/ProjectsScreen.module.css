@@ -30,6 +30,7 @@
   background: transparent;
   border: 0;
   padding: 6px 0;
+  text-decoration: none; /* пункты сайдбара — <Link> */
   cursor: pointer;
   font-family: var(--font-display);
   font-weight: 700;
@@ -89,6 +90,7 @@
   color: var(--fg-muted);
   border: 0;
   border-radius: var(--radius-card);
+  text-decoration: none;
   padding: 0 0 0 60px;
   font-family: var(--font-display);
   font-weight: 700;
@@ -127,15 +129,23 @@
   background-clip: padding-box;
 }
 
+/* Картиночный тайл — <Link> вокруг <img>; скелетон-тон ссылки виден, пока картинка грузится.
+   Скелетоны загрузки — <div> с тем же классом. */
 .tile {
   display: block;
   width: 100%;
-  height: auto; /* image tiles size to their natural aspect ratio — no cropping */
   margin-bottom: var(--tile-gap);
   background: var(--c-skeleton); /* neutral tone shown behind a CDN image while it loads */
+  text-decoration: none;
   cursor: pointer;
   outline: none;
   transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+
+.tileImg {
+  display: block;
+  width: 100%;
+  height: auto; /* natural aspect ratio — no cropping */
 }
 
 .tile:hover {

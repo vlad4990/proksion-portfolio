@@ -1,17 +1,21 @@
 // Типы ответов публичного API (docs/architecture.md §7; контракты задачи 03 —
-// back/src/dto.ts). Совместимы с masonry-листингом фронта (front/CLAUDE.md): тайл — { id, src, w, h }.
-// Зеркалят back/src/dto.ts; форма СТАБИЛЬНА — менять синхронно с бэкендом.
+// back/src/dto.ts). Совместимы с masonry-листингом фронта (front/CLAUDE.md):
+// тайл — { id, src, w, h, cat, sub }. Зеркалят back/src/dto.ts; форма СТАБИЛЬНА —
+// менять синхронно с бэкендом.
 
 /**
- * Тайл листинга. `id` — id работы (задел под клик → модалка, задача 10);
- * `src` — URL thumb cover-картинки (`/media/...`); `w/h` — натуральные размеры
- * (фронт ставит aspect-ratio → нет скачков layout).
+ * Тайл листинга. `id` — id работы; `src` — URL thumb cover-картинки (`/media/...`);
+ * `w/h` — натуральные размеры (фронт ставит aspect-ratio → нет скачков layout);
+ * `cat`/`sub` — слаги пути: тайл сразу знает свой канонический URL
+ * `/projects/:cat/:sub/:id` и рендерится настоящей ссылкой (в т.ч. с глобального листинга).
  */
 export interface Tile {
   id: number
   src: string
   w: number
   h: number
+  cat: string
+  sub: string
 }
 
 /** Плоская метаинформация категории. */

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Navigate, Route as RouterRoute, Routes, useLocation, useNavigate } from 'react-router'
+import { Navigate, Route as RouterRoute, Routes, useLocation } from 'react-router'
 import { useIsMobile } from './hooks/useIsMobile'
 import type { HeroPhase, Route } from './types'
 
@@ -43,7 +43,6 @@ function pathnameToRoute(pathname: string): Route {
 
 export default function App() {
   const isMobile = useIsMobile()
-  const navigateTo = useNavigate()
   const { pathname } = useLocation()
   const route = pathnameToRoute(pathname)
 
@@ -88,10 +87,11 @@ export default function App() {
     }
   }, [heroPhase, dismissHero])
 
-  const navigate = (r: Route) => {
-    navigateTo(r === 'home' ? '/' : `/${r}`)
-    requestAnimationFrame(() => window.scrollTo(0, 0))
-  }
+  // После смены раздела — к началу страницы. Ключ — route (top-level раздел), а не
+  // pathname: открытие/закрытие модалки работы внутри /projects скролл не сбрасывает.
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [route])
 
   const curtainClass = `${styles.heroOverlay}${
     heroPhase === 'dismissing' ? ` ${styles.heroOverlayDismissing}` : ''
@@ -115,22 +115,19 @@ export default function App() {
 
         {heroPhase === 'gone' && (
           <Routes>
-            <RouterRoute path="/" element={<MobileAbout onNav={navigate} />} />
-            <RouterRoute path="/projects" element={<MobileProjects onNav={navigate} />} />
-            <RouterRoute
-              path="/projects/:cat/:sub"
-              element={<MobileProjects onNav={navigate} />}
-            />
+            <RouterRoute path="/" element={<MobileAbout />} />
+            <RouterRoute path="/projects" element={<MobileProjects />} />
+            <RouterRoute path="/projects/:cat/:sub" element={<MobileProjects />} />
             <RouterRoute
               path="/projects/:cat/:sub/:work"
               element={
                 <>
-                  <MobileProjects onNav={navigate} />
+                  <MobileProjects />
                   <MobileWorkModal />
                 </>
               }
             />
-            <RouterRoute path="/contacts" element={<MobileContacts onNav={navigate} />} />
+            <RouterRoute path="/contacts" element={<MobileContacts />} />
             <RouterRoute path="*" element={<Navigate to="/" replace />} />
           </Routes>
         )}
@@ -140,17 +137,10 @@ export default function App() {
 
   // ── Desktop tree ──────────────────────────────────────────
   const showNav = heroPhase === 'gone'
-  const onHome = () => {
-    navigateTo('/')
-    requestAnimationFrame(() => smoothScrollTo(0))
-  }
-  const onProjects = () => {
-    navigateTo('/projects')
-    requestAnimationFrame(() => window.scrollTo(0, 0))
-  }
-  const onContacts = () => {
-    navigateTo('/contacts')
-    requestAnimationFrame(() => window.scrollTo(0, 0))
+  // Навигация — ссылки в TopNav; отдельный случай — клик по «домой», когда уже на главной
+  // (ссылка не меняет URL, эффект скролла не сработает) — плавно скроллим вверх сами.
+  const onHomeClick = () => {
+    if (pathname === '/') smoothScrollTo(0)
   }
 
   return (
@@ -171,13 +161,7 @@ export default function App() {
         style={{ display: showNav ? 'block' : 'none' }}
         data-test="nav-host"
       >
-        <TopNav
-          route={route}
-          onHome={onHome}
-          onAbout={onHome}
-          onProjects={onProjects}
-          onContacts={onContacts}
-        />
+        <TopNav route={route} onHomeClick={onHomeClick} />
       </div>
 
       <div className={styles.stageWrap} data-test="stage-wrap">

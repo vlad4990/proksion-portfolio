@@ -65,6 +65,7 @@
 
 .chip {
   flex: 0 0 auto;
+  text-decoration: none; /* чипы — <Link> */
   font-family: var(--font-display);
   font-size: var(--t-chip-mob);
   font-weight: 700;
@@ -106,6 +107,7 @@
   padding: 10px 14px 11px;
   background: transparent;
   border: none;
+  text-decoration: none; /* суб-табы — <Link> */
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   cursor: pointer;
@@ -149,14 +151,22 @@
   background-clip: padding-box;
 }
 
+/* Картиночный тайл — <Link> вокруг <img>; скелетоны загрузки — <div> с тем же классом. */
 .tile {
   display: block;
   width: 100%;
-  height: auto; /* image tiles size to their natural aspect ratio — no cropping */
   margin-bottom: var(--tile-gap-mob);
   background: var(--c-skeleton); /* neutral tone shown behind a CDN image while it loads */
+  text-decoration: none;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.tileImg {
+  display: block;
+  width: 100%;
+  height: auto; /* natural aspect ratio — no cropping */
 }
 
 .tile:active {

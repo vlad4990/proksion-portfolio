@@ -1,6 +1,5 @@
 import photoMasked1 from '../../assets/photo-masked-1-full.webp'
 import photoMasked2 from '../../assets/photo-masked-2.webp'
-import type { Route } from '../../types'
 import { MobileTabBar } from './MobileTabBar'
 import styles from './MobileAbout.module.css'
 
@@ -74,7 +73,7 @@ function MobileEduEntry({ degree, school }: { degree: string; school: string }) 
   )
 }
 
-export function MobileAbout({ onNav }: { onNav: (r: Route) => void }) {
+export function MobileAbout() {
   return (
     <div className={styles.page} data-test="about">
       <header className={styles.header} data-test="mobile-header">
@@ -110,12 +109,7 @@ export function MobileAbout({ onNav }: { onNav: (r: Route) => void }) {
         </div>
       </div>
 
-      <MobileTabBar
-        active="home"
-        onAbout={() => onNav('home')}
-        onProjects={() => onNav('projects')}
-        onContacts={() => onNav('contacts')}
-      />
+      <MobileTabBar active="home" />
     </div>
   )
 }

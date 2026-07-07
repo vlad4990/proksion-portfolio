@@ -21,6 +21,7 @@
   background: transparent;
   border: 0;
   padding: 0;
+  text-decoration: none; /* пункты навигации — <Link> */
   color: var(--accent);
   font-family: var(--font-display);
   font-size: var(--t-nav-wordmark);
@@ -46,6 +47,7 @@
   display: inline-block;
   background: transparent;
   border: 0;
+  text-decoration: none;
   color: var(--fg-muted);
   border-radius: var(--radius-pill);
   padding: var(--nav-item-pad);

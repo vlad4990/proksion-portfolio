@@ -1,4 +1,3 @@
-import type { Route } from '../../types'
 import { MobileTabBar } from './MobileTabBar'
 import styles from './MobileContacts.module.css'
 
@@ -9,7 +8,7 @@ const ROWS = [
   { label: 'CV / PDF', value: 'Скачать резюме →', href: '#' },
 ]
 
-export function MobileContacts({ onNav }: { onNav: (r: Route) => void }) {
+export function MobileContacts() {
   return (
     <div className={styles.page} data-test="contacts">
       <header className={styles.header} data-test="mobile-header">
@@ -40,12 +39,7 @@ export function MobileContacts({ onNav }: { onNav: (r: Route) => void }) {
         </div>
       </div>
 
-      <MobileTabBar
-        active="contacts"
-        onAbout={() => onNav('home')}
-        onProjects={() => onNav('projects')}
-        onContacts={() => onNav('contacts')}
-      />
+      <MobileTabBar active="contacts" />
     </div>
   )
 }

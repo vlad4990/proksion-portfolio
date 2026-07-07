@@ -65,7 +65,7 @@ describe('public routes (seeded)', () => {
     expect(status).toBe(404)
   })
 
-  test('GET /categories/:cat/:sub → tiles strictly { id, src, w, h }', async () => {
+  test('GET /categories/:cat/:sub → tiles strictly { id, src, w, h, cat, sub }', async () => {
     const cat = repos.category.list()[0]!
     const sub = repos.subcategory.list(cat.id)[0]!
     const { status, body } = await get(app, `/categories/${cat.slug}/${sub.slug}`)
@@ -74,11 +74,13 @@ describe('public routes (seeded)', () => {
     expect(body.subcategory.slug).toBe(sub.slug)
     expect(body.works.length).toBe(repos.work.list(sub.id).length)
     for (const tile of body.works) {
-      expect(Object.keys(tile).sort()).toEqual(['h', 'id', 'src', 'w'])
+      expect(Object.keys(tile).sort()).toEqual(['cat', 'h', 'id', 'src', 'sub', 'w'])
       expect(typeof tile.id).toBe('number')
       expect(typeof tile.w).toBe('number')
       expect(typeof tile.h).toBe('number')
       expect(tile.src).toMatch(/^\/media\/.+\/thumb\.(avif|webp|jpg)$/)
+      expect(tile.cat).toBe(cat.slug)
+      expect(tile.sub).toBe(sub.slug)
     }
   })
 
@@ -211,8 +213,13 @@ describe('public routes (seeded)', () => {
     expect(body.offset).toBe(0)
     expect(Array.isArray(body.items)).toBe(true)
     for (const tile of body.items) {
-      expect(Object.keys(tile).sort()).toEqual(['h', 'id', 'src', 'w'])
+      expect(Object.keys(tile).sort()).toEqual(['cat', 'h', 'id', 'src', 'sub', 'w'])
     }
+    // слаги глобального листинга сверяем с резолвом by-id (один источник правды пути)
+    const first = body.items[0]
+    const byId = (await get(app, `/works/by-id/${first.id}`)).body
+    expect(first.cat).toBe(byId.cat)
+    expect(first.sub).toBe(byId.sub)
   })
 })
 

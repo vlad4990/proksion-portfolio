@@ -10,13 +10,17 @@ import { imageVariants, mediaUrl, type ImageVariants } from './media-url.ts'
 /**
  * Тайл листинга (совместим с masonry-фронтом, см. front/CLAUDE.md).
  * `id` — id РАБОТЫ (клик → модалка работы); `src` — URL thumb cover-картинки
- * (jpg как универсальный fallback, §5); `w/h` — натуральные размеры (фронт ставит aspect-ratio).
+ * (jpg как универсальный fallback, §5); `w/h` — натуральные размеры (фронт ставит aspect-ratio);
+ * `cat`/`sub` — слаги пути: тайл ЛЮБОГО листинга (включая глобальный `/works`) сразу знает
+ * свой канонический URL `/projects/:cat/:sub/:id`, и фронт рендерит настоящую ссылку.
  */
 export interface Tile {
   id: number
   src: string
   w: number
   h: number
+  cat: string
+  sub: string
 }
 
 /** Картинка в детали работы: все варианты/форматы + метаданные. `lqip` — только если задан. */
@@ -95,8 +99,15 @@ export interface WorksPage {
 
 // ── Сериализаторы ──────────────────────────────────────────────────────────────
 
-export function toTile(work: Work, cover: Image): Tile {
-  return { id: work.id, src: mediaUrl(cover.key_base, 'thumb', 'jpg'), w: cover.width, h: cover.height }
+export function toTile(work: Work, cover: Image, catSlug: string, subSlug: string): Tile {
+  return {
+    id: work.id,
+    src: mediaUrl(cover.key_base, 'thumb', 'jpg'),
+    w: cover.width,
+    h: cover.height,
+    cat: catSlug,
+    sub: subSlug,
+  }
 }
 
 export function toImageDetail(image: Image): ImageDetail {

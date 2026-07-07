@@ -82,7 +82,7 @@ export function publicRoutes(db: Database) {
       return categoryNav(repos, category.id)
     })
 
-    // Подкатегория + работы (тайлы { id, src, w, h }).
+    // Подкатегория + работы (тайлы { id, src, w, h, cat, sub }).
     .get('/categories/:cat/:sub', ({ params, set }) => {
       const category = repos.category.getBySlug(params.cat)
       if (!category) {
@@ -97,7 +97,7 @@ export function publicRoutes(db: Database) {
       const listing: SubcategoryListing = {
         category: toCategoryRef(category),
         subcategory: toSubcategoryRef(subcategory),
-        works: subcategoryTiles(repos, subcategory.id),
+        works: subcategoryTiles(repos, subcategory.id, category.slug, subcategory.slug),
       }
       return listing
     })

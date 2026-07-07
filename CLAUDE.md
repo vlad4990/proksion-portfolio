@@ -64,7 +64,7 @@ make down        # остановить (volume'ы сохраняются)
 
 - **SPA на Vite + React + react-router** (URL-роутинг). Точка входа `src/main.tsx` → `BrowserRouter` → `App`. Маршруты: `/`, `/projects`, `/projects/:cat/:sub`, `/contacts`, catch-all → `/`.
 - **Двойное дерево компонентов** `components/desktop/*` и `components/mobile/*`, выбор через `useIsMobile()` (`matchMedia('(max-width: 767.98px)')`). Это не один responsive-layout — разные компоненты; фичи делаются в обоих деревьях.
-- **Листинг проектов** — блок `projects-tiles` (десктоп+мобайл) на `react-masonry-css` (Pinterest-стиль): колонки через `breakpointCols` (4/3/2 десктоп, 2 мобайл), зазоры `--tile-gap`/`--tile-gap-mob`. Тайлы со стабильным `id` (задел под клик → модалка), пока инертны.
+- **Листинг проектов** — блок `projects-tiles` (десктоп+мобайл) на `react-masonry-css` (Pinterest-стиль): колонки через `breakpointCols` (4/3/2 десктоп, 2 мобайл), зазоры `--tile-gap`/`--tile-gap-mob`. Тайл — настоящая `<Link>`-ссылка на `/projects/:cat/:sub/:id` (модалка работы поверх листинга); слаги `cat`/`sub` приходят в самом тайле из API.
 - **Занавес-герой** — fixed-оверлей (z 1000), показывается только при свежей загрузке `/`, снимается первым вводом/кликом.
 - **Стайлинг** — CSS Modules + единственный глобал `src/styles/tokens.css` (токены + `@font-face`, шрифты в `front/public/fonts/`). Респонсив — дискретные токен-тиры через `@media` (база `:root` ≥1400, 1100–1399, 768–1099, `<768` — мобильное дерево с `--*-mob`), без `scale()`/`clamp()`.
 
