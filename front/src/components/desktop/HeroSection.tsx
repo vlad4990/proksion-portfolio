@@ -1,4 +1,4 @@
-import heroPortrait from '../../assets/hero-proksion.png'
+import heroPortrait from '../../assets/hero-proksion.webp'
 import markerPixel from '../../assets/icon-marker-pixel.svg'
 import styles from './HeroSection.module.css'
 

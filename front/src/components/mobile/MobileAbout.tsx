@@ -1,5 +1,5 @@
-import photoMasked1 from '../../assets/photo-masked-1-full.png'
-import photoMasked2 from '../../assets/photo-masked-2.png'
+import photoMasked1 from '../../assets/photo-masked-1-full.webp'
+import photoMasked2 from '../../assets/photo-masked-2.webp'
 import type { Route } from '../../types'
 import { MobileTabBar } from './MobileTabBar'
 import styles from './MobileAbout.module.css'
