@@ -248,8 +248,9 @@ Caddy срезает префикс `/api` (`handle_path /api/*` в корнев
 | GET   | `/works`                            | все работы (для `/projects`), пагинация                      |
 | GET   | `/works/:cat/:sub/:work`            | полная работа: описание + все картинки (варианты, `w/h`, alt)|
 
-Форма тайла для листинга совместима с masonry-фронтом: `{ id, src, w, h, cat, sub }`
-(`src` = URL `thumb` cover-картинки, `w/h` = натуральные размеры → aspect-ratio без скачков,
+Форма тайла для листинга совместима с masonry-фронтом: `{ id, src, w, h, cat, sub, variants }`
+(`src` = URL `thumb` cover-картинки в jpg — fallback, `variants` = thumb в avif/webp/jpg для
+`<picture>` в листинге, `w/h` = натуральные размеры → aspect-ratio без скачков,
 `cat`/`sub` = слаги пути — тайл любого листинга сразу знает канонический URL
 `/projects/:cat/:sub/:id`, и фронт рендерит настоящую ссылку).
 

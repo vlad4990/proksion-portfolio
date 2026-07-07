@@ -163,6 +163,10 @@
   transition: opacity var(--dur-base) var(--ease-out);
 }
 
+.tilePicture {
+  display: block; /* убирает inline-baseline зазор под картинкой */
+}
+
 .tileImg {
   display: block;
   width: 100%;

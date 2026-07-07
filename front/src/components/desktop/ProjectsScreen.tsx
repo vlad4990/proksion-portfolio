@@ -54,9 +54,13 @@ function SidebarChild({ label, active, to }: { label: string; active: boolean; t
 
 const BREAKPOINT_COLS = { default: 4, 1399: 3, 1099: 2 }
 
+/** Первые тайлы (примерно два ряда) — не лениво и с высоким приоритетом: это LCP листинга,
+ *  ленивая загрузка первого экрана лишь оттягивала появление работ. */
+const EAGER_TILES = 8
+
 /** Тайлы из API: место зарезервировано через aspect-ratio (w/h) — нет скачков layout.
- *  Тайл — настоящая ссылка на /projects/:cat/:sub/:id (модалка работы поверх листинга):
- *  работает cmd-клик/новая вкладка/копирование адреса, Enter — нативно. */
+ *  Тайл — настоящая ссылка на /projects/:cat/:sub/:id (модалка работы поверх листинга);
+ *  картинка — <picture> avif/webp/jpg (thumb-варианты уже отдаёт бэкенд, avif втрое легче). */
 function TileGrid({ tiles }: { tiles: Tile[] }) {
   return (
     <Masonry
@@ -64,24 +68,32 @@ function TileGrid({ tiles }: { tiles: Tile[] }) {
       className={styles.masonry}
       columnClassName={styles.masonryColumn}
     >
-      {tiles.map((t) => (
-        <Link
-          key={t.id}
-          to={`/projects/${t.cat}/${t.sub}/${t.id}`}
-          className={styles.tile}
-          aria-label="Открыть работу"
-          data-test="projects-tile"
-        >
-          <img
-            src={t.src}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className={styles.tileImg}
-            style={{ aspectRatio: `${t.w} / ${t.h}` }}
-          />
-        </Link>
-      ))}
+      {tiles.map((t, i) => {
+        const eager = i < EAGER_TILES
+        return (
+          <Link
+            key={t.id}
+            to={`/projects/${t.cat}/${t.sub}/${t.id}`}
+            className={styles.tile}
+            aria-label="Открыть работу"
+            data-test="projects-tile"
+          >
+            <picture className={styles.tilePicture}>
+              <source type="image/avif" srcSet={t.variants.avif} />
+              <source type="image/webp" srcSet={t.variants.webp} />
+              <img
+                src={t.variants.jpg}
+                alt=""
+                loading={eager ? 'eager' : 'lazy'}
+                decoding="async"
+                className={styles.tileImg}
+                style={{ aspectRatio: `${t.w} / ${t.h}` }}
+                {...(eager ? { fetchpriority: 'high' } : {})}
+              />
+            </picture>
+          </Link>
+        )
+      })}
     </Masonry>
   )
 }

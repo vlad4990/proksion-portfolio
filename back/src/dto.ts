@@ -3,7 +3,7 @@
 // их потом дорого. Любая правка формы — осознанно и синхронно с фронтом.
 
 import type { Category, Image, Subcategory, Work } from './types.ts'
-import { imageVariants, mediaUrl, type ImageVariants } from './media-url.ts'
+import { imageVariants, mediaUrl, type ImageVariants, type VariantUrls } from './media-url.ts'
 
 // ── Контракты ответов ─────────────────────────────────────────────────────────
 
@@ -12,7 +12,9 @@ import { imageVariants, mediaUrl, type ImageVariants } from './media-url.ts'
  * `id` — id РАБОТЫ (клик → модалка работы); `src` — URL thumb cover-картинки
  * (jpg как универсальный fallback, §5); `w/h` — натуральные размеры (фронт ставит aspect-ratio);
  * `cat`/`sub` — слаги пути: тайл ЛЮБОГО листинга (включая глобальный `/works`) сразу знает
- * свой канонический URL `/projects/:cat/:sub/:id`, и фронт рендерит настоящую ссылку.
+ * свой канонический URL `/projects/:cat/:sub/:id`, и фронт рендерит настоящую ссылку;
+ * `variants` — thumb во всех форматах (avif/webp/jpg) для `<picture>` в листинге
+ * (avif втрое легче jpg; `src` остаётся jpg-fallback для потребителей без `<picture>`).
  */
 export interface Tile {
   id: number
@@ -21,6 +23,7 @@ export interface Tile {
   h: number
   cat: string
   sub: string
+  variants: VariantUrls
 }
 
 /** Картинка в детали работы: все варианты/форматы + метаданные. `lqip` — только если задан. */
@@ -107,6 +110,7 @@ export function toTile(work: Work, cover: Image, catSlug: string, subSlug: strin
     h: cover.height,
     cat: catSlug,
     sub: subSlug,
+    variants: imageVariants(cover.key_base).thumb,
   }
 }
 

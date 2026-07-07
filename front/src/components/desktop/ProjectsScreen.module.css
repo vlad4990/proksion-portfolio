@@ -142,6 +142,10 @@
   transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
 }
 
+.tilePicture {
+  display: block; /* убирает inline-baseline зазор под картинкой */
+}
+
 .tileImg {
   display: block;
   width: 100%;

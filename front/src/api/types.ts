@@ -4,10 +4,11 @@
 // менять синхронно с бэкендом.
 
 /**
- * Тайл листинга. `id` — id работы; `src` — URL thumb cover-картинки (`/media/...`);
- * `w/h` — натуральные размеры (фронт ставит aspect-ratio → нет скачков layout);
- * `cat`/`sub` — слаги пути: тайл сразу знает свой канонический URL
- * `/projects/:cat/:sub/:id` и рендерится настоящей ссылкой (в т.ч. с глобального листинга).
+ * Тайл листинга. `id` — id работы; `src` — URL thumb cover-картинки (`/media/...`,
+ * jpg-fallback); `w/h` — натуральные размеры (фронт ставит aspect-ratio → нет скачков
+ * layout); `cat`/`sub` — слаги пути: тайл сразу знает свой канонический URL
+ * `/projects/:cat/:sub/:id` и рендерится настоящей ссылкой (в т.ч. с глобального листинга);
+ * `variants` — thumb в avif/webp/jpg для `<picture>` (avif втрое легче jpg).
  */
 export interface Tile {
   id: number
@@ -16,6 +17,7 @@ export interface Tile {
   h: number
   cat: string
   sub: string
+  variants: VariantUrls
 }
 
 /** Плоская метаинформация категории. */

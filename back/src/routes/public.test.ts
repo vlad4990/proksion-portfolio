@@ -65,7 +65,7 @@ describe('public routes (seeded)', () => {
     expect(status).toBe(404)
   })
 
-  test('GET /categories/:cat/:sub → tiles strictly { id, src, w, h, cat, sub }', async () => {
+  test('GET /categories/:cat/:sub → tiles strictly { id, src, w, h, cat, sub, variants }', async () => {
     const cat = repos.category.list()[0]!
     const sub = repos.subcategory.list(cat.id)[0]!
     const { status, body } = await get(app, `/categories/${cat.slug}/${sub.slug}`)
@@ -74,13 +74,18 @@ describe('public routes (seeded)', () => {
     expect(body.subcategory.slug).toBe(sub.slug)
     expect(body.works.length).toBe(repos.work.list(sub.id).length)
     for (const tile of body.works) {
-      expect(Object.keys(tile).sort()).toEqual(['cat', 'h', 'id', 'src', 'sub', 'w'])
+      expect(Object.keys(tile).sort()).toEqual(['cat', 'h', 'id', 'src', 'sub', 'variants', 'w'])
       expect(typeof tile.id).toBe('number')
       expect(typeof tile.w).toBe('number')
       expect(typeof tile.h).toBe('number')
       expect(tile.src).toMatch(/^\/media\/.+\/thumb\.(avif|webp|jpg)$/)
       expect(tile.cat).toBe(cat.slug)
       expect(tile.sub).toBe(sub.slug)
+      // thumb-варианты для <picture> в листинге; jpg совпадает с fallback-src
+      for (const fmt of ['avif', 'webp', 'jpg']) {
+        expect(tile.variants[fmt]).toMatch(new RegExp(`^/media/.+/thumb\\.${fmt}$`))
+      }
+      expect(tile.variants.jpg).toBe(tile.src)
     }
   })
 
@@ -213,7 +218,7 @@ describe('public routes (seeded)', () => {
     expect(body.offset).toBe(0)
     expect(Array.isArray(body.items)).toBe(true)
     for (const tile of body.items) {
-      expect(Object.keys(tile).sort()).toEqual(['cat', 'h', 'id', 'src', 'sub', 'w'])
+      expect(Object.keys(tile).sort()).toEqual(['cat', 'h', 'id', 'src', 'sub', 'variants', 'w'])
     }
     // слаги глобального листинга сверяем с резолвом by-id (один источник правды пути)
     const first = body.items[0]
