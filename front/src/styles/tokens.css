@@ -8,17 +8,20 @@
    Компоненты читают их через var(--token) внутри своих CSS Modules.
    ===================================================================== */
 
-/* -- Fonts ----------------------------------------------------------- */
+/* -- Fonts -----------------------------------------------------------
+   WOFF2 (вдвое-втрое легче TTF); оба шрифта preload'ятся из index.html,
+   поэтому качаются параллельно с CSS. font-display: block — осознанно:
+   бренд-типографика без FOUT-подмены. */
 @font-face {
   font-family: "Stengazeta";
-  src: url("/fonts/Stengazeta-Regular.ttf") format("truetype");
+  src: url("/fonts/Stengazeta-Regular.woff2") format("woff2");
   font-weight: 400 900;
   font-style: normal;
   font-display: block;
 }
 @font-face {
   font-family: "Kanit";
-  src: url("/fonts/Kanit-Cyrillic.ttf") format("truetype");
+  src: url("/fonts/Kanit-Cyrillic.woff2") format("woff2");
   font-weight: 400 800;
   font-style: normal;
   font-display: block;
