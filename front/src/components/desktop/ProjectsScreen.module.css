@@ -160,6 +160,39 @@
   box-shadow: 0 0 0 3px var(--accent);
 }
 
+/* ── «Показать ещё» — подгрузка глобального листинга ───────── */
+.loadMore {
+  display: block;
+  margin: var(--sp-block-sm) auto 0;
+  padding: 12px 28px 10px;
+  background: transparent;
+  border: var(--stroke-hairline) solid var(--hairline);
+  color: var(--fg-muted);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-title);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  cursor: pointer;
+  outline: none;
+  transition: color 180ms var(--ease-out), border-color 180ms var(--ease-out);
+}
+
+.loadMore:hover {
+  color: var(--fg-strong);
+  border-color: var(--fg-muted);
+}
+
+.loadMore:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.loadMore:disabled {
+  color: var(--fg-dim);
+  cursor: default;
+}
+
 /* ── Empty / error states ──────────────────────────────────── */
 .message {
   margin: 0;

@@ -120,7 +120,17 @@ function TileSkeleton() {
 }
 
 export function ProjectsScreen() {
-  const { categories, tiles, tilesStatus, activeCategory, activeSubSlug, cat } = useProjects()
+  const {
+    categories,
+    tiles,
+    tilesStatus,
+    activeCategory,
+    activeSubSlug,
+    cat,
+    hasMore,
+    loadingMore,
+    loadMore,
+  } = useProjects()
   const allActive = !cat
 
   const groupTo = (g: CategoryNav) =>
@@ -172,6 +182,17 @@ export function ProjectsScreen() {
             </p>
           )}
           {tilesStatus === 'ready' && tiles.length > 0 && <TileGrid tiles={tiles} />}
+          {hasMore && (
+            <button
+              type="button"
+              className={styles.loadMore}
+              onClick={loadMore}
+              disabled={loadingMore}
+              data-test="projects-load-more"
+            >
+              {loadingMore ? 'Загружаем…' : 'Показать ещё'}
+            </button>
+          )}
         </div>
       </div>
     </section>

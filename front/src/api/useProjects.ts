@@ -59,6 +59,12 @@ export interface ProjectsData {
   /** Сырые параметры маршрута. */
   cat: string | undefined
   sub: string | undefined
+  /** Есть ли непоказанные работы (пагинация есть только у глобального `/works`). */
+  hasMore: boolean
+  /** Идёт подгрузка следующей страницы (для disabled-состояния кнопки). */
+  loadingMore: boolean
+  /** Подгрузить следующую страницу глобального листинга (append к текущим тайлам). */
+  loadMore: () => void
 }
 
 export function useProjects(): ProjectsData {
@@ -70,6 +76,7 @@ export function useProjects(): ProjectsData {
     categoriesCache ? 'ready' : 'loading',
   )
   const [tilesState, setTilesState] = useState<TilesState>(() => initialTilesState(key))
+  const [loadingMore, setLoadingMore] = useState(false)
 
   // Смена вида листинга — синхронно в рендере (render-phase update): ни кадра
   // со старыми тайлами, кэшированный вид появляется мгновенно.
@@ -118,6 +125,28 @@ export function useProjects(): ProjectsData {
     }
   }, [key, tilesState.key, tilesState.status, cat, sub])
 
+  // Подгрузка следующей страницы: только глобальный листинг (подкатегории приходят целиком).
+  // GET /works с offset = сколько уже показано; накопленный список кладём обратно в кэш,
+  // чтобы после модалки/навигации пользователь вернулся ко всем догруженным работам.
+  const hasMore = tilesState.status === 'ready' && tilesState.tiles.length < tilesState.total
+  const loadMore = (): void => {
+    if (key !== 'all' || !hasMore || loadingMore) return
+    setLoadingMore(true)
+    getWorks(tilesState.tiles.length)
+      .then((page) => {
+        const entry: TilesCacheEntry = {
+          tiles: [...tilesState.tiles, ...page.items],
+          total: page.total,
+        }
+        tilesCache.set(key, entry)
+        setTilesState({ key, ...entry, status: 'ready' })
+      })
+      .catch(() => {
+        /* подгрузка не удалась — кнопка остаётся, клик можно повторить */
+      })
+      .finally(() => setLoadingMore(false))
+  }
+
   // Без fallback на первую категорию: на `/projects` показаны ВСЕ работы, и подсвечивать
   // какую-то категорию как активную было бы враньём (для этого есть пункт «Все работы»).
   const activeCategory = categories.find((c) => c.slug === cat)
@@ -134,5 +163,8 @@ export function useProjects(): ProjectsData {
     activeSubSlug,
     cat,
     sub,
+    hasMore,
+    loadingMore,
+    loadMore,
   }
 }
