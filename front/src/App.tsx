@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Navigate, Route as RouterRoute, Routes, useLocation } from 'react-router'
 import { useIsMobile } from './hooks/useIsMobile'
+import { ROUTE_TITLES } from './seo'
 import type { HeroPhase, Route } from './types'
 
 import { TopNav } from './components/desktop/TopNav'
@@ -91,6 +92,12 @@ export default function App() {
   // pathname: открытие/закрытие модалки работы внутри /projects скролл не сбрасывает.
   useEffect(() => {
     window.scrollTo(0, 0)
+  }, [route])
+
+  // Заголовок вкладки следует разделу; модалка работы ставит свой в useWorkModal
+  // (route при этом не меняется — конфликтов нет).
+  useEffect(() => {
+    document.title = ROUTE_TITLES[route]
   }, [route])
 
   const curtainClass = `${styles.heroOverlay}${
