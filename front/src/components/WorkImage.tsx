@@ -4,7 +4,10 @@
 // Брендово-нейтрален: ни цветов, ни размеров не хардкодит — стили приходят классами из дерева.
 //
 // Родитель монтирует <WorkImage key={image.id} …>: смена слайда = свежий монтаж →
-// состояние loaded сбрасывается, LQIP снова виден. `complete`-проверка покрывает кэш.
+// состояние loaded сбрасывается, LQIP снова виден. Загрузку отслеживаем НАТИВНЫМ
+// listener'ом + проверкой `complete` в эффекте: реактовский onLoad терял событие
+// (на проде картинка навсегда оставалась в opacity:0 при complete=true), а нативная
+// подписка покрывает оба порядка «load до/после эффекта».
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import type { ImageDetail } from '../api/types'
@@ -17,13 +20,40 @@ interface WorkImageProps {
   imgClassName?: string
 }
 
+/**
+ * Скрытый прелоадер соседнего слайда: тот же `<picture>` avif/webp/jpg, что и у видимого
+ * слайда, — браузер сам выбирает и скачивает ПРАВИЛЬНЫЙ формат в кэш (голый `new Image()`
+ * знал бы только jpg). Модалки рендерят его для next/prev — листание мгновенное.
+ */
+export function PreloadImage({ image }: { image: ImageDetail }) {
+  return (
+    <picture hidden aria-hidden="true" data-test="work-preload">
+      <source type="image/avif" srcSet={image.variants.full.avif} />
+      <source type="image/webp" srcSet={image.variants.full.webp} />
+      <img src={image.variants.full.jpg} alt="" />
+    </picture>
+  )
+}
+
 export function WorkImage({ image, className, imgClassName }: WorkImageProps) {
   const [loaded, setLoaded] = useState(false)
   const imgRef = useRef<HTMLImageElement>(null)
 
-  // Картинка могла прийти из кэша до навешивания onLoad — синхронизируем по `complete`.
   useEffect(() => {
-    if (imgRef.current?.complete) setLoaded(true)
+    const el = imgRef.current
+    if (!el) return
+    if (el.complete) {
+      setLoaded(true)
+      return
+    }
+    const onDone = () => setLoaded(true)
+    el.addEventListener('load', onDone)
+    // При ошибке тоже показываем <img> (сломанная иконка честнее вечного блюра).
+    el.addEventListener('error', onDone)
+    return () => {
+      el.removeEventListener('load', onDone)
+      el.removeEventListener('error', onDone)
+    }
   }, [])
 
   const pictureStyle: CSSProperties = {
@@ -42,7 +72,6 @@ export function WorkImage({ image, className, imgClassName }: WorkImageProps) {
         width={image.w}
         height={image.h}
         decoding="async"
-        onLoad={() => setLoaded(true)}
         className={imgClassName}
         style={{ opacity: loaded ? 1 : 0 }}
         data-test="work-image"

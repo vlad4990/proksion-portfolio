@@ -10,6 +10,7 @@
 import { useEffect } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { useWorkDetail, type WorkStatus } from '../api/useWorkDetail'
+import { ROUTE_TITLES, workTitle } from '../seo'
 import type { ImageDetail, WorkDetailById } from '../api/types'
 
 export interface WorkModalController {
@@ -66,6 +67,16 @@ export function useWorkModal(): WorkModalController {
   useEffect(() => {
     if (status === 'notfound') navigate(listingPath, { replace: true })
   }, [status, listingPath, navigate])
+
+  // Заголовок вкладки = название работы; при закрытии возвращаем заголовок листинга
+  // (route не меняется — эффект App не перезапустится).
+  useEffect(() => {
+    if (status !== 'ready' || !detail) return
+    document.title = workTitle(detail.title)
+    return () => {
+      document.title = ROUTE_TITLES.projects
+    }
+  }, [status, detail])
 
   // Клавиатура: Esc закрывает всегда; стрелки листают карусель (когда есть что листать).
   // Эффект пересубскрайбится при смене activeIndex/count → замыкания всегда свежие.

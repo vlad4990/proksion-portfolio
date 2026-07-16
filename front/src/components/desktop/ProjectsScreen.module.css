@@ -30,6 +30,7 @@
   background: transparent;
   border: 0;
   padding: 6px 0;
+  text-decoration: none; /* пункты сайдбара — <Link> */
   cursor: pointer;
   font-family: var(--font-display);
   font-weight: 700;
@@ -89,6 +90,7 @@
   color: var(--fg-muted);
   border: 0;
   border-radius: var(--radius-card);
+  text-decoration: none;
   padding: 0 0 0 60px;
   font-family: var(--font-display);
   font-weight: 700;
@@ -127,15 +129,27 @@
   background-clip: padding-box;
 }
 
+/* Картиночный тайл — <Link> вокруг <img>; скелетон-тон ссылки виден, пока картинка грузится.
+   Скелетоны загрузки — <div> с тем же классом. */
 .tile {
   display: block;
   width: 100%;
-  height: auto; /* image tiles size to their natural aspect ratio — no cropping */
   margin-bottom: var(--tile-gap);
   background: var(--c-skeleton); /* neutral tone shown behind a CDN image while it loads */
+  text-decoration: none;
   cursor: pointer;
   outline: none;
   transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+
+.tilePicture {
+  display: block; /* убирает inline-baseline зазор под картинкой */
+}
+
+.tileImg {
+  display: block;
+  width: 100%;
+  height: auto; /* natural aspect ratio — no cropping */
 }
 
 .tile:hover {
@@ -144,6 +158,39 @@
 
 .tile:focus-visible {
   box-shadow: 0 0 0 3px var(--accent);
+}
+
+/* ── «Показать ещё» — подгрузка глобального листинга ───────── */
+.loadMore {
+  display: block;
+  margin: var(--sp-block-sm) auto 0;
+  padding: var(--load-more-pad);
+  background: transparent;
+  border: var(--stroke-hairline) solid var(--hairline);
+  color: var(--fg-muted);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-title);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  cursor: pointer;
+  outline: none;
+  transition: color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+
+.loadMore:hover {
+  color: var(--fg-strong);
+  border-color: var(--fg-muted);
+}
+
+.loadMore:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.loadMore:disabled {
+  color: var(--fg-dim);
+  cursor: default;
 }
 
 /* ── Empty / error states ──────────────────────────────────── */

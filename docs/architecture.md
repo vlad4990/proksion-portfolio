@@ -248,8 +248,11 @@ Caddy срезает префикс `/api` (`handle_path /api/*` в корнев
 | GET   | `/works`                            | все работы (для `/projects`), пагинация                      |
 | GET   | `/works/:cat/:sub/:work`            | полная работа: описание + все картинки (варианты, `w/h`, alt)|
 
-Форма тайла для листинга совместима с masonry-фронтом: `{ id, src, w, h }`
-(`src` = URL `thumb` cover-картинки, `w/h` = натуральные размеры → aspect-ratio без скачков).
+Форма тайла для листинга совместима с masonry-фронтом: `{ id, src, w, h, cat, sub, variants }`
+(`src` = URL `thumb` cover-картинки в jpg — fallback, `variants` = thumb в avif/webp/jpg для
+`<picture>` в листинге, `w/h` = натуральные размеры → aspect-ratio без скачков,
+`cat`/`sub` = слаги пути — тайл любого листинга сразу знает канонический URL
+`/projects/:cat/:sub/:id`, и фронт рендерит настоящую ссылку).
 
 ### Админка (требуется авторизация)
 
@@ -288,8 +291,8 @@ Caddy срезает префикс `/api` (`handle_path /api/*` в корнев
 
 - **API-клиент**: новый модуль `src/api/` (тонкие `fetch`-обёртки, типы ответов). База — `/api`.
 - **Листинг**: заменить статические массивы `GROUPS`/тайлов в `ProjectsScreen.tsx` и
-  `MobileProjects.tsx` на данные из API. Форма тайла `{ id, src, w, h }` уже поддержана masonry
-  (см. `front/CLAUDE.md`) — менять раскладку не нужно.
+  `MobileProjects.tsx` на данные из API. Форма тайла `{ id, src, w, h, cat, sub, variants }` поддержана
+  masonry (см. `front/CLAUDE.md`); тайл — `<Link>` на `/projects/:cat/:sub/:id`.
 - **Модалка** (полноэкранная): новый компонент в **обоих** деревьях
   (`components/desktop/` + `components/mobile/`, по конвенции двойного дерева). Рендерит
   описание + карусель картинок (`<picture>` avif/webp/jpg, LQIP-фон на время загрузки).

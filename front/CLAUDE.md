@@ -20,7 +20,7 @@ npm run preview  # serve the production build locally
 
 SPA на **Vite 6 + React 18 + TypeScript strict**. Зависимостей минимум: `react`, `react-dom`, `react-router` (7.x) и `react-masonry-css` (~2 КБ, без транзитивных зависимостей; собственные TS-типы — листинг тайлов проектов). Никаких UI-библиотек и CSS-фреймворков — своя дизайн-система на CSS-токенах. Точка входа — `src/main.tsx` (`BrowserRouter` → `App`).
 
-**Данные — из API** (`src/api/`: `client.ts` тонкие fetch-обёртки, `types.ts`, хуки `useProjects`/`useWorkDetail`). База — `/api` (в dev проксируется на `back:3001`, в проде Caddy `handle_path /api/*`). Картинки — same-origin `/media/*`. Dev-proxy `/api`+`/media` настроен в `vite.config.ts` (dev-сервер на 5005). Статических массивов контента больше нет.
+**Данные — из API** (`src/api/`: `client.ts` тонкие fetch-обёртки, `types.ts`, хуки `useProjects`/`useWorkDetail`). Хуки держат **сессионный кэш** (модульные Map'ы: категории, тайлы по виду листинга, деталь по id) — повторная навигация и закрытие модалки не перезапрашивают данные и не мигают скелетонами; ревалидации нет (контент меняется редко, свежее — со следующей загрузкой страницы). База — `/api` (в dev проксируется на `back:3001`, в проде Caddy `handle_path /api/*`). Картинки — same-origin `/media/*`. Dev-proxy `/api`+`/media` настроен в `vite.config.ts` (dev-сервер на 5005). Статических массивов контента больше нет.
 
 > Исторически фронт был на Astro + React islands; миграция на чистый Vite+React SPA завершена — никаких `.astro`, SSR и `@astrojs/*` больше нет.
 
@@ -38,7 +38,7 @@ SPA на **Vite 6 + React 18 + TypeScript strict**. Зависимостей м�
 - `/contacts`
 - `*` — `<Navigate to="/" replace />`
 
-URL реально меняется (`useNavigate`), история работает. Навигация: десктоп — через `TopNav` (колбэки `onHome/onProjects/onContacts` + плавный скролл), мобайл — через `MobileTabBar`. После перехода — `window.scrollTo(0,0)`.
+URL реально меняется, история работает. Навигация — **настоящие ссылки** (`<Link>`): десктоп — `TopNav`, мобайл — `MobileTabBar`, сайдбар/чипы листинга и сами тайлы тоже ссылки (работают cmd-клик/новая вкладка/копирование адреса). Скролл к началу — эффект в `App.tsx`, привязанный к **ключу листинга** (`scrollKeyFromPath` — путь без `:work`-сегмента модалки), а не ко всему `pathname`: открытие/закрытие модалки внутри `/projects` (и карусель `?img=`) скролл листинга не сбрасывают, а смена раздела/подкатегории или переход подкатегория→общий `/projects` — сбрасывают. Повторный клик по уже активному пункту (URL не меняется → эффект молчит) докручивается плавно в самих nav-компонентах (`TopNav` + `MobileTabBar`) через общий `smoothScrollTo` из `src/lib/scroll.ts` — одинаково в обоих деревьях.
 
 ### Двойное дерево компонентов (не адаптив через CSS)
 
@@ -46,7 +46,7 @@ URL реально меняется (`useNavigate`), история работа
 
 ### Листинг проектов — masonry (react-masonry-css)
 
-Блок `data-test="projects-tiles"` в обоих деревьях (`ProjectsScreen.tsx`, `MobileProjects.tsx`) раскладывает тайлы через `<Masonry>` (Pinterest-стиль, распределение слева-направо). Число колонок задаётся `breakpointCols` (JS, по ширине окна): десктоп `{ default: 4, 1399: 3, 1099: 2 }` (повторяет тиры токенов), мобайл `{ default: 2 }`. Зазоры — токены `--tile-gap` / `--tile-gap-mob`; CSS-паттерн библиотеки: контейнер `.masonry` (`display:flex`, `margin-left: -gap`), колонки `.masonryColumn` (`padding-left: gap`), тайлы — `margin-bottom: gap`. `<Masonry>` обёрнут во внешний `<div data-test="projects-tiles">`, т.к. типы библиотеки не пробрасывают произвольные `data-*`. Картиночные тайлы — `<img width:100% height:auto>` (показываются **целиком, без обрезки**; высоту знать заранее не нужно — берётся из самой картинки). Форма данных CDN-ready: достаточно `{ id, src }`; опциональные натуральные размеры `w/h` → ставится `aspect-ratio` и место резервируется заранее (нет скачков layout при загрузке), без них — просто `height:auto`. На `<img>` стоят `loading="lazy"` + `decoding="async"`, под ними skeleton-тон `--c-skeleton` на время загрузки. Тайлы-заглушки (без `src`) — цветные блоки с фиксированной высотой `ph`. ⚠️ `react-masonry-css` распределяет тайлы по индексу (порядок чтения, баланс по числу элементов), **не** по измеренной пиксельной высоте — при сильном разбросе высот низы колонок не выравниваются идеально (компромисс выбранной библиотеки). Каждый тайл имеет стабильный `id` (ключ списка) и **кликабелен** → `navigate` на `/projects/:cat/:sub/:work` → модалка работы (`WorkModal`/`MobileWorkModal`) с каруселью картинок поверх листинга. Форма тайла из API — `{ id, src, w, h }`.
+Блок `data-test="projects-tiles"` в обоих деревьях (`ProjectsScreen.tsx`, `MobileProjects.tsx`) раскладывает тайлы через `<Masonry>` (Pinterest-стиль, распределение слева-направо). Число колонок задаётся `breakpointCols` (JS, по ширине окна): десктоп `{ default: 4, 1399: 3, 1099: 2 }` (повторяет тиры токенов), мобайл `{ default: 2 }`. Зазоры — токены `--tile-gap` / `--tile-gap-mob`; CSS-паттерн библиотеки: контейнер `.masonry` (`display:flex`, `margin-left: -gap`), колонки `.masonryColumn` (`padding-left: gap`), тайлы — `margin-bottom: gap`. `<Masonry>` обёрнут во внешний `<div data-test="projects-tiles">`, т.к. типы библиотеки не пробрасывают произвольные `data-*`. Картиночный тайл — **`<Link>` вокруг `<picture>` avif/webp/jpg** (thumb-варианты приходят в тайле из API; картинка целиком, без обрезки; класс `.tile` на ссылке — скелетон-фон/ховер, `.tilePicture`/`.tileImg` внутри). Натуральные размеры `w/h` → `aspect-ratio` резервирует место заранее (нет скачков layout при загрузке). Первые тайлы (`EAGER_TILES`: 8 десктоп / 4 мобайл) грузятся `loading="eager"` + `fetchpriority="high"` — это LCP листинга; остальные — `loading="lazy"` + `decoding="async"`, под ними skeleton-тон `--c-skeleton`. ⚠️ `react-masonry-css` распределяет тайлы по индексу (порядок чтения, баланс по числу элементов), **не** по измеренной пиксельной высоте — при сильном разбросе высот низы колонок не выравниваются идеально (компромисс выбранной библиотеки). Каждый тайл — настоящая ссылка на `/projects/:cat/:sub/:id` (слаги приходят в самом тайле) → модалка работы (`WorkModal`/`MobileWorkModal`) с каруселью поверх листинга. Форма тайла из API — `{ id, src, w, h, cat, sub, variants }`.
 
 ### Занавес-герой (hero curtain)
 
@@ -71,6 +71,7 @@ src/
 ├── types.ts             # Route ('home'|'projects'|'contacts'), HeroPhase
 ├── api/                 # client.ts (fetch → /api) · types.ts · useProjects · useWorkDetail
 ├── hooks/useIsMobile.ts # брейкпоинт <768px (matchMedia)
+├── lib/scroll.ts        # smoothScrollTo — общий плавный скролл для nav-деревьев
 ├── styles/              # tokens.css (глобальный) + layout.module.css
 ├── App.module.css       # chrome: curtain / nav-host / stage
 └── components/

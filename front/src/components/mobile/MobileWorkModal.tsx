@@ -7,7 +7,7 @@ import { useRef, type MouseEvent, type TouchEvent } from 'react'
 import { useWorkModal } from '../../hooks/useWorkModal'
 import { useScrollLock } from '../../hooks/useScrollLock'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
-import { WorkImage } from '../WorkImage'
+import { PreloadImage, WorkImage } from '../WorkImage'
 import styles from './MobileWorkModal.module.css'
 
 /** Минимальный сдвиг (px) горизонтального свайпа для смены слайда. */
@@ -23,6 +23,13 @@ export function MobileWorkModal() {
   if (modal.status === 'notfound') return null
 
   const title = modal.detail?.title ?? 'Работа'
+
+  // Соседние слайды греем заранее скрытыми <picture> — свайп без ожидания сети.
+  // При двух картинках prev === next, второго прелоадера не нужно.
+  const nextImage =
+    modal.count > 1 ? modal.images[(modal.activeIndex + 1) % modal.count] : undefined
+  const prevImage =
+    modal.count > 2 ? modal.images[(modal.activeIndex - 1 + modal.count) % modal.count] : undefined
 
   const onBackdrop = (e: MouseEvent<HTMLDivElement>): void => {
     if (e.target === e.currentTarget) modal.close()
@@ -100,6 +107,8 @@ export function MobileWorkModal() {
                   imgClassName={styles.img}
                 />
               )}
+              {nextImage && <PreloadImage key={`pre-${nextImage.id}`} image={nextImage} />}
+              {prevImage && <PreloadImage key={`pre-${prevImage.id}`} image={prevImage} />}
 
               {modal.count > 1 && (
                 <>

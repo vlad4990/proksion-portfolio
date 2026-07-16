@@ -1,17 +1,23 @@
 // Типы ответов публичного API (docs/architecture.md §7; контракты задачи 03 —
-// back/src/dto.ts). Совместимы с masonry-листингом фронта (front/CLAUDE.md): тайл — { id, src, w, h }.
-// Зеркалят back/src/dto.ts; форма СТАБИЛЬНА — менять синхронно с бэкендом.
+// back/src/dto.ts). Совместимы с masonry-листингом фронта (front/CLAUDE.md):
+// тайл — { id, src, w, h, cat, sub, variants }. Зеркалят back/src/dto.ts; форма СТАБИЛЬНА —
+// менять синхронно с бэкендом.
 
 /**
- * Тайл листинга. `id` — id работы (задел под клик → модалка, задача 10);
- * `src` — URL thumb cover-картинки (`/media/...`); `w/h` — натуральные размеры
- * (фронт ставит aspect-ratio → нет скачков layout).
+ * Тайл листинга. `id` — id работы; `src` — URL thumb cover-картинки (`/media/...`,
+ * jpg-fallback); `w/h` — натуральные размеры (фронт ставит aspect-ratio → нет скачков
+ * layout); `cat`/`sub` — слаги пути: тайл сразу знает свой канонический URL
+ * `/projects/:cat/:sub/:id` и рендерится настоящей ссылкой (в т.ч. с глобального листинга);
+ * `variants` — thumb в avif/webp/jpg для `<picture>` (avif втрое легче jpg).
  */
 export interface Tile {
   id: number
   src: string
   w: number
   h: number
+  cat: string
+  sub: string
+  variants: VariantUrls
 }
 
 /** Плоская метаинформация категории. */
@@ -97,8 +103,10 @@ export interface WorkDetail {
 
 /**
  * Деталь работы по id (эндпоинт `/api/works/by-id/:id`, задача 10, вариант B). Всё из
- * `WorkDetail` + слаги пути `cat`/`sub`: по клику из глобального листинга `/projects` у тайла
- * есть только id, и из этого ответа строится канонический URL `/projects/:cat/:sub/:id`.
+ * `WorkDetail` + слаги пути `cat`/`sub`: сегмент `:work` в URL модалки — числовой id работы,
+ * поэтому деталь грузится по id. `cat`/`sub` — метаданные канонического пути
+ * `/projects/:cat/:sub/:id`, сохранённые в контракте: текущий фронт их не читает (ссылку строит
+ * из тайла), они остаются в ответе, чтобы путь можно было восстановить из одного id.
  */
 export interface WorkDetailById extends WorkDetail {
   cat: string

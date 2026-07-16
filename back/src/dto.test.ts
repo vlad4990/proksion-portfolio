@@ -42,10 +42,27 @@ function makeImage(over: Partial<Image> = {}): Image {
 }
 
 describe('toTile', () => {
-  test('produces strictly { id, src, w, h }; id is the work id, src is thumb jpg cover', () => {
-    const tile = toTile(makeWork({ id: 42 }), makeImage({ key_base: 'images/42/7', width: 640, height: 480 }))
-    expect(tile).toEqual({ id: 42, src: '/media/images/42/7/thumb.jpg', w: 640, h: 480 })
-    expect(Object.keys(tile).sort()).toEqual(['h', 'id', 'src', 'w'])
+  test('produces strictly { id, src, w, h, cat, sub, variants }; src is thumb jpg cover', () => {
+    const tile = toTile(
+      makeWork({ id: 42 }),
+      makeImage({ key_base: 'images/42/7', width: 640, height: 480 }),
+      'kupikod',
+      'bannera',
+    )
+    expect(tile).toEqual({
+      id: 42,
+      src: '/media/images/42/7/thumb.jpg',
+      w: 640,
+      h: 480,
+      cat: 'kupikod',
+      sub: 'bannera',
+      variants: {
+        avif: '/media/images/42/7/thumb.avif',
+        webp: '/media/images/42/7/thumb.webp',
+        jpg: '/media/images/42/7/thumb.jpg',
+      },
+    })
+    expect(Object.keys(tile).sort()).toEqual(['cat', 'h', 'id', 'src', 'sub', 'variants', 'w'])
   })
 })
 

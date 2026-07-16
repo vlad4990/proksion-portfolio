@@ -1,4 +1,4 @@
-import heroPortrait from '../../assets/hero-proksion.png'
+import heroPortrait from '../../assets/hero-proksion.webp'
 import styles from './MobileHero.module.css'
 
 export function MobileHero() {

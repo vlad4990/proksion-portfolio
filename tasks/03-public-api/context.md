@@ -20,8 +20,10 @@
 ## Контракты (важно для фронта)
 - **Роуты объявляются от корня** (`/categories`, `/works`, ...) — снаружи доступны как `/api/...`
   (Caddy `handle_path` срезает `/api`, §7).
-- **Тайл листинга**: `{ id, src, w, h }`, где `src` = URL `thumb` cover-картинки, `w/h` —
-  натуральные размеры (фронт ставит `aspect-ratio`). Совместимо с masonry (`front/CLAUDE.md`).
+- **Тайл листинга**: `{ id, src, w, h, cat, sub, variants }`, где `src` = URL `thumb`
+  cover-картинки (jpg-fallback), `w/h` — натуральные размеры (фронт ставит `aspect-ratio`),
+  `cat`/`sub` — слаги пути тайла, `variants` — thumb в avif/webp/jpg. Совместимо с masonry
+  (`front/CLAUDE.md`).
 - **Деталь работы**: описание + `images[]` (для каждой — варианты `thumb`/`full` в форматах
   `avif`/`webp`/`jpg`, `w/h`, `alt`, `sort_order`, опц. `lqip`).
 - **URL медиа** строится из `key_base`: `/media/{key_base}/{variant}.{ext}` (§5). На этом этапе

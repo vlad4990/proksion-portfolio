@@ -3,20 +3,27 @@
 // их потом дорого. Любая правка формы — осознанно и синхронно с фронтом.
 
 import type { Category, Image, Subcategory, Work } from './types.ts'
-import { imageVariants, mediaUrl, type ImageVariants } from './media-url.ts'
+import { imageVariants, mediaUrl, type ImageVariants, type VariantUrls } from './media-url.ts'
 
 // ── Контракты ответов ─────────────────────────────────────────────────────────
 
 /**
  * Тайл листинга (совместим с masonry-фронтом, см. front/CLAUDE.md).
  * `id` — id РАБОТЫ (клик → модалка работы); `src` — URL thumb cover-картинки
- * (jpg как универсальный fallback, §5); `w/h` — натуральные размеры (фронт ставит aspect-ratio).
+ * (jpg как универсальный fallback, §5); `w/h` — натуральные размеры (фронт ставит aspect-ratio);
+ * `cat`/`sub` — слаги пути: тайл ЛЮБОГО листинга (включая глобальный `/works`) сразу знает
+ * свой канонический URL `/projects/:cat/:sub/:id`, и фронт рендерит настоящую ссылку;
+ * `variants` — thumb во всех форматах (avif/webp/jpg) для `<picture>` в листинге
+ * (avif втрое легче jpg; `src` остаётся jpg-fallback для потребителей без `<picture>`).
  */
 export interface Tile {
   id: number
   src: string
   w: number
   h: number
+  cat: string
+  sub: string
+  variants: VariantUrls
 }
 
 /** Картинка в детали работы: все варианты/форматы + метаданные. `lqip` — только если задан. */
@@ -42,8 +49,10 @@ export interface WorkDetail {
 
 /**
  * Деталь работы, адресуемой по id (задача 10, вариант B). Всё из `WorkDetail` + слаги пути
- * `cat`/`sub`: клик из ГЛОБАЛЬНОГО листинга `/projects` знает только id тайла, поэтому
- * фронт резолвит канонический URL `/projects/:cat/:sub/:id` из этого ответа.
+ * `cat`/`sub`: сегмент `:work` в URL модалки — числовой id работы, поэтому деталь грузится по id.
+ * `cat`/`sub` — метаданные канонического пути работы (`/projects/:cat/:sub/:id`), сохранённые в
+ * контракте ответа. Текущий фронт их не читает (ссылку он строит из тайла ещё до загрузки детали);
+ * слаги остаются в ответе, чтобы путь можно было восстановить из одного id.
  */
 export interface WorkDetailById extends WorkDetail {
   cat: string
@@ -95,8 +104,16 @@ export interface WorksPage {
 
 // ── Сериализаторы ──────────────────────────────────────────────────────────────
 
-export function toTile(work: Work, cover: Image): Tile {
-  return { id: work.id, src: mediaUrl(cover.key_base, 'thumb', 'jpg'), w: cover.width, h: cover.height }
+export function toTile(work: Work, cover: Image, catSlug: string, subSlug: string): Tile {
+  return {
+    id: work.id,
+    src: mediaUrl(cover.key_base, 'thumb', 'jpg'),
+    w: cover.width,
+    h: cover.height,
+    cat: catSlug,
+    sub: subSlug,
+    variants: imageVariants(cover.key_base).thumb,
+  }
 }
 
 export function toImageDetail(image: Image): ImageDetail {

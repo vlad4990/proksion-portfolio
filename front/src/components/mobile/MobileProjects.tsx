@@ -1,10 +1,7 @@
-import { useNavigate } from 'react-router'
-import type { KeyboardEvent } from 'react'
+import { Link } from 'react-router'
 import Masonry from 'react-masonry-css'
 import { useProjects } from '../../api/useProjects'
-import { useOpenWork } from '../../hooks/useOpenWork'
 import type { Tile } from '../../api/types'
-import type { Route } from '../../types'
 import { MobileTabBar } from './MobileTabBar'
 import styles from './MobileProjects.module.css'
 
@@ -13,38 +10,45 @@ const SKELETON_HEIGHTS = [180, 140, 200, 160, 150, 190]
 
 const BREAKPOINT_COLS = { default: 2 }
 
+/** Первые тайлы (первый экран, 2 колонки) — не лениво и с высоким приоритетом (LCP листинга). */
+const EAGER_TILES = 4
+
 /** Тайлы из API: aspect-ratio из w/h резервирует место — без скачков layout.
- *  Тап/Enter/Space → открыть модалку работы (onOpen с id тайла). */
-function TileGrid({ tiles, onOpen }: { tiles: Tile[]; onOpen: (id: number) => void }) {
-  const onKey = (e: KeyboardEvent<HTMLImageElement>, id: number) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      onOpen(id)
-    }
-  }
+ *  Тайл — настоящая ссылка на /projects/:cat/:sub/:id (модалка работы поверх листинга);
+ *  картинка — <picture> avif/webp/jpg (thumb-варианты уже отдаёт бэкенд, avif втрое легче). */
+function TileGrid({ tiles }: { tiles: Tile[] }) {
   return (
     <Masonry
       breakpointCols={BREAKPOINT_COLS}
       className={styles.masonry}
       columnClassName={styles.masonryColumn}
     >
-      {tiles.map((t) => (
-        <img
-          key={t.id}
-          src={t.src}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className={styles.tile}
-          tabIndex={0}
-          role="button"
-          aria-label="Открыть работу"
-          onClick={() => onOpen(t.id)}
-          onKeyDown={(e) => onKey(e, t.id)}
-          style={{ aspectRatio: `${t.w} / ${t.h}` }}
-          data-test="projects-tile"
-        />
-      ))}
+      {tiles.map((t, i) => {
+        const eager = i < EAGER_TILES
+        return (
+          <Link
+            key={t.id}
+            to={`/projects/${t.cat}/${t.sub}/${t.id}`}
+            className={styles.tile}
+            aria-label="Открыть работу"
+            data-test="projects-tile"
+          >
+            <picture className={styles.tilePicture}>
+              <source type="image/avif" srcSet={t.variants.avif} />
+              <source type="image/webp" srcSet={t.variants.webp} />
+              <img
+                src={t.variants.jpg}
+                alt=""
+                loading={eager ? 'eager' : 'lazy'}
+                decoding="async"
+                className={styles.tileImg}
+                style={{ aspectRatio: `${t.w} / ${t.h}` }}
+                {...(eager ? { fetchpriority: 'high' } : {})}
+              />
+            </picture>
+          </Link>
+        )
+      })}
     </Masonry>
   )
 }
@@ -70,10 +74,19 @@ function TileSkeleton() {
   )
 }
 
-export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
-  const navigate = useNavigate()
-  const openWork = useOpenWork()
-  const { categories, tiles, tilesStatus, activeCategory, activeSubSlug } = useProjects()
+export function MobileProjects() {
+  const {
+    categories,
+    tiles,
+    tilesStatus,
+    activeCategory,
+    activeSubSlug,
+    cat,
+    hasMore,
+    loadingMore,
+    loadMore,
+  } = useProjects()
+  const allActive = !cat
 
   return (
     <div className={styles.page} data-test="projects">
@@ -85,23 +98,27 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
         <h1 className={styles.title} data-test="projects-title">ПРОЕКТЫ</h1>
 
         <div className={styles.chips} data-test="projects-chips">
+          <Link
+            to="/projects"
+            className={`${styles.chip}${allActive ? ` ${styles.chipActive}` : ''}`}
+            data-test="projects-chip-all"
+          >
+            ВСЕ
+          </Link>
           {categories.map((g) => {
             const isActive = g.id === activeCategory?.id
             return (
-              <button
+              <Link
                 key={g.id}
-                type="button"
-                className={`${styles.chip}${isActive ? ` ${styles.chipActive}` : ''}`}
-                onClick={() =>
-                  navigate(
-                    `/projects/${g.slug}` +
-                      (g.subcategories[0] ? `/${g.subcategories[0].slug}` : ''),
-                  )
+                to={
+                  `/projects/${g.slug}` +
+                  (g.subcategories[0] ? `/${g.subcategories[0].slug}` : '')
                 }
+                className={`${styles.chip}${isActive ? ` ${styles.chipActive}` : ''}`}
                 data-test="projects-chip"
               >
                 {g.title}
-              </button>
+              </Link>
             )
           })}
         </div>
@@ -111,11 +128,10 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
             {activeCategory.subcategories.map((s) => {
               const isActive = s.slug === activeSubSlug
               return (
-                <button
+                <Link
                   key={s.id}
-                  type="button"
+                  to={`/projects/${activeCategory.slug}/${s.slug}`}
                   className={`${styles.subTab}${isActive ? ` ${styles.subTabActive}` : ''}`}
-                  onClick={() => navigate(`/projects/${activeCategory.slug}/${s.slug}`)}
                   data-test="projects-subtab"
                 >
                   <span
@@ -125,7 +141,7 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
                   >
                     {s.title}
                   </span>
-                </button>
+                </Link>
               )
             })}
           </div>
@@ -143,18 +159,22 @@ export function MobileProjects({ onNav }: { onNav: (r: Route) => void }) {
               Здесь пока пусто.
             </p>
           )}
-          {tilesStatus === 'ready' && tiles.length > 0 && (
-            <TileGrid tiles={tiles} onOpen={openWork} />
+          {tilesStatus === 'ready' && tiles.length > 0 && <TileGrid tiles={tiles} />}
+          {hasMore && (
+            <button
+              type="button"
+              className={styles.loadMore}
+              onClick={loadMore}
+              disabled={loadingMore}
+              data-test="projects-load-more"
+            >
+              {loadingMore ? 'Загружаем…' : 'Показать ещё'}
+            </button>
           )}
         </div>
       </div>
 
-      <MobileTabBar
-        active="projects"
-        onAbout={() => onNav('home')}
-        onProjects={() => onNav('projects')}
-        onContacts={() => onNav('contacts')}
-      />
+      <MobileTabBar active="projects" />
     </div>
   )
 }

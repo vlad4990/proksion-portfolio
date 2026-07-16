@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Navigate, Route as RouterRoute, Routes, useLocation, useNavigate } from 'react-router'
+import { Navigate, Route as RouterRoute, Routes, useLocation } from 'react-router'
 import { useIsMobile } from './hooks/useIsMobile'
+import { ROUTE_TITLES } from './seo'
 import type { HeroPhase, Route } from './types'
 
 import { TopNav } from './components/desktop/TopNav'
@@ -19,21 +20,6 @@ import { MobileWorkModal } from './components/mobile/MobileWorkModal'
 
 import styles from './App.module.css'
 
-/** Eased programmatic scroll (used by the desktop nav). */
-function smoothScrollTo(target: number, duration = 600) {
-  const start = window.scrollY
-  const change = target - start
-  if (Math.abs(change) < 2) return
-  const t0 = performance.now()
-  const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2)
-  function step(now: number) {
-    const t = Math.min(1, (now - t0) / duration)
-    window.scrollTo(0, start + change * ease(t))
-    if (t < 1) requestAnimationFrame(step)
-  }
-  requestAnimationFrame(step)
-}
-
 /** Derive the active top-level screen from the URL path. */
 function pathnameToRoute(pathname: string): Route {
   if (pathname.startsWith('/projects')) return 'projects'
@@ -41,11 +27,20 @@ function pathnameToRoute(pathname: string): Route {
   return 'home'
 }
 
+/** Ключ скролла — «идентичность листинга»: путь БЕЗ :work-сегмента модалки. Открытие/закрытие
+ *  работы (`/projects/:cat/:sub/:work`) и карусель (`?img=`) ключ не меняют → скролл листинга
+ *  не сбрасывается; смена раздела/подкатегории или переход подкатегория→общий листинг — меняют. */
+function scrollKeyFromPath(pathname: string): string {
+  const seg = pathname.split('/').filter(Boolean)
+  if (seg[0] === 'projects' && seg.length === 4) return `/${seg.slice(0, 3).join('/')}`
+  return pathname
+}
+
 export default function App() {
   const isMobile = useIsMobile()
-  const navigateTo = useNavigate()
   const { pathname } = useLocation()
   const route = pathnameToRoute(pathname)
+  const scrollKey = scrollKeyFromPath(pathname)
 
   // Hero curtain only on a fresh load of the root path; deep links skip it.
   const [heroPhase, setHeroPhase] = useState<HeroPhase>(
@@ -88,10 +83,17 @@ export default function App() {
     }
   }, [heroPhase, dismissHero])
 
-  const navigate = (r: Route) => {
-    navigateTo(r === 'home' ? '/' : `/${r}`)
-    requestAnimationFrame(() => window.scrollTo(0, 0))
-  }
+  // После смены листинга — к началу страницы. Ключ — scrollKey (путь без :work), а не весь
+  // pathname: открытие/закрытие модалки работы внутри /projects скролл листинга не сбрасывает.
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [scrollKey])
+
+  // Заголовок вкладки следует разделу; модалка работы ставит свой в useWorkModal
+  // (route при этом не меняется — конфликтов нет).
+  useEffect(() => {
+    document.title = ROUTE_TITLES[route]
+  }, [route])
 
   const curtainClass = `${styles.heroOverlay}${
     heroPhase === 'dismissing' ? ` ${styles.heroOverlayDismissing}` : ''
@@ -115,22 +117,19 @@ export default function App() {
 
         {heroPhase === 'gone' && (
           <Routes>
-            <RouterRoute path="/" element={<MobileAbout onNav={navigate} />} />
-            <RouterRoute path="/projects" element={<MobileProjects onNav={navigate} />} />
-            <RouterRoute
-              path="/projects/:cat/:sub"
-              element={<MobileProjects onNav={navigate} />}
-            />
+            <RouterRoute path="/" element={<MobileAbout />} />
+            <RouterRoute path="/projects" element={<MobileProjects />} />
+            <RouterRoute path="/projects/:cat/:sub" element={<MobileProjects />} />
             <RouterRoute
               path="/projects/:cat/:sub/:work"
               element={
                 <>
-                  <MobileProjects onNav={navigate} />
+                  <MobileProjects />
                   <MobileWorkModal />
                 </>
               }
             />
-            <RouterRoute path="/contacts" element={<MobileContacts onNav={navigate} />} />
+            <RouterRoute path="/contacts" element={<MobileContacts />} />
             <RouterRoute path="*" element={<Navigate to="/" replace />} />
           </Routes>
         )}
@@ -140,18 +139,6 @@ export default function App() {
 
   // ── Desktop tree ──────────────────────────────────────────
   const showNav = heroPhase === 'gone'
-  const onHome = () => {
-    navigateTo('/')
-    requestAnimationFrame(() => smoothScrollTo(0))
-  }
-  const onProjects = () => {
-    navigateTo('/projects')
-    requestAnimationFrame(() => window.scrollTo(0, 0))
-  }
-  const onContacts = () => {
-    navigateTo('/contacts')
-    requestAnimationFrame(() => window.scrollTo(0, 0))
-  }
 
   return (
     <>
@@ -171,13 +158,7 @@ export default function App() {
         style={{ display: showNav ? 'block' : 'none' }}
         data-test="nav-host"
       >
-        <TopNav
-          route={route}
-          onHome={onHome}
-          onAbout={onHome}
-          onProjects={onProjects}
-          onContacts={onContacts}
-        />
+        <TopNav route={route} />
       </div>
 
       <div className={styles.stageWrap} data-test="stage-wrap">
