@@ -1,6 +1,6 @@
 // Типы ответов публичного API (docs/architecture.md §7; контракты задачи 03 —
 // back/src/dto.ts). Совместимы с masonry-листингом фронта (front/CLAUDE.md):
-// тайл — { id, src, w, h, cat, sub }. Зеркалят back/src/dto.ts; форма СТАБИЛЬНА —
+// тайл — { id, src, w, h, cat, sub, variants }. Зеркалят back/src/dto.ts; форма СТАБИЛЬНА —
 // менять синхронно с бэкендом.
 
 /**
@@ -103,8 +103,10 @@ export interface WorkDetail {
 
 /**
  * Деталь работы по id (эндпоинт `/api/works/by-id/:id`, задача 10, вариант B). Всё из
- * `WorkDetail` + слаги пути `cat`/`sub`: по клику из глобального листинга `/projects` у тайла
- * есть только id, и из этого ответа строится канонический URL `/projects/:cat/:sub/:id`.
+ * `WorkDetail` + слаги пути `cat`/`sub`: сегмент `:work` в URL модалки — числовой id работы,
+ * поэтому деталь грузится по id. `cat`/`sub` — метаданные канонического пути
+ * `/projects/:cat/:sub/:id`, сохранённые в контракте: текущий фронт их не читает (ссылку строит
+ * из тайла), они остаются в ответе, чтобы путь можно было восстановить из одного id.
  */
 export interface WorkDetailById extends WorkDetail {
   cat: string

@@ -164,7 +164,7 @@
 .loadMore {
   display: block;
   margin: var(--sp-block-sm) auto 0;
-  padding: 12px 28px 10px;
+  padding: var(--load-more-pad);
   background: transparent;
   border: var(--stroke-hairline) solid var(--hairline);
   color: var(--fg-muted);
@@ -176,7 +176,7 @@
   letter-spacing: var(--tracking-caps);
   cursor: pointer;
   outline: none;
-  transition: color 180ms var(--ease-out), border-color 180ms var(--ease-out);
+  transition: color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
 }
 
 .loadMore:hover {

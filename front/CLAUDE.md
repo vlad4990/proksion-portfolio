@@ -38,7 +38,7 @@ SPA на **Vite 6 + React 18 + TypeScript strict**. Зависимостей м�
 - `/contacts`
 - `*` — `<Navigate to="/" replace />`
 
-URL реально меняется, история работает. Навигация — **настоящие ссылки** (`<Link>`): десктоп — `TopNav`, мобайл — `MobileTabBar`, сайдбар/чипы листинга и сами тайлы тоже ссылки (работают cmd-клик/новая вкладка/копирование адреса). Скролл к началу — эффект в `App.tsx` при смене top-level раздела (`route`), поэтому открытие/закрытие модалки внутри `/projects` скролл листинга не сбрасывает; клик по «домой», когда уже на `/`, — плавный `smoothScrollTo(0)` через `onHomeClick`.
+URL реально меняется, история работает. Навигация — **настоящие ссылки** (`<Link>`): десктоп — `TopNav`, мобайл — `MobileTabBar`, сайдбар/чипы листинга и сами тайлы тоже ссылки (работают cmd-клик/новая вкладка/копирование адреса). Скролл к началу — эффект в `App.tsx`, привязанный к **ключу листинга** (`scrollKeyFromPath` — путь без `:work`-сегмента модалки), а не ко всему `pathname`: открытие/закрытие модалки внутри `/projects` (и карусель `?img=`) скролл листинга не сбрасывают, а смена раздела/подкатегории или переход подкатегория→общий `/projects` — сбрасывают. Повторный клик по уже активному пункту (URL не меняется → эффект молчит) докручивается плавно в самих nav-компонентах (`TopNav` + `MobileTabBar`) через общий `smoothScrollTo` из `src/lib/scroll.ts` — одинаково в обоих деревьях.
 
 ### Двойное дерево компонентов (не адаптив через CSS)
 
@@ -71,6 +71,7 @@ src/
 ├── types.ts             # Route ('home'|'projects'|'contacts'), HeroPhase
 ├── api/                 # client.ts (fetch → /api) · types.ts · useProjects · useWorkDetail
 ├── hooks/useIsMobile.ts # брейкпоинт <768px (matchMedia)
+├── lib/scroll.ts        # smoothScrollTo — общий плавный скролл для nav-деревьев
 ├── styles/              # tokens.css (глобальный) + layout.module.css
 ├── App.module.css       # chrome: curtain / nav-host / stage
 └── components/

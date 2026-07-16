@@ -6,8 +6,8 @@
 
 ## Контракты ответов
 - [ ] `GET /api/categories` → список с подкатегориями/счётчиками (форма из §7).
-- [ ] `GET /api/categories/:cat/:sub` → тайлы строго формы `{ id, src, w, h }`; `src` — URL
-      `thumb` cover; `w/h` — числа.
+- [ ] `GET /api/categories/:cat/:sub` → тайлы строго формы `{ id, src, w, h, cat, sub, variants }`;
+      `src` — URL `thumb` cover; `w/h` — числа; `variants` — thumb в avif/webp/jpg.
 - [ ] `GET /api/works/:cat/:sub/:work` → описание + `images[]` с вариантами `thumb`/`full`
       в `avif`/`webp`/`jpg`, плюс `w/h`, `alt`, `sort_order` (и `lqip`, если задан).
 - [ ] URL медиа имеют вид `/media/{key_base}/{variant}.{ext}`.

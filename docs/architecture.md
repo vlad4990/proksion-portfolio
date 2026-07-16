@@ -291,7 +291,7 @@ Caddy срезает префикс `/api` (`handle_path /api/*` в корнев
 
 - **API-клиент**: новый модуль `src/api/` (тонкие `fetch`-обёртки, типы ответов). База — `/api`.
 - **Листинг**: заменить статические массивы `GROUPS`/тайлов в `ProjectsScreen.tsx` и
-  `MobileProjects.tsx` на данные из API. Форма тайла `{ id, src, w, h, cat, sub }` поддержана
+  `MobileProjects.tsx` на данные из API. Форма тайла `{ id, src, w, h, cat, sub, variants }` поддержана
   masonry (см. `front/CLAUDE.md`); тайл — `<Link>` на `/projects/:cat/:sub/:id`.
 - **Модалка** (полноэкранная): новый компонент в **обоих** деревьях
   (`components/desktop/` + `components/mobile/`, по конвенции двойного дерева). Рендерит

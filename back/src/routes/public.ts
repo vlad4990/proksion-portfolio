@@ -82,7 +82,7 @@ export function publicRoutes(db: Database) {
       return categoryNav(repos, category.id)
     })
 
-    // Подкатегория + работы (тайлы { id, src, w, h, cat, sub }).
+    // Подкатегория + работы (тайлы { id, src, w, h, cat, sub, variants }).
     .get('/categories/:cat/:sub', ({ params, set }) => {
       const category = repos.category.getBySlug(params.cat)
       if (!category) {
@@ -116,9 +116,10 @@ export function publicRoutes(db: Database) {
       return page
     })
 
-    // Полная работа ПО ID (вариант B задачи 10): для клика из листинга (у тайла есть id).
-    // Тот же контент, что и by-slug, ПЛЮС слаги cat/sub — чтобы фронт построил канонический
-    // URL /projects/:cat/:sub/:id даже с глобального листинга, где cat/sub у тайла нет.
+    // Полная деталь работы ПО ID (вариант B задачи 10): сегмент `:work` в URL модалки — числовой
+    // id работы, поэтому деталь грузится по id. Тот же контент, что и by-slug, ПЛЮС слаги cat/sub —
+    // метаданные канонического пути работы, сохранённые в ответе (текущий фронт их не читает:
+    // ссылку он строит из тайла; слаги остаются, чтобы путь можно было восстановить из одного id).
     // Путь — `/works/by-id/:id`, а НЕ `/works/:id`: роутер (memoirist) запрещает разные имена
     // параметра в одной позиции, а слот 2 под /works уже занят `:cat` (эндпоинт by-slug).
     // Статический сегмент `by-id` снимает конфликт, оставляя эндпоинт в неймспейсе /works.

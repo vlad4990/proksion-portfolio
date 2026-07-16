@@ -123,6 +123,9 @@
   --dur-fast: 120ms;
   --dur-base: 220ms;
 
+  /* Components */
+  --load-more-pad: 12px 28px 10px;  /* «Показать ещё» — padding (desktop) */
+
   /* === MOBILE tokens — used by the mobile component tree ============= */
   --breakpoint-mobile: 768px;
 
@@ -141,6 +144,8 @@
   /* Mobile layout */
   --mob-pad:           22px;   /* horizontal page gutter              */
   --tile-gap-mob:      12px;   /* gutter between masonry tiles        */
+  --load-more-pad-mob: 13px 16px 11px; /* «Показать ещё» — padding    */
+  --load-more-gap-mob: 20px;   /* «Показать ещё» — зазор над кнопкой  */
   --mob-header-h:      56px;   /* top mini-header height              */
   --mob-status:        56px;   /* space above header (status bar)     */
   --mob-content-top:  112px;   /* = status + header                   */

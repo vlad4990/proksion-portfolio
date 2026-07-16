@@ -181,8 +181,8 @@
 .loadMore {
   display: block;
   width: 100%;
-  margin-top: 20px;
-  padding: 13px 16px 11px;
+  margin-top: var(--load-more-gap-mob);
+  padding: var(--load-more-pad-mob);
   background: transparent;
   border: var(--stroke-hairline) solid var(--hairline);
   color: var(--fg-muted);
