@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, Route as RouterRoute, Routes, useLocation } from 'react-router'
 import { useIsMobile } from './hooks/useIsMobile'
 import { ROUTE_TITLES } from './seo'
@@ -8,6 +8,7 @@ import { TopNav } from './components/desktop/TopNav'
 import { HeroSection } from './components/desktop/HeroSection'
 import { AboutSection } from './components/desktop/AboutSection'
 import { ProjectsScreen } from './components/desktop/ProjectsScreen'
+import { CategoryScreen } from './components/desktop/CategoryScreen'
 import { ContactsScreen } from './components/desktop/ContactsScreen'
 
 import { WorkModal } from './components/desktop/WorkModal'
@@ -15,6 +16,7 @@ import { WorkModal } from './components/desktop/WorkModal'
 import { MobileHero } from './components/mobile/MobileHero'
 import { MobileAbout } from './components/mobile/MobileAbout'
 import { MobileProjects } from './components/mobile/MobileProjects'
+import { MobileCategory } from './components/mobile/MobileCategory'
 import { MobileContacts } from './components/mobile/MobileContacts'
 import { MobileWorkModal } from './components/mobile/MobileWorkModal'
 
@@ -27,20 +29,28 @@ function pathnameToRoute(pathname: string): Route {
   return 'home'
 }
 
-/** Ключ скролла — «идентичность листинга»: путь БЕЗ :work-сегмента модалки. Открытие/закрытие
- *  работы (`/projects/:cat/:sub/:work`) и карусель (`?img=`) ключ не меняют → скролл листинга
- *  не сбрасывается; смена раздела/подкатегории или переход подкатегория→общий листинг — меняют. */
-function scrollKeyFromPath(pathname: string): string {
+/** Путь модалки работы: `/projects/:cat/:sub/:work` (4 сегмента). */
+function isWorkModalPath(pathname: string): boolean {
   const seg = pathname.split('/').filter(Boolean)
-  if (seg[0] === 'projects' && seg.length === 4) return `/${seg.slice(0, 3).join('/')}`
-  return pathname
+  return seg[0] === 'projects' && seg.length === 4
+}
+
+/** Ключ скролла — «идентичность листинга». Пока открыта работа, держим ключ ТОГО листинга,
+ *  с которого её открыли: из URL модалки его не вывести (канонический путь работы всегда
+ *  содержит подкатегорию, а листингом мог быть и таб «ВСЕ» `/projects/:cat`, и корневая
+ *  `/projects` в тег-режиме). Открытие/закрытие работы и карусель (`?img=`) ключ не меняют →
+ *  скролл листинга не сбрасывается; смена раздела/таба/страницы — меняет. */
+function useScrollKey(pathname: string): string {
+  const listingKey = useRef(pathname)
+  if (!isWorkModalPath(pathname)) listingKey.current = pathname
+  return listingKey.current
 }
 
 export default function App() {
   const isMobile = useIsMobile()
   const { pathname } = useLocation()
   const route = pathnameToRoute(pathname)
-  const scrollKey = scrollKeyFromPath(pathname)
+  const scrollKey = useScrollKey(pathname)
 
   // Hero curtain only on a fresh load of the root path; deep links skip it.
   const [heroPhase, setHeroPhase] = useState<HeroPhase>(
@@ -119,12 +129,13 @@ export default function App() {
           <Routes>
             <RouterRoute path="/" element={<MobileAbout />} />
             <RouterRoute path="/projects" element={<MobileProjects />} />
-            <RouterRoute path="/projects/:cat/:sub" element={<MobileProjects />} />
+            <RouterRoute path="/projects/:cat" element={<MobileCategory />} />
+            <RouterRoute path="/projects/:cat/:sub" element={<MobileCategory />} />
             <RouterRoute
               path="/projects/:cat/:sub/:work"
               element={
                 <>
-                  <MobileProjects />
+                  <MobileCategory />
                   <MobileWorkModal />
                 </>
               }
@@ -166,12 +177,13 @@ export default function App() {
           <Routes>
             <RouterRoute path="/" element={<AboutSection />} />
             <RouterRoute path="/projects" element={<ProjectsScreen />} />
-            <RouterRoute path="/projects/:cat/:sub" element={<ProjectsScreen />} />
+            <RouterRoute path="/projects/:cat" element={<CategoryScreen />} />
+            <RouterRoute path="/projects/:cat/:sub" element={<CategoryScreen />} />
             <RouterRoute
               path="/projects/:cat/:sub/:work"
               element={
                 <>
-                  <ProjectsScreen />
+                  <CategoryScreen />
                   <WorkModal />
                 </>
               }

@@ -13,6 +13,11 @@ export function categoryHref(cat: string): string {
   return `/projects/${cat}`
 }
 
+/** Таб подкатегории на странице категории — тот же экран, состояние в URL. */
+export function subcategoryHref(cat: string, sub: string): string {
+  return `/projects/${cat}/${sub}`
+}
+
 /** Корневая с активным тегом-фильтром (пустой слаг — просто /projects). */
 export function tagHref(slug?: string | undefined): string {
   return slug ? `/projects?tag=${encodeURIComponent(slug)}` : '/projects'

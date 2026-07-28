@@ -16,3 +16,8 @@ export const ROUTE_TITLES: Record<Route, string> = {
 export function workTitle(title: string | null): string {
   return `${title ?? 'Работа'} — PROKSION`
 }
+
+/** Заголовок вкладки страницы категории: «KUPIKOD — PROKSION» (задача 19). */
+export function categoryTitle(title: string): string {
+  return `${title.toUpperCase()} — PROKSION`
+}

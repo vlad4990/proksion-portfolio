@@ -9,8 +9,8 @@
 // • Esc / стрелки клавиатуры; close() → navigate назад на листинг `/projects/:cat/:sub`.
 // • 404 → редирект на листинг (не белый экран).
 
-import { useEffect } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router'
 import { useWorkDetail, type WorkStatus } from '../api/useWorkDetail'
 import { ROUTE_TITLES, workTitle } from '../seo'
 import type { ImageDetail, WorkDetail } from '../api/types'
@@ -33,6 +33,7 @@ export interface WorkModalController {
 export function useWorkModal(): WorkModalController {
   // `work` — СЛАГ работы; числовое значение = легаси-ссылка (см. useWorkDetail).
   const { cat, sub, work } = useParams()
+  const location = useLocation()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const { detail, status, canonicalPath } = useWorkDetail(cat, sub, work)
@@ -61,8 +62,16 @@ export function useWorkModal(): WorkModalController {
   const prev = (): void => {
     if (count > 1) goTo((activeIndex - 1 + count) % count)
   }
+  // Закрытие возвращает на ТОТ листинг, с которого работу открыли (спека редизайна §1.3):
+  // канонический путь работы всегда содержит подкатегорию, но открыть её могли и с таба
+  // «ВСЕ» (`/projects/:cat`), и с корневой в тег-режиме — из URL это не вывести, поэтому
+  // шаг назад по истории. Deep-link (первая запись истории, `key === 'default'`) шага назад
+  // не имеет — там уходим на листинг подкатегории. Флаг снимаем на первом рендере: `?img=`
+  // делает `replace` и меняет `key`, а решение должно остаться прежним.
+  const [openedInApp] = useState(() => location.key !== 'default')
   const close = (): void => {
-    navigate(listingPath)
+    if (openedInApp) navigate(-1)
+    else navigate(listingPath, { replace: true })
   }
 
   // 404 → редирект на листинг (идемпотентно; не белый экран).
