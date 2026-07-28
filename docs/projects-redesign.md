@@ -262,12 +262,12 @@ GET /works?category=<slug>&subcategory=<slug>&tag=<slug>&offset=&limit=
 | Метод/путь                            | Body / назначение                                              |
 | ------------------------------------- | -------------------------------------------------------------- |
 | PATCH `/admin/categories/:id`         | + `kicker, meta_role, period, description_long` (string\|null), `display_variant` ('showcase'\|'strip'\|'cards', иначе 400) |
-| POST `/admin/tags`                    | `{title*, slug?, sort_order?}` → 201 + строка `tag` (слаг — `makeSlug`, уникальный глобально) |
+| POST `/admin/tags`                    | `{title*, slug?, sort_order?}` → 201 + строка `tag`. Слаг из `title` — `makeSlug` с авто-суффиксом `-2`; **явно заданный** занятый слаг → 400 (то же в PATCH) |
 | PATCH `/admin/tags/:id`               | `{title?, slug?, sort_order?}`                                 |
 | DELETE `/admin/tags/:id`              | `{ok:true}` (связи каскадом)                                   |
 | PATCH `/admin/tags/reorder`           | `{ids:[…]}` (монтировать до `/:id`, как в reorder.ts)          |
 | PATCH `/admin/works/:id`              | + `tag_ids?: number[]` — полная замена набора тегов (400 при несуществующем id) |
-| PATCH `/admin/categories/:id/featured`| `{work_ids:[…]}` — работы категории (400 при чужой работе); порядок массива = `featured_order` (0 = hero); работы категории вне списка → NULL. Пустой массив = очистить витрину |
+| PATCH `/admin/categories/:id/featured`| `{work_ids:[…]}` — работы категории (400 при чужой/несуществующей работе или **дубликате** в списке); порядок массива = `featured_order` (0 = hero); работы категории вне списка → NULL. Пустой массив = очистить витрину. `tag_ids` в ответах публичного API упорядочены по `tag.sort_order` (набор тегов работы неупорядочен) |
 
 GET-эндпоинты админке не нужны: список тегов — публичный `/tags`, витрина —
 `/featured`, работы категории — `/works?category=`, теги работы — добавить
