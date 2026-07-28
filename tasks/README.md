@@ -3,6 +3,9 @@
 Нарезка работ по превращению портфолио из статических заглушек в управляемое приложение
 (бэкенд + хранилище + админка + бэкап). **Единый источник правды по архитектуре —
 [`docs/architecture.md`](../docs/architecture.md)**; задачи ссылаются на её разделы (§N).
+Задачи 13–19 — **редизайн листинга проектов**; их источник правды —
+[`docs/projects-redesign.md`](../docs/projects-redesign.md) (дизайн: `front/1111.pen`,
+смотреть через Pencil MCP).
 
 > История ранней миграции на Astro — в [`_legacy-astro/`](./_legacy-astro/) (стек с тех пор
 > сменился на Vite+React SPA; читать только как исторический контекст).
@@ -95,6 +98,25 @@ tasks/
 
 **Параллелизм:** 09–10 (front) зависят только от 03 → можно вести параллельно с 04–08.
 Админка (07–08) — после 05–06 (или против мок-API).
+
+### Редизайн листинга проектов (13–19)
+
+Спека — [`docs/projects-redesign.md`](../docs/projects-redesign.md).
+
+| # | Задача | Слой / метод | Зависит от |
+|---|---|---|---|
+| 13 | [db-tags-featured](./13-db-tags-featured/) | back / TDD | — |
+| 14 | [public-api-listing](./14-public-api-listing/) | back / TDD | 13 |
+| 15 | [admin-api-tags-featured](./15-admin-api-tags-featured/) | back / TDD | 13, 14 |
+| 16 | [admin-ui-listing-content](./16-admin-ui-listing-content/) | admin / TDD | 14, 15 |
+| 17 | [front-ds-shared](./17-front-ds-shared/) | front / SDD | 14 |
+| 18 | [front-projects-root](./18-front-projects-root/) | front / SDD | 14, 17 |
+| 19 | [front-category-page](./19-front-category-page/) | front / SDD | 14, 17 |
+
+**Параллелизм:** после 14 ветки расходятся — админка (15→16) и фронт (17→18/19)
+независимы; 18 и 19 можно вести параллельно (перелинкованы, но не зависят кодом).
+**После деплоя** — контентный шаг в админке (не код): тексты категорий, теги и
+разметка работ, витрины разделов (спека §8).
 
 ---
 
