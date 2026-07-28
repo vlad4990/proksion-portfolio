@@ -312,12 +312,17 @@ Caddy срезает префикс `/api` (`handle_path /api/*` в корнев
 | POST             | `/admin/login`                         | пароль → httpOnly-cookie с JWT              |
 | POST             | `/admin/logout`                        | сбросить cookie                             |
 | GET              | `/admin/me`                            | проверка сессии                             |
-| POST/PATCH/DELETE| `/admin/categories[/:id]`              | CRUD категорий                              |
+| POST/PATCH/DELETE| `/admin/categories[/:id]`              | CRUD категорий; PATCH принимает и контент секции: `kicker`, `meta_role`, `period`, `description_long` (string\|null) и `display_variant` (`showcase`\|`strip`\|`cards`, иначе 400) |
+| PATCH            | `/admin/categories/:id/featured`       | `{work_ids:[…]}` — кураторская витрина секции: порядок массива = `featured_order` (0 = hero), работы категории вне списка → NULL, пустой массив очищает витрину. Чужая/несуществующая работа или дубликаты → 400 |
 | POST/PATCH/DELETE| `/admin/subcategories[/:id]`           | CRUD подкатегорий                           |
-| POST/PATCH/DELETE| `/admin/works[/:id]`                   | CRUD работ (title/description/cover/order)  |
+| POST/PATCH/DELETE| `/admin/works[/:id]`                   | CRUD работ (title/description/cover/order); PATCH принимает `tag_ids?: number[]` — полная замена набора тегов (несуществующий id → 400, работа не изменена) |
 | POST             | `/admin/works/:id/images`              | multipart-загрузка → пайплайн §6 → MinIO+БД |
 | PATCH/DELETE     | `/admin/images/:id`                    | alt/порядок/удаление                        |
-| PATCH            | `/admin/.../reorder`                   | `sort_order` для категорий/подкат/работ/картинок |
+| POST/PATCH/DELETE| `/admin/tags[/:id]`                    | CRUD тегов-фильтров (`{title*, slug?, sort_order?}`); слаг уникален глобально, удаление каскадит `work_tag` |
+| PATCH            | `/admin/.../reorder`                   | `sort_order` для категорий/подкат/работ/картинок/тегов |
+
+GET-эндпоинтов у admin-API нет: админка читает публичные — список тегов `/tags`, витрины
+`/featured`, работы категории `/works?category=`, теги работы — `tag_ids` в деталях работы.
 
 **Авторизация (один редактор):**
 - Пароль хранится как argon2id-хэш в env `ADMIN_PASSWORD_HASH` (`Bun.password.hash/verify` —

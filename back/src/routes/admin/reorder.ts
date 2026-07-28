@@ -8,7 +8,7 @@
 import { Elysia } from 'elysia'
 import { asRecord, guarded, protect, requireIntArray, type AdminDeps } from './_shared.ts'
 
-type Kind = 'category' | 'subcategory' | 'work' | 'image'
+type Kind = 'category' | 'subcategory' | 'work' | 'image' | 'tag'
 
 export function adminReorderRoutes(deps: AdminDeps) {
   const { repos, onMutation } = deps
@@ -28,6 +28,9 @@ export function adminReorderRoutes(deps: AdminDeps) {
     image: (id, sort_order) => {
       repos.image.update(id, { sort_order })
     },
+    tag: (id, sort_order) => {
+      repos.tag.update(id, { sort_order })
+    },
   }
 
   const reorder = (kind: Kind, body: unknown, set: { status?: number | string }) =>
@@ -43,4 +46,5 @@ export function adminReorderRoutes(deps: AdminDeps) {
     .patch('/admin/subcategories/reorder', ({ body, set }) => reorder('subcategory', body, set), guard)
     .patch('/admin/works/reorder', ({ body, set }) => reorder('work', body, set), guard)
     .patch('/admin/images/reorder', ({ body, set }) => reorder('image', body, set), guard)
+    .patch('/admin/tags/reorder', ({ body, set }) => reorder('tag', body, set), guard)
 }

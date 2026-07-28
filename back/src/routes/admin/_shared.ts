@@ -134,6 +134,20 @@ export function optNumberOrNull(obj: Rec, key: string): number | null | undefine
   return v
 }
 
+/** Опциональное значение из фиксированного набора строк (иначе 400) — например `display_variant`. */
+export function optEnum<T extends string>(
+  obj: Rec,
+  key: string,
+  allowed: readonly T[],
+): T | undefined {
+  if (!(key in obj) || obj[key] === undefined) return undefined
+  const v = obj[key]
+  if (typeof v !== 'string' || !(allowed as readonly string[]).includes(v)) {
+    throw new BadRequest(`"${key}" must be one of: ${allowed.join(', ')}`)
+  }
+  return v as T
+}
+
 /** Массив целых (для reorder). */
 export function requireIntArray(obj: Rec, key: string): number[] {
   const v = obj[key]
@@ -155,6 +169,19 @@ export function nextSortOrder(orders: readonly number[]): number {
 /** slugify(source) с гарантией уникальности среди `existing`. */
 export function makeSlug(source: string, fallback: string, existing: Iterable<string>): string {
   return uniqueSlug(slugify(source, fallback), existing)
+}
+
+/**
+ * Слаг из ЯВНО заданного пользователем значения: slugify БЕЗ авто-суффикса — занятый слаг
+ * даёт 400. Отличие от `makeSlug`: подменять запрошенный слаг на `-2` молча нельзя, ответ
+ * должен быть явной ошибкой (спека редизайна §5.5 / verify задачи 15).
+ */
+export function exactSlug(source: string, fallback: string, existing: Iterable<string>): string {
+  const slug = slugify(source, fallback)
+  for (const taken of existing) {
+    if (taken === slug) throw new BadRequest(`slug "${slug}" is already taken`)
+  }
+  return slug
 }
 
 // ── Обход дерева (для каскадной чистки S3) ────────────────────────────────────────

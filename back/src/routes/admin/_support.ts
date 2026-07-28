@@ -2,6 +2,7 @@
 // Даёт: in-memory БД + репозитории + AdminDeps с счётчиком мутаций, и фабрики auth-заголовков
 // (валидная сессия / CSRF) поверх настоящих jwt/guard из задачи 05.
 
+import type { Database } from 'bun:sqlite'
 import { openDb } from '../../db/index.ts'
 import { createRepos, type Repos } from '../../repos.ts'
 import { signToken } from '../../auth/jwt.ts'
@@ -28,6 +29,8 @@ export function req(path: string, init: RequestInit = {}): Request {
 }
 
 export interface TestCtx {
+  /** То же соединение, что и у репозиториев — чтобы поднять поверх него публичные роуты. */
+  db: Database
   repos: Repos
   deps: AdminDeps
   /** Сколько раз дёрнулся onMutation(). */
@@ -47,7 +50,7 @@ export function makeCtx(store: ObjectStore | null = null): TestCtx {
       mutations += 1
     },
   }
-  return { repos, deps, mutationCount: () => mutations }
+  return { db, repos, deps, mutationCount: () => mutations }
 }
 
 /** Фейковое хранилище, у которого заливка всегда падает (для теста атомарности). */

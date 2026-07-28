@@ -22,6 +22,7 @@ import {
   parseId,
   protect,
   purgeWorkObjects,
+  requireIntArray,
   requireNumber,
   type AdminDeps,
 } from './_shared.ts'
@@ -100,7 +101,19 @@ export function adminWorkRoutes(deps: AdminDeps) {
           }
           const sortOrder = optNumber(b, 'sort_order')
           if (sortOrder !== undefined) patch.sort_order = sortOrder
+          // Теги (§5.5): полная замена набора. Существование тегов проверяем ДО апдейта работы —
+          // иначе при невалидном id остальные поля патча уже были бы записаны.
+          let tagIds: number[] | undefined
+          if (b.tag_ids !== undefined) {
+            tagIds = requireIntArray(b, 'tag_ids')
+            for (const tagId of tagIds) {
+              if (!repos.tag.getById(tagId)) {
+                throw new BadRequest(`tag ${tagId} does not exist`)
+              }
+            }
+          }
           const row = repos.work.update(id, patch)
+          if (tagIds !== undefined) repos.tag.setWorkTags(id, tagIds)
           onMutation()
           return row
         }),

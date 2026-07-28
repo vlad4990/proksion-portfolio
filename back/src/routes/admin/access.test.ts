@@ -17,6 +17,14 @@ const ENDPOINTS: ReadonlyArray<{ method: string; path: string }> = [
   { method: 'POST', path: '/admin/works/1/images' },
   { method: 'PATCH', path: '/admin/images/1' },
   { method: 'PATCH', path: '/admin/categories/reorder' },
+  // Мутации редизайна (задача 15): контент секции и теги работы едут в существующих PATCH'ах
+  { method: 'PATCH', path: '/admin/categories/1' },
+  { method: 'PATCH', path: '/admin/works/1' },
+  { method: 'POST', path: '/admin/tags' },
+  { method: 'PATCH', path: '/admin/tags/1' },
+  { method: 'DELETE', path: '/admin/tags/1' },
+  { method: 'PATCH', path: '/admin/tags/reorder' },
+  { method: 'PATCH', path: '/admin/categories/1/featured' },
 ]
 
 describe('admin CRUD access control', () => {

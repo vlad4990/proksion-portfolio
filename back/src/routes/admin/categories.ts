@@ -3,25 +3,35 @@
 //
 // Слаг: из title (или явного `slug`), уникален среди всех категорий, стабилен после создания
 // (PATCH без поля `slug` его не меняет). Удаление каскадит в БД (FK) и чистит объекты S3.
+//
+// Редизайн листинга (docs/projects-redesign.md §5.5) добавил сюда контент секции категории
+// (`kicker`/`meta_role`/`period`/`description_long`/`display_variant`) и кураторскую витрину
+// (`PATCH /admin/categories/:id/featured`).
 
 import { Elysia } from 'elysia'
-import type { CategoryPatch } from '../../types.ts'
+import type { CategoryPatch, DisplayVariant } from '../../types.ts'
 import {
   asRecord,
+  BadRequest,
   guarded,
   makeSlug,
   nextSortOrder,
   NotFound,
+  optEnum,
   optNumber,
   optString,
   optStringOrNull,
   parseId,
   protect,
   purgeWorkObjects,
+  requireIntArray,
   requireString,
   workIdsUnderCategory,
   type AdminDeps,
 } from './_shared.ts'
+
+/** Допустимые варианты секции-витрины (`category.display_variant`, спека редизайна §2.1). */
+const DISPLAY_VARIANTS: readonly DisplayVariant[] = ['showcase', 'strip', 'cards']
 
 export function adminCategoryRoutes(deps: AdminDeps) {
   const { repos, onMutation } = deps
@@ -69,9 +79,46 @@ export function adminCategoryRoutes(deps: AdminDeps) {
           if (description !== undefined) patch.description = description
           const sortOrder = optNumber(b, 'sort_order')
           if (sortOrder !== undefined) patch.sort_order = sortOrder
+          // Контент секции/страницы категории (редизайн §4): все четыре — сбрасываемые в null.
+          const kicker = optStringOrNull(b, 'kicker')
+          if (kicker !== undefined) patch.kicker = kicker
+          const metaRole = optStringOrNull(b, 'meta_role')
+          if (metaRole !== undefined) patch.meta_role = metaRole
+          const period = optStringOrNull(b, 'period')
+          if (period !== undefined) patch.period = period
+          const descriptionLong = optStringOrNull(b, 'description_long')
+          if (descriptionLong !== undefined) patch.description_long = descriptionLong
+          const displayVariant = optEnum(b, 'display_variant', DISPLAY_VARIANTS)
+          if (displayVariant !== undefined) patch.display_variant = displayVariant
           const row = repos.category.update(id, patch)
           onMutation()
           return row
+        }),
+      guard,
+    )
+    // Кураторская витрина секции (§5.5). Путь длиннее generic-`/:id`, конфликта роутов нет.
+    // Валидация принадлежности работ категории — здесь: репозиторий `setFeatured` даёт только
+    // механику (одна транзакция), проверок области он не делает.
+    .patch(
+      '/admin/categories/:id/featured',
+      ({ params, body, set }) =>
+        guarded(set, () => {
+          const id = parseId(params.id)
+          if (!repos.category.getById(id)) throw new NotFound('category')
+          const workIds = requireIntArray(asRecord(body), 'work_ids')
+          if (new Set(workIds).size !== workIds.length) {
+            throw new BadRequest('"work_ids" must not contain duplicates')
+          }
+          for (const workId of workIds) {
+            const work = repos.work.getById(workId)
+            const subcategory = work ? repos.subcategory.getById(work.subcategory_id) : null
+            if (!subcategory || subcategory.category_id !== id) {
+              throw new BadRequest(`work ${workId} does not belong to this category`)
+            }
+          }
+          repos.work.setFeatured(id, workIds) // пустой список = очистить витрину
+          onMutation()
+          return { ok: true }
         }),
       guard,
     )

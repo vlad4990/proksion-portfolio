@@ -48,6 +48,17 @@ describe('admin reorder', () => {
     expect(ctx.repos.image.list(work.id).map((i) => i.id)).toEqual([i1.id, i0.id])
   })
 
+  test('tags reorder persists the chip order of /projects', async () => {
+    const a = ctx.repos.tag.create({ slug: 'a', title: 'A', sort_order: 0 })
+    const b = ctx.repos.tag.create({ slug: 'b', title: 'B', sort_order: 1 })
+    const c = ctx.repos.tag.create({ slug: 'c', title: 'C', sort_order: 2 })
+
+    const res = await patch('/admin/tags/reorder', [c.id, a.id, b.id])
+    expect(res.status).toBe(200)
+    expect(ctx.repos.tag.list().map((t) => t.id)).toEqual([c.id, a.id, b.id])
+    expect(ctx.mutationCount()).toBe(1)
+  })
+
   test('bad payload (not an array of ints) → 400', async () => {
     expect((await patch('/admin/categories/reorder', 'nope' as unknown as number[])).status).toBe(400)
   })

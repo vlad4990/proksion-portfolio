@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, test } from 'bun:test'
 import { adminWorkRoutes } from './works.ts'
+import { publicRoutes } from '../public.ts'
+import type { WorkDetailById } from '../../dto.ts'
 import { authHeaders, jsonHeaders, makeCtx, req, type TestCtx } from './_support.ts'
 
 describe('admin works CRUD', () => {
@@ -127,5 +129,98 @@ describe('admin works CRUD', () => {
     expect(res.status).toBe(200)
     expect(ctx.repos.work.getById(work.id)).toBeNull()
     expect(ctx.repos.image.getById(img.id)).toBeNull()
+  })
+})
+
+// Теги работы (§5.5): PATCH `/admin/works/:id` c `tag_ids` — полная замена набора.
+describe('admin works tag_ids', () => {
+  let ctx: TestCtx
+  let app: ReturnType<typeof adminWorkRoutes>
+  let publicApp: ReturnType<typeof publicRoutes>
+  let workId: number
+  let tagA: number
+  let tagB: number
+  let tagC: number
+
+  beforeEach(() => {
+    ctx = makeCtx()
+    app = adminWorkRoutes(ctx.deps)
+    publicApp = publicRoutes(ctx.db)
+    const cat = ctx.repos.category.create({ slug: 'cat', title: 'Кат' })
+    const sub = ctx.repos.subcategory.create({ category_id: cat.id, slug: 'sub', title: 'Под' })
+    workId = ctx.repos.work.create({ subcategory_id: sub.id, slug: 'w', title: 'W' }).id
+    tagA = ctx.repos.tag.create({ slug: 'a', title: 'A', sort_order: 0 }).id
+    tagB = ctx.repos.tag.create({ slug: 'b', title: 'B', sort_order: 1 }).id
+    tagC = ctx.repos.tag.create({ slug: 'c', title: 'C', sort_order: 2 }).id
+  })
+
+  const patch = (body: unknown, id: number = workId) =>
+    app.handle(
+      req(`/admin/works/${id}`, {
+        method: 'PATCH',
+        headers: jsonHeaders(),
+        body: JSON.stringify(body),
+      }),
+    )
+
+  test('tag_ids replaces the whole set', async () => {
+    expect((await patch({ tag_ids: [tagA, tagB] })).status).toBe(200)
+    expect(ctx.repos.tag.listTagIdsByWork(workId)).toEqual([tagA, tagB])
+
+    expect((await patch({ tag_ids: [tagC] })).status).toBe(200)
+    expect(ctx.repos.tag.listTagIdsByWork(workId)).toEqual([tagC])
+    expect(ctx.mutationCount()).toBe(2)
+  })
+
+  test('an empty tag_ids clears every tag', async () => {
+    await patch({ tag_ids: [tagA, tagB] })
+    expect((await patch({ tag_ids: [] })).status).toBe(200)
+    expect(ctx.repos.tag.listTagIdsByWork(workId)).toEqual([])
+  })
+
+  test('omitting tag_ids leaves the set untouched', async () => {
+    await patch({ tag_ids: [tagA] })
+    expect((await patch({ title: 'Другое' })).status).toBe(200)
+    expect(ctx.repos.tag.listTagIdsByWork(workId)).toEqual([tagA])
+  })
+
+  test('a non-existent tag id → 400, neither tags nor the work change', async () => {
+    await patch({ tag_ids: [tagA] })
+    const before = ctx.mutationCount()
+
+    const res = await patch({ title: 'НЕ ДОЛЖНО СОХРАНИТЬСЯ', tag_ids: [tagB, 9999] })
+    expect(res.status).toBe(400)
+    expect(((await res.json()) as { error: string }).error).toBe('bad_request')
+    expect(ctx.repos.tag.listTagIdsByWork(workId)).toEqual([tagA])
+    expect(ctx.repos.work.getById(workId)?.title).toBe('W')
+    expect(ctx.mutationCount()).toBe(before)
+  })
+
+  test('tag_ids that is not an array of ints → 400', async () => {
+    expect((await patch({ tag_ids: 'nope' })).status).toBe(400)
+    expect((await patch({ tag_ids: [1.5] })).status).toBe(400)
+    expect(ctx.mutationCount()).toBe(0)
+  })
+
+  test('tag_ids works alongside the other patch fields', async () => {
+    const res = await patch({ title: 'Новый заголовок', description: 'Текст', tag_ids: [tagB] })
+    expect(res.status).toBe(200)
+    const row = (await res.json()) as { title: string; description: string }
+    expect(row.title).toBe('Новый заголовок')
+    expect(row.description).toBe('Текст')
+    expect(ctx.repos.tag.listTagIdsByWork(workId)).toEqual([tagB])
+    expect(ctx.mutationCount()).toBe(1)
+  })
+
+  test('tag_ids on an unknown work → 404', async () => {
+    expect((await patch({ tag_ids: [tagA] }, 9999)).status).toBe(404)
+  })
+
+  test('the public work detail reflects the new tag set', async () => {
+    await patch({ tag_ids: [tagC, tagA] })
+    const detail = (await (
+      await publicApp.handle(req(`/works/by-id/${workId}`))
+    ).json()) as WorkDetailById
+    expect(detail.tag_ids).toEqual([tagA, tagC]) // порядок — по tag.sort_order
   })
 })
