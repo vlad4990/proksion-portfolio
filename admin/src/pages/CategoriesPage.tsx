@@ -3,24 +3,14 @@ import { Link } from 'react-router-dom'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import {
-  createCategory,
-  deleteCategory,
-  getCategories,
-  reorderCategories,
-  updateCategory,
-} from '@/api/content'
+import { createCategory, deleteCategory, getCategories, reorderCategories } from '@/api/content'
 import type { CategoryNav } from '@/api/types'
 import { apiErrorMessage } from '@/lib/errors'
 import { useResource } from '@/lib/useResource'
-import {
-  emptyNamedEntity,
-  namedEntityToValues,
-  toCategoryInput,
-  type NamedEntityValues,
-} from '@/forms/schemas'
+import { emptyNamedEntity, toCategoryInput, type NamedEntityValues } from '@/forms/schemas'
 import { useReorder } from '@/components/useReorder'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
+import { CategoryEditDialog } from '@/components/CategoryEditDialog'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { NamedEntityDialog } from '@/components/NamedEntityDialog'
 import { ReorderControls } from '@/components/ReorderControls'
@@ -37,7 +27,8 @@ import {
 export default function CategoriesPage() {
   const { data, loading, error, reload } = useResource((signal) => getCategories(signal), [])
   const [createOpen, setCreateOpen] = useState(false)
-  const [editTarget, setEditTarget] = useState<CategoryNav | null>(null)
+  // Редактирование идёт по слагу: диалог сам догружает деталь категории (description_long).
+  const [editSlug, setEditSlug] = useState<string | null>(null)
 
   const categories = useMemo(() => data ?? [], [data])
   const { order, getItemProps, moveUp, moveDown } = useReorder(categories, async (ids) => {
@@ -53,12 +44,6 @@ export default function CategoriesPage() {
   const handleCreate = async (values: NamedEntityValues) => {
     await createCategory(toCategoryInput(values))
     toast.success('Категория создана')
-    reload()
-  }
-
-  const handleEdit = (target: CategoryNav) => async (values: NamedEntityValues) => {
-    await updateCategory(target.id, toCategoryInput(values))
-    toast.success('Категория обновлена')
     reload()
   }
 
@@ -133,7 +118,7 @@ export default function CategoriesPage() {
                       variant="ghost"
                       size="icon"
                       aria-label="Редактировать"
-                      onClick={() => setEditTarget(cat)}
+                      onClick={() => setEditSlug(cat.slug)}
                     >
                       <Pencil />
                     </Button>
@@ -162,14 +147,11 @@ export default function CategoriesPage() {
         initialValues={emptyNamedEntity}
         onSubmit={handleCreate}
       />
-      {editTarget && (
-        <NamedEntityDialog
-          open
-          onOpenChange={(next) => !next && setEditTarget(null)}
-          title="Редактировать категорию"
-          isEdit
-          initialValues={namedEntityToValues(editTarget)}
-          onSubmit={handleEdit(editTarget)}
+      {editSlug !== null && (
+        <CategoryEditDialog
+          catSlug={editSlug}
+          onClose={() => setEditSlug(null)}
+          onSaved={reload}
         />
       )}
     </div>

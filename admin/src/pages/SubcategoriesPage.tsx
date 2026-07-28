@@ -8,20 +8,26 @@ import {
   deleteSubcategory,
   getCategory,
   reorderSubcategories,
+  updateCategory,
   updateSubcategory,
 } from '@/api/content'
 import type { SubcategoryNav } from '@/api/types'
 import { apiErrorMessage } from '@/lib/errors'
 import { useResource } from '@/lib/useResource'
 import {
+  categoryDetailToValues,
   emptyNamedEntity,
   namedEntityToValues,
+  toCategoryPatch,
   toNamedEntityPayload,
+  type CategoryFormValues,
   type NamedEntityValues,
 } from '@/forms/schemas'
 import { useReorder } from '@/components/useReorder'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
+import { CategoryDialog } from '@/components/CategoryDialog'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
+import { FeaturedEditor } from '@/components/FeaturedEditor'
 import { NamedEntityDialog } from '@/components/NamedEntityDialog'
 import { ReorderControls } from '@/components/ReorderControls'
 import { Button } from '@/components/ui/button'
@@ -41,6 +47,7 @@ export default function SubcategoriesPage() {
     [catSlug],
   )
   const [createOpen, setCreateOpen] = useState(false)
+  const [categoryEditOpen, setCategoryEditOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<SubcategoryNav | null>(null)
 
   const category = data
@@ -54,6 +61,14 @@ export default function SubcategoriesPage() {
       throw err
     }
   })
+
+  // Контент раздела (kicker/роль/период/описание/вариант секции) — форма категории.
+  const handleEditCategory = async (values: CategoryFormValues) => {
+    if (!category) return
+    await updateCategory(category.id, toCategoryPatch(values))
+    toast.success('Раздел обновлён')
+    reload()
+  }
 
   const handleCreate = async (values: NamedEntityValues) => {
     if (!category) return
@@ -93,10 +108,20 @@ export default function SubcategoriesPage() {
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">Разделы внутри категории.</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)} disabled={!category}>
-          <Plus />
-          Новая подкатегория
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setCategoryEditOpen(true)}
+            disabled={!category}
+          >
+            <Pencil />
+            Редактировать раздел
+          </Button>
+          <Button onClick={() => setCreateOpen(true)} disabled={!category}>
+            <Plus />
+            Новая подкатегория
+          </Button>
+        </div>
       </div>
 
       {loading && <p className="text-sm text-muted-foreground">Загрузка…</p>}
@@ -117,7 +142,7 @@ export default function SubcategoriesPage() {
               <TableHead className="w-28">Порядок</TableHead>
               <TableHead>Название</TableHead>
               <TableHead>Слаг</TableHead>
-              <TableHead className="w-24">Работы</TableHead>
+              <TableHead className="w-40">Работ с картинками</TableHead>
               <TableHead className="w-40 text-right">Действия</TableHead>
             </TableRow>
           </TableHeader>
@@ -169,6 +194,19 @@ export default function SubcategoriesPage() {
             ))}
           </TableBody>
         </Table>
+      )}
+
+      {category && <FeaturedEditor categoryId={category.id} catSlug={catSlug} />}
+
+      {category && (
+        <CategoryDialog
+          open={categoryEditOpen}
+          onOpenChange={setCategoryEditOpen}
+          title="Редактировать раздел"
+          isEdit
+          initialValues={categoryDetailToValues(category)}
+          onSubmit={handleEditCategory}
+        />
       )}
 
       <NamedEntityDialog

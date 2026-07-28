@@ -1,17 +1,25 @@
 import { describe, expect, it } from 'vitest'
 
-import type { WorkDetail } from '@/api/types'
+import type { CategoryDetail, WorkDetail } from '@/api/types'
 
 import {
+  categoryDetailToValues,
+  categorySchema,
   emptyToNull,
   namedEntitySchema,
   namedEntityToValues,
+  tagSchema,
+  tagToValues,
   toCategoryInput,
+  toCategoryPatch,
   toSubcategoryInput,
+  toTagInput,
+  toTagPatch,
   toWorkInput,
   toWorkPatch,
   workDetailToValues,
   workSchema,
+  type CategoryFormValues,
 } from './schemas'
 
 describe('namedEntitySchema (категория/подкатегория)', () => {
@@ -93,6 +101,124 @@ describe('toWorkInput / toWorkPatch', () => {
     expect(toWorkPatch({ title: 'Афиша', slug: '', description: '' })).toEqual({
       title: 'Афиша',
       description: null,
+    })
+  })
+})
+
+describe('categorySchema / toCategoryPatch (контент секции, редизайн §5.5)', () => {
+  const values: CategoryFormValues = {
+    title: 'Графика',
+    slug: 'grafika',
+    description: 'Коротко',
+    kicker: 'КОММЕРЧЕСКАЯ ГРАФИКА',
+    meta_role: 'SMM · ПРОМО-ГРАФИКА',
+    period: '2023 — 2026',
+    description_long: 'Длинный текст',
+    display_variant: 'strip',
+  }
+
+  it('невалидный display_variant отвергается схемой', () => {
+    expect(categorySchema.safeParse({ ...values, display_variant: 'grid' }).success).toBe(false)
+  })
+
+  it('валидные значения проходят', () => {
+    expect(categorySchema.safeParse(values).success).toBe(true)
+  })
+
+  it('все контентные поля уходят в patch как есть', () => {
+    expect(toCategoryPatch(values)).toEqual({
+      title: 'Графика',
+      slug: 'grafika',
+      description: 'Коротко',
+      kicker: 'КОММЕРЧЕСКАЯ ГРАФИКА',
+      meta_role: 'SMM · ПРОМО-ГРАФИКА',
+      period: '2023 — 2026',
+      description_long: 'Длинный текст',
+      display_variant: 'strip',
+    })
+  })
+
+  it('очищенные поля → null (сбросить в БД), пустой слаг опускается', () => {
+    expect(
+      toCategoryPatch({
+        ...values,
+        slug: '',
+        description: '',
+        kicker: '',
+        meta_role: '   ',
+        period: '',
+        description_long: '',
+      }),
+    ).toEqual({
+      title: 'Графика',
+      description: null,
+      kicker: null,
+      meta_role: null,
+      period: null,
+      description_long: null,
+      display_variant: 'strip',
+    })
+  })
+
+  it('categoryDetailToValues: null-поля → пустые строки, variant сохраняется', () => {
+    const detail: CategoryDetail = {
+      id: 1,
+      slug: 'grafika',
+      title: 'Графика',
+      description: null,
+      sort_order: 0,
+      kicker: null,
+      meta_role: null,
+      period: '2023 — 2026',
+      display_variant: 'cards',
+      description_long: null,
+      work_count: 3,
+      updated_max: null,
+      subcategories: [],
+    }
+    expect(categoryDetailToValues(detail)).toEqual({
+      title: 'Графика',
+      slug: 'grafika',
+      description: '',
+      kicker: '',
+      meta_role: '',
+      period: '2023 — 2026',
+      description_long: '',
+      display_variant: 'cards',
+    })
+  })
+})
+
+describe('теги: схема и маппинг', () => {
+  it('пустое название → ошибка', () => {
+    expect(tagSchema.safeParse({ title: '  ', slug: '' }).success).toBe(false)
+  })
+
+  it('toTagInput: пустой слаг опускается (бэк сгенерит транслит)', () => {
+    expect(toTagInput({ title: 'Айдентика', slug: '' })).toEqual({ title: 'Айдентика' })
+    expect(toTagInput({ title: 'Айдентика', slug: 'ident' })).toEqual({
+      title: 'Айдентика',
+      slug: 'ident',
+    })
+  })
+
+  it('toTagPatch: слаг не шлётся, если не менялся (переименование не трогает ссылку)', () => {
+    expect(toTagPatch({ title: 'Плакаты', slug: 'afishi' }, 'afishi')).toEqual({
+      title: 'Плакаты',
+    })
+  })
+
+  it('toTagPatch: изменённый слаг уходит в patch', () => {
+    expect(toTagPatch({ title: 'Плакаты', slug: 'plakaty' }, 'afishi')).toEqual({
+      title: 'Плакаты',
+      slug: 'plakaty',
+    })
+  })
+
+  it('tagToValues: строка тега → значения формы', () => {
+    expect(tagToValues({ title: 'Айдентика', slug: 'identika' })).toEqual({
+      title: 'Айдентика',
+      slug: 'identika',
     })
   })
 })

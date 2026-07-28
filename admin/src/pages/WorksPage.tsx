@@ -180,7 +180,7 @@ export default function WorksPage() {
                         variant="outline"
                         size="sm"
                         disabled
-                        title="Открыть нельзя: публичный листинг не отдаёт slug (откройте после создания в этой сессии)"
+                        title="Открыть нельзя: у работы неизвестен слаг"
                       >
                         <Settings2 />
                         Управление

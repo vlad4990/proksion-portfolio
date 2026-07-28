@@ -32,9 +32,17 @@ export function Layout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-muted/20">
       <header className="border-b bg-background">
         <div className="container flex h-14 items-center justify-between">
-          <Link to="/" className="text-sm font-semibold uppercase tracking-wide hover:opacity-80">
-            PROKSION · Админка
-          </Link>
+          <nav className="flex items-center gap-5">
+            <Link to="/" className="text-sm font-semibold uppercase tracking-wide hover:opacity-80">
+              PROKSION · Админка
+            </Link>
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+              Категории
+            </Link>
+            <Link to="/tags" className="text-sm text-muted-foreground hover:text-foreground">
+              Теги
+            </Link>
+          </nav>
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
             {identity && <span>{identity.sub}</span>}
             <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>

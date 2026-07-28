@@ -153,6 +153,14 @@ export interface SubcategoryListing {
   works: Tile[]
 }
 
+/** Страница листинга `GET /api/works?...` (offset/limit-пагинация, `total` — с учётом фильтров). */
+export interface WorksPage {
+  items: Tile[]
+  total: number
+  limit: number
+  offset: number
+}
+
 export type ImageFormat = 'avif' | 'webp' | 'jpg'
 export type ImageVariant = 'thumb' | 'full'
 export type VariantUrls = Record<ImageFormat, string>

@@ -4,6 +4,7 @@ import { Pencil } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
+  getTags,
   getWorkDetail,
   reorderImages,
   updateImage,
@@ -20,6 +21,7 @@ import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { ImageCard } from '@/components/ImageCard'
 import { ImageUploader } from '@/components/ImageUploader'
 import { WorkDialog } from '@/components/WorkDialog'
+import { WorkTagsCard } from '@/components/WorkTagsCard'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -30,6 +32,7 @@ export default function WorkDetailPage() {
     (signal) => getWorkDetail(catSlug, subSlug, workSlug, signal),
     [catSlug, subSlug, workSlug],
   )
+  const tagsResource = useResource((signal) => getTags(signal), [])
   const [editOpen, setEditOpen] = useState(false)
 
   // Запоминаем работу в реестре (slug/title) — чтобы список работ мог её открыть/показать.
@@ -56,6 +59,18 @@ export default function WorkDetailPage() {
     await updateWork(data.id, toWorkPatch(values))
     toast.success('Работа обновлена')
     reload()
+  }
+
+  // Теги — не форма, а точечная мутация: ошибка идёт тостом (конвенция админки), успех — рефетч.
+  const handleSaveTags = async (tagIds: number[]) => {
+    if (!data) return
+    try {
+      await updateWork(data.id, { tag_ids: tagIds })
+      toast.success('Теги сохранены')
+      reload()
+    } catch (err) {
+      toast.error(apiErrorMessage(err))
+    }
   }
 
   const handleSetCover = async (imageId: number) => {
@@ -142,6 +157,14 @@ export default function WorkDetailPage() {
               )}
             </CardContent>
           </Card>
+
+          <WorkTagsCard
+            tags={tagsResource.data ?? []}
+            loading={tagsResource.loading}
+            error={tagsResource.error}
+            value={data.tag_ids}
+            onSave={handleSaveTags}
+          />
 
           <Card>
             <CardHeader>

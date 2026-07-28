@@ -5,6 +5,7 @@ import { Layout } from '@/components/Layout'
 import { WorkRegistryProvider } from '@/content/work-registry'
 import LoginPage from '@/pages/LoginPage'
 import CategoriesPage from '@/pages/CategoriesPage'
+import TagsPage from '@/pages/TagsPage'
 import SubcategoriesPage from '@/pages/SubcategoriesPage'
 import WorksPage from '@/pages/WorksPage'
 import WorkDetailPage from '@/pages/WorkDetailPage'
@@ -33,6 +34,7 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route element={<ProtectedLayout />}>
         <Route path="/" element={<CategoriesPage />} />
+        <Route path="/tags" element={<TagsPage />} />
         <Route path="/categories/:catSlug" element={<SubcategoriesPage />} />
         <Route path="/categories/:catSlug/:subSlug" element={<WorksPage />} />
         <Route path="/categories/:catSlug/:subSlug/:workSlug" element={<WorkDetailPage />} />
