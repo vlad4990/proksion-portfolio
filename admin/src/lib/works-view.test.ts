@@ -5,7 +5,21 @@ import type { KnownWork } from '@/content/work-registry'
 
 import { buildWorksView } from './works-view'
 
-const tile = (id: number): Tile => ({ id, src: `/media/images/${id}/1/thumb.jpg`, w: 800, h: 600 })
+const tile = (id: number): Tile => ({
+  id,
+  slug: `w${id}`,
+  title: null,
+  src: `/media/images/${id}/1/thumb.jpg`,
+  w: 800,
+  h: 600,
+  cat: 'cat',
+  sub: 'sub',
+  variants: {
+    avif: `/media/images/${id}/1/thumb.avif`,
+    webp: `/media/images/${id}/1/thumb.webp`,
+    jpg: `/media/images/${id}/1/thumb.jpg`,
+  },
+})
 const known = (id: number, slug: string, title: string | null = null): KnownWork => ({
   id,
   catSlug: 'cat',

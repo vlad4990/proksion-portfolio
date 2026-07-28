@@ -111,6 +111,7 @@ describe('entity → form', () => {
       title: null,
       description: null,
       cover_image_id: null,
+      tag_ids: [],
       images: [],
     }
     expect(workDetailToValues(work)).toEqual({ title: '', slug: 'w', description: '' })

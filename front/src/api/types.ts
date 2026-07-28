@@ -1,17 +1,21 @@
 // Типы ответов публичного API (docs/architecture.md §7; контракты задачи 03 —
-// back/src/dto.ts). Совместимы с masonry-листингом фронта (front/CLAUDE.md):
-// тайл — { id, src, w, h, cat, sub, variants }. Зеркалят back/src/dto.ts; форма СТАБИЛЬНА —
-// менять синхронно с бэкендом.
+// back/src/dto.ts, расширение редизайна — docs/projects-redesign.md §5, задача 14).
+// Совместимы с masonry-листингом фронта (front/CLAUDE.md): тайл —
+// { id, slug, title, src, w, h, cat, sub, variants }. Зеркалят back/src/dto.ts;
+// форма СТАБИЛЬНА — менять синхронно с бэкендом.
 
 /**
- * Тайл листинга. `id` — id работы; `src` — URL thumb cover-картинки (`/media/...`,
- * jpg-fallback); `w/h` — натуральные размеры (фронт ставит aspect-ratio → нет скачков
- * layout); `cat`/`sub` — слаги пути: тайл сразу знает свой канонический URL
- * `/projects/:cat/:sub/:id` и рендерится настоящей ссылкой (в т.ч. с глобального листинга);
+ * Тайл листинга. `id` — id работы; `slug`/`title` — слаг работы для канонического URL модалки
+ * `/projects/:cat/:sub/:slug` и заголовок (aria-label, подпись hero-тайла витрины);
+ * `src` — URL thumb cover-картинки (`/media/...`, jpg-fallback); `w/h` — натуральные размеры
+ * (фронт ставит aspect-ratio → нет скачков layout); `cat`/`sub` — слаги пути: тайл сразу знает
+ * свой канонический URL и рендерится настоящей ссылкой (в т.ч. с глобального листинга);
  * `variants` — thumb в avif/webp/jpg для `<picture>` (avif втрое легче jpg).
  */
 export interface Tile {
   id: number
+  slug: string
+  title: string | null
   src: string
   w: number
   h: number
@@ -19,6 +23,9 @@ export interface Tile {
   sub: string
   variants: VariantUrls
 }
+
+/** Вариант вёрстки секции-витрины категории на `/projects` (спека редизайна §2.1). */
+export type DisplayVariant = 'showcase' | 'strip' | 'cards'
 
 /** Плоская метаинформация категории. */
 export interface CategoryRef {
@@ -38,14 +45,58 @@ export interface SubcategoryRef {
   sort_order: number
 }
 
-/** Подкатегория для навигации: метаданные + счётчик работ. */
+/**
+ * Подкатегория для навигации: метаданные + счётчик работ.
+ * `work_count` — только ВИДИМЫЕ работы (с картинками), т.е. ровно те, что рендерятся
+ * тайлами (спека редизайна §5.2 — счётчик «ПОКАЗАНО N ИЗ M» честный).
+ */
 export interface SubcategoryNav extends SubcategoryRef {
   work_count: number
 }
 
-/** Категория для навигации: метаданные + вложенные подкатегории. */
+/**
+ * Категория для навигации: метаданные + контент секции редизайна + агрегаты по видимым
+ * работам + вложенные подкатегории. `updated_max` — max `work.updated_at` ISO-строкой
+ * (`2026-07-28T01:15:09Z`, разбирается `new Date`) либо `null`, если видимых работ нет
+ * (крошки страницы категории: «ОБНОВЛЕНО — ИЮЛЬ 2026»).
+ */
 export interface CategoryNav extends CategoryRef {
+  kicker: string | null
+  meta_role: string | null
+  period: string | null
+  display_variant: DisplayVariant
+  work_count: number
+  updated_max: string | null
   subcategories: SubcategoryNav[]
+}
+
+/** Ответ `GET /api/categories/:cat`: навигационная форма + длинное описание страницы. */
+export interface CategoryDetail extends CategoryNav {
+  description_long: string | null
+}
+
+/** Тег-фильтр чипов `/projects` со счётчиком видимых работ (`GET /api/tags`, §5.3). */
+export interface TagNav {
+  id: number
+  slug: string
+  title: string
+  sort_order: number
+  work_count: number
+}
+
+/** Работа кураторской витрины: тайл + описание (карточки варианта `cards`). */
+export interface FeaturedWork extends Tile {
+  description: string | null
+}
+
+/**
+ * Секция витрины категории на корневой `/projects` (`GET /api/featured`, §5.3).
+ * `curated: false` — витрина не настроена, показан fallback (первые видимые работы).
+ */
+export interface FeaturedSection {
+  cat: string
+  curated: boolean
+  works: FeaturedWork[]
 }
 
 /** Ответ листинга подкатегории: контекст + тайлы работ. */
@@ -55,7 +106,11 @@ export interface SubcategoryListing {
   works: Tile[]
 }
 
-/** Страница глобального листинга `/works` (offset/limit-пагинация). */
+/**
+ * Страница листинга `/works` (offset/limit-пагинация; дефолт limit 24, максимум 100).
+ * Фильтры-квери `category`/`subcategory`(требует category)/`tag` комбинируются,
+ * `total` их учитывает; неизвестный слаг → пустая страница, не ошибка (§5.4).
+ */
 export interface WorksPage {
   items: Tile[]
   total: number
@@ -91,13 +146,17 @@ export interface ImageDetail {
   variants: ImageVariants
 }
 
-/** Полная работа: описание + упорядоченные картинки карусели. */
+/**
+ * Полная работа: описание + упорядоченные картинки карусели + `tag_ids` (id тегов работы;
+ * нужны админке для мультивыбора, фронту не мешают).
+ */
 export interface WorkDetail {
   id: number
   slug: string
   title: string | null
   description: string | null
   cover_image_id: number | null
+  tag_ids: number[]
   images: ImageDetail[]
 }
 

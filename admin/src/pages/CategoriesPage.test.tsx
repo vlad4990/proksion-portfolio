@@ -22,6 +22,12 @@ const cat = (id: number, slug: string, title: string): CategoryNav => ({
   title,
   description: null,
   sort_order: 0,
+  kicker: null,
+  meta_role: null,
+  period: null,
+  display_variant: 'showcase',
+  work_count: 0,
+  updated_max: null,
   subcategories: [],
 })
 

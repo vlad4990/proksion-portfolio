@@ -260,17 +260,50 @@ Caddy срезает префикс `/api` (`handle_path /api/*` в корнев
 | Метод | Путь (внутр.)                       | Ответ                                                        |
 | ----- | ----------------------------------- | ------------------------------------------------------------ |
 | GET   | `/health`                           | `ok`                                                         |
-| GET   | `/categories`                       | категории (+ подкатегории/счётчики) для навигации            |
-| GET   | `/categories/:cat`                  | категория + её подкатегории                                  |
+| GET   | `/categories`                       | категории (+ контент секции, агрегаты, подкатегории/счётчики) |
+| GET   | `/categories/:cat`                  | категория + её подкатегории + `description_long`             |
 | GET   | `/categories/:cat/:sub`             | подкатегория + работы (тайлы: cover-thumb URL + `w/h`)       |
-| GET   | `/works`                            | все работы (для `/projects`), пагинация                      |
+| GET   | `/tags`                             | теги-фильтры `/projects` со счётчиками видимых работ         |
+| GET   | `/featured`                         | витрины секций по категориям (кураторские либо fallback)     |
+| GET   | `/works`                            | работы: фильтры `category`/`subcategory`/`tag` + пагинация   |
+| GET   | `/works/by-id/:id`                  | полная работа по id + слаги пути (`cat`/`sub`)               |
 | GET   | `/works/:cat/:sub/:work`            | полная работа: описание + все картинки (варианты, `w/h`, alt)|
 
-Форма тайла для листинга совместима с masonry-фронтом: `{ id, src, w, h, cat, sub, variants }`
-(`src` = URL `thumb` cover-картинки в jpg — fallback, `variants` = thumb в avif/webp/jpg для
+Форма тайла для листинга совместима с masonry-фронтом:
+`{ id, slug, title, src, w, h, cat, sub, variants }` (`slug`/`title` = слаг работы для
+канонического URL модалки и заголовок — подпись hero-тайла витрины, aria-label, списки админки;
+`src` = URL `thumb` cover-картинки в jpg — fallback, `variants` = thumb в avif/webp/jpg для
 `<picture>` в листинге, `w/h` = натуральные размеры → aspect-ratio без скачков,
 `cat`/`sub` = слаги пути — тайл любого листинга сразу знает канонический URL
-`/projects/:cat/:sub/:id`, и фронт рендерит настоящую ссылку).
+`/projects/:cat/:sub/:slug`, и фронт рендерит настоящую ссылку).
+
+**Расширение под редизайн листинга** (задача 14; контракт — `projects-redesign.md` §5):
+
+- **Счётчики честные**: `work_count` категории и подкатегории считают только ВИДИМЫЕ работы
+  (у работы есть ≥1 картинка) — ровно те, что рендерятся тайлами. Работа без картинок не
+  попадает ни в листинги, ни в счётчики, ни в `/tags`.
+- `CategoryNav` дополнен контентом секции (`kicker`, `meta_role`, `period`,
+  `display_variant`) и агрегатами (`work_count`, `updated_max` = max `work.updated_at`
+  по видимым работам ISO-строкой `2026-07-28T01:15:09Z` либо `null` — в БД timestamp'ы лежат
+  как `YYYY-MM-DD HH:MM:SS`, который парсится не всеми браузерами);
+  `description_long` отдаётся только в `/categories/:cat`.
+- `GET /tags` → `{ id, slug, title, sort_order, work_count }[]`, порядок `sort_order, id`;
+  тег без работ отдаётся с `work_count: 0`.
+- `GET /featured` → `{ cat, curated, works }[]` по всем категориям в порядке `sort_order`;
+  `works` — работы с `work.featured_order` по возрастанию (`curated: true`), а если
+  кураторская витрина пуста — первые 8 видимых работ категории (`curated: false`);
+  элемент витрины = тайл + `description`.
+- `GET /works` — **пагинация и фильтрация в SQL** (один JOIN с `LIMIT/OFFSET` + отдельный
+  `COUNT(*)`, не обход дерева в памяти). Порядок: `category.sort_order → subcategory.sort_order
+  → work.sort_order → work.id`. Параметры `category`, `subcategory` (требует `category`),
+  `tag` комбинируются; неизвестный слаг фильтра → пустая страница `total: 0` (не 404).
+  Лимит: дефолт **24** (порция инфинити-скролла), максимум 100.
+- Детали работы (`/works/:cat/:sub/:work`, `/works/by-id/:id`) несут `tag_ids: number[]`
+  (мультивыбор тегов в админке).
+
+Агрегаты и листинги живут в `back/src/queries.ts` (слой SQL-чтений поверх CRUD-репозиториев);
+сериализаторы форм — `back/src/dto.ts`, зеркала типов — `front/src/api/types.ts` и
+`admin/src/api/types.ts` (менять синхронно все три).
 
 ### Админка (требуется авторизация)
 

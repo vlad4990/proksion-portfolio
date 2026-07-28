@@ -2,31 +2,49 @@
 // Роуты объявляются ОТ КОРНЯ — снаружи доступны как /api/... (Caddy `handle_path /api/*`
 // срезает префикс, §7). Мутации/аплоад — задачи 04–06, здесь их нет.
 //
-// Пагинация `/works` — зафиксированный контракт: offset/limit (дефолт limit 60, максимум 100).
-// Ответ: { items: Tile[], total, limit, offset }.
+// Пагинация `/works` — зафиксированный контракт: offset/limit (дефолт limit 24 — порция
+// инфинити-скролла, максимум 100). Ответ: { items: Tile[], total, limit, offset };
+// `total` учитывает фильтры `category`/`subcategory`/`tag` (спека редизайна §5.4).
+//
+// Счётчики (`work_count`, `/tags`) и листинги считают только ВИДИМЫЕ работы — с ≥1 картинкой
+// (спека редизайна §5.2): ровно то, что реально рендерится тайлами.
 
 import { Elysia } from 'elysia'
 import type { Database } from 'bun:sqlite'
 import { createRepos, type Repos } from '../repos.ts'
-import { allTiles, subcategoryTiles } from '../queries.ts'
 import {
+  categoryStats,
+  countWorkTiles,
+  featuredSections,
+  listWorkTiles,
+  subcategoryTiles,
+  subcategoryWorkCounts,
+  tagNavs,
+  EMPTY_CATEGORY_STATS,
+  type WorksFilter,
+} from '../queries.ts'
+import {
+  toCategoryDetail,
   toCategoryNav,
   toCategoryRef,
   toSubcategoryNav,
   toSubcategoryRef,
   toWorkDetail,
   toWorkDetailById,
+  type CategoryDetail,
   type CategoryNav,
+  type FeaturedSection,
   type SubcategoryListing,
+  type TagNav,
   type WorkDetail,
   type WorkDetailById,
   type WorksPage,
 } from '../dto.ts'
 
-export const DEFAULT_WORKS_LIMIT = 60
+export const DEFAULT_WORKS_LIMIT = 24
 export const MAX_WORKS_LIMIT = 100
 
-/** limit: положительное целое; невалидное → дефолт 60; больше максимума → клампится к 100. */
+/** limit: положительное целое; невалидное → дефолт 24; больше максимума → клампится к 100. */
 function parseLimit(raw: string | undefined): number {
   if (raw === undefined) return DEFAULT_WORKS_LIMIT
   const n = Number(raw)
@@ -48,14 +66,16 @@ function parseId(raw: string): number | null {
   return Number.isInteger(n) && n > 0 ? n : null
 }
 
-/** Навигация: все категории с вложенными подкатегориями и счётчиками работ. */
-function categoryNav(repos: Repos, categoryId: number): CategoryNav | null {
-  const category = repos.category.getById(categoryId)
-  if (!category) return null
-  const subcategories = repos.subcategory
-    .list(category.id)
-    .map((sub) => toSubcategoryNav(sub, repos.work.list(sub.id).length))
-  return toCategoryNav(category, subcategories)
+/** Пустой параметр (`?category=`) — это отсутствие фильтра, а не поиск пустого слага. */
+function parseFilter(raw: string | undefined): string | undefined {
+  return raw === undefined || raw === '' ? undefined : raw
+}
+
+/** Подкатегории категории со счётчиками видимых работ (счёт — SQL'ем, один GROUP BY на всё). */
+function subcategoryNavs(repos: Repos, categoryId: number, counts: Map<number, number>) {
+  return repos.subcategory
+    .list(categoryId)
+    .map((sub) => toSubcategoryNav(sub, counts.get(sub.id) ?? 0))
 }
 
 export function publicRoutes(db: Database) {
@@ -64,25 +84,51 @@ export function publicRoutes(db: Database) {
   return new Elysia()
     .get('/health', () => 'ok')
 
-    // Все категории (+ подкатегории/счётчики) для навигации.
-    .get('/categories', () =>
-      repos.category
+    // Все категории (+ контент секции, агрегаты, подкатегории/счётчики) для навигации.
+    .get('/categories', () => {
+      const counts = subcategoryWorkCounts(db)
+      const stats = categoryStats(db)
+      const navs: CategoryNav[] = repos.category
         .list()
-        .map((cat) => categoryNav(repos, cat.id))
-        .filter((nav): nav is CategoryNav => nav !== null),
-    )
+        .map((cat) =>
+          toCategoryNav(
+            cat,
+            subcategoryNavs(repos, cat.id, counts),
+            stats.get(cat.id) ?? EMPTY_CATEGORY_STATS,
+          ),
+        )
+      return navs
+    })
 
-    // Одна категория + её подкатегории.
+    // Одна категория + её подкатегории (+ description_long для страницы категории).
     .get('/categories/:cat', ({ params, set }) => {
       const category = repos.category.getBySlug(params.cat)
       if (!category) {
         set.status = 404
         return { error: 'not_found', resource: 'category', slug: params.cat }
       }
-      return categoryNav(repos, category.id)
+      const detail: CategoryDetail = toCategoryDetail(
+        category,
+        subcategoryNavs(repos, category.id, subcategoryWorkCounts(db)),
+        categoryStats(db).get(category.id) ?? EMPTY_CATEGORY_STATS,
+      )
+      return detail
     })
 
-    // Подкатегория + работы (тайлы { id, src, w, h, cat, sub, variants }).
+    // Теги-фильтры чипов /projects со счётчиками видимых работ (спека редизайна §5.3).
+    .get('/tags', () => {
+      const tags: TagNav[] = tagNavs(db)
+      return tags
+    })
+
+    // Витрины секций корневой /projects: кураторский список либо fallback (§5.3).
+    .get('/featured', () => {
+      const sections: FeaturedSection[] = featuredSections(db)
+      return sections
+    })
+
+    // Подкатегория + работы (тайлы { id, slug, title, src, w, h, cat, sub, variants }).
+    // Остаётся ради совместимости админки; фронт-листинги переезжают на /works?category=&subcategory=.
     .get('/categories/:cat/:sub', ({ params, set }) => {
       const category = repos.category.getBySlug(params.cat)
       if (!category) {
@@ -102,14 +148,20 @@ export function publicRoutes(db: Database) {
       return listing
     })
 
-    // Все работы (для /projects), offset/limit-пагинация.
+    // Листинг работ: фильтры category/subcategory/tag + offset/limit-пагинация (в SQL).
+    // Неизвестный слаг фильтра — не 404, а пустая страница (§5.4): фронт сам решает,
+    // показывать ли «ничего не найдено».
     .get('/works', ({ query }) => {
       const limit = parseLimit(query.limit)
       const offset = parseOffset(query.offset)
-      const tiles = allTiles(repos)
+      const filter: WorksFilter = {
+        category: parseFilter(query.category),
+        subcategory: parseFilter(query.subcategory),
+        tag: parseFilter(query.tag),
+      }
       const page: WorksPage = {
-        items: tiles.slice(offset, offset + limit),
-        total: tiles.length,
+        items: listWorkTiles(db, filter, limit, offset),
+        total: countWorkTiles(db, filter),
         limit,
         offset,
       }
@@ -143,6 +195,7 @@ export function publicRoutes(db: Database) {
       const detail: WorkDetailById = toWorkDetailById(
         work,
         repos.image.list(work.id),
+        repos.tag.listTagIdsByWork(work.id),
         category.slug,
         subcategory.slug,
       )
@@ -166,7 +219,11 @@ export function publicRoutes(db: Database) {
         set.status = 404
         return { error: 'not_found', resource: 'work', slug: params.work }
       }
-      const detail: WorkDetail = toWorkDetail(work, repos.image.list(work.id))
+      const detail: WorkDetail = toWorkDetail(
+        work,
+        repos.image.list(work.id),
+        repos.tag.listTagIdsByWork(work.id),
+      )
       return detail
     })
 }
