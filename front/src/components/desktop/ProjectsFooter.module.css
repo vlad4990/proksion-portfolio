@@ -1,0 +1,108 @@
+/* Футер /projects* — десктоп. Дизайн: фрейм tVnqG, узел «Footer»
+   (vertical gap 36, паддинг --sp-block / --gutter, верхняя hairline;
+   нижний бар — своя верхняя hairline, паддинг 20 по вертикали). */
+
+.footer {
+  border-top: var(--stroke-hairline) solid var(--hairline);
+  background: var(--bg);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  padding-top: var(--sp-block);
+}
+
+.cta {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-header-1);
+  line-height: var(--lh-tight);
+  /* В дизайне трекинг CTA — 1.6px на кегле --t-header-1 (80px). */
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg-strong);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tile-gap);
+}
+
+.email {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-sub-section);
+  line-height: 1;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.email:hover {
+  color: var(--fg-strong);
+}
+
+.tgButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--cta-btn-pad);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--t-chip);
+  line-height: 1;
+  letter-spacing: 0.07em;
+  color: var(--fg-strong);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.tgButton:hover {
+  background: var(--accent-dim);
+}
+
+.tgArrow {
+  font-size: var(--t-chip);
+  line-height: 1;
+}
+
+.bottomBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tile-gap);
+  padding: 20px 0;
+  border-top: var(--stroke-hairline) solid var(--hairline);
+}
+
+.copy,
+.social {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--t-meta);
+  line-height: 1;
+  letter-spacing: 0.077em;
+  color: var(--fg-dim);
+}
+
+.socials {
+  display: flex;
+  gap: 24px;
+}
+
+.social {
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.social:hover {
+  color: var(--fg-strong);
+}

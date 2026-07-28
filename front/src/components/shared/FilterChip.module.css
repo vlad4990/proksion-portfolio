@@ -1,0 +1,59 @@
+/* Чип-фильтр: теги на корневой /projects и табы подкатегорий на странице категории.
+   Дизайн — фреймы tVnqG / h16xA (desktop) и N8NrSi / fQvBp (mobile):
+   active = заливка --accent (label --fg-strong bold, count --fg),
+   inactive = рамка --hairline (label --fg, count --fg-dim). Радиус 0 (--radius-pill). */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--chip-pad);
+  border: var(--stroke-hairline) solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: none;
+  font-family: var(--font-body);
+  font-size: var(--t-chip);
+  line-height: 1;
+  color: var(--fg);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+.chip:hover {
+  border-color: var(--fg-dim);
+}
+
+.chipActive,
+.chipActive:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Мобильное дерево — та же анатомия, плотнее (--chip-pad-mob, --t-chip-mob). */
+.chipMobile {
+  gap: 6px;
+  padding: var(--chip-pad-mob);
+  font-size: var(--t-chip-mob);
+}
+
+.label {
+  /* В дизайне трекинг чипа — 1px на 14px кегле. */
+  letter-spacing: 0.07em;
+  font-weight: 400;
+}
+
+.chipActive .label {
+  color: var(--fg-strong);
+  font-weight: 700;
+}
+
+.count {
+  color: var(--fg-dim);
+  font-weight: 400;
+}
+
+.chipActive .count {
+  color: var(--fg);
+}

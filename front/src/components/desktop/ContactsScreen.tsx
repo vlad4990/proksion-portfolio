@@ -1,20 +1,14 @@
+import { CONTACT_CHANNELS, type ContactChannel } from '../../lib/contacts'
 import layout from '../../styles/layout.module.css'
 import styles from './ContactsScreen.module.css'
 
-interface Row {
-  index: string
-  label: string
-  value: string
-  href: string
-  download?: boolean
-}
+/** Строка канала = константа из lib/contacts.ts + порядковый номер («01»…«04»). */
+type Row = ContactChannel & { index: string }
 
-const ROWS: Row[] = [
-  { index: '01', label: 'TELEGRAM', value: '@kristina_pr', href: 'https://t.me/kristina_pr' },
-  { index: '02', label: 'EMAIL', value: 'hi@proksion.ru', href: 'mailto:hi@proksion.ru' },
-  { index: '03', label: 'BEHANCE', value: 'behance.net/proksion', href: 'https://behance.net/proksion' },
-  { index: '04', label: 'CV / PDF', value: 'Скачать резюме', href: '#', download: true },
-]
+const ROWS: Row[] = CONTACT_CHANNELS.map((c, i) => ({
+  ...c,
+  index: String(i + 1).padStart(2, '0'),
+}))
 
 function ContactRow({ index, label, value, href, download }: Row) {
   const isExternal = href.startsWith('http')

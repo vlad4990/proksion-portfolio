@@ -1,37 +1,72 @@
-// Загрузка детали работы для модалки (задача 10, вариант B): GET /api/works/by-id/:id.
-// Сегмент `:work` в URL модалки — это ЧИСЛОВОЙ id работы (решение пользователя, вариант B).
-// Различаем 404 (несуществующий/невалидный id → редирект на листинг, не белый экран) и
-// прочие ошибки сети/сервера (показываем «ошибка» с кнопкой закрытия).
+// Загрузка детали работы для модалки. КАНОНИЧЕСКИЙ источник — слаг (спека редизайна §5.6):
+// `/projects/:cat/:sub/:work`, где `:work` — слаг работы → GET /works/:cat/:sub/:work.
+// ЛЕГАСИ-ветка: если `:work` — целое число (старые ссылки задачи 10, вариант B), деталь
+// грузится по id (GET /works/by-id/:id), а модалка `replace`-редиректит на слаговый URL —
+// слаги пути приходят в самом ответе. Различаем 404 (несуществующая работа → редирект на
+// листинг, не белый экран) и прочие ошибки сети/сервера («ошибка» с кнопкой закрытия).
 //
-// Сессионный кэш по id: повторное открытие той же работы — мгновенно, без «Загрузка…»
-// (как и кэш листинга в useProjects, живёт до перезагрузки страницы, без ревалидации).
+// Сессионный кэш по ключу вида (`slug:cat/sub/work` либо `id:123`): повторное открытие той
+// же работы — мгновенно, без «Загрузка…» (как кэш листинга в useProjects, без ревалидации).
+// Ответ, полученный по id, кладём и под слаговый ключ — после редиректа модалка не
+// перезапрашивает то же самое.
 
 import { useEffect, useState } from 'react'
-import { ApiError, getWorkById } from './client'
-import type { WorkDetailById } from './types'
+import { ApiError, getWorkById, getWorkBySlug } from './client'
+import type { WorkDetail } from './types'
 
 /** Состояние загрузки детали: `notfound` — именно 404, `error` — сеть/прочее. */
 export type WorkStatus = 'loading' | 'error' | 'notfound' | 'ready'
 
-const detailCache = new Map<string, WorkDetailById>()
+const detailCache = new Map<string, WorkDetail>()
+/** Канонический слаговый путь по легаси-id — чтобы редирект работал и на кэш-хите. */
+const canonicalPathCache = new Map<string, string>()
 
-export interface WorkDetailData {
-  detail: WorkDetailById | null
-  status: WorkStatus
+const slugKey = (cat: string, sub: string, work: string): string => `slug:${cat}/${sub}/${work}`
+
+/** `:work` — легаси-ссылка (числовой id работы), а не слаг? */
+export function isLegacyWorkParam(work: string | undefined): boolean {
+  return work !== undefined && /^\d+$/.test(work)
 }
 
-/** Грузит деталь работы по id из URL. Пока id не задан — `loading` (роут гарантирует его). */
-export function useWorkDetail(id: string | undefined): WorkDetailData {
-  const cached = id ? detailCache.get(id) : undefined
-  const [detail, setDetail] = useState<WorkDetailById | null>(cached ?? null)
+export interface WorkDetailData {
+  detail: WorkDetail | null
+  status: WorkStatus
+  /**
+   * Канонический слаговый путь работы — не `null` только когда деталь загружена по легаси-id:
+   * модалка обязана сделать `navigate(canonicalPath, { replace: true })`.
+   */
+  canonicalPath: string | null
+}
+
+/**
+ * Грузит деталь работы по параметрам маршрута модалки. Пока параметров нет — `loading`
+ * (роут их гарантирует).
+ */
+export function useWorkDetail(
+  cat: string | undefined,
+  sub: string | undefined,
+  work: string | undefined,
+): WorkDetailData {
+  const legacy = isLegacyWorkParam(work)
+  const key =
+    work === undefined
+      ? null
+      : legacy
+        ? `id:${work}`
+        : cat && sub
+          ? slugKey(cat, sub, work)
+          : null
+
+  const cached = key ? detailCache.get(key) : undefined
+  const [detail, setDetail] = useState<WorkDetail | null>(cached ?? null)
   const [status, setStatus] = useState<WorkStatus>(cached ? 'ready' : 'loading')
 
   useEffect(() => {
-    if (!id) {
+    if (!key || work === undefined) {
       setStatus('loading')
       return
     }
-    const hit = detailCache.get(id)
+    const hit = detailCache.get(key)
     if (hit) {
       setDetail(hit)
       setStatus('ready')
@@ -40,9 +75,19 @@ export function useWorkDetail(id: string | undefined): WorkDetailData {
     let cancelled = false
     setStatus('loading')
     setDetail(null)
-    getWorkById(id)
+    const load: Promise<WorkDetail> = legacy
+      ? getWorkById(work).then((data) => {
+          // Слаги пути берём из ответа, а не из URL: легаси-ссылку могли сохранить с любыми
+          // `cat`/`sub` — канонический путь всегда определяет бэкенд.
+          const canonical = `/projects/${data.cat}/${data.sub}/${data.slug}`
+          canonicalPathCache.set(key, canonical)
+          detailCache.set(slugKey(data.cat, data.sub, data.slug), data)
+          return data
+        })
+      : getWorkBySlug(cat ?? '', sub ?? '', work)
+    load
       .then((data) => {
-        detailCache.set(id, data)
+        detailCache.set(key, data)
         if (cancelled) return
         setDetail(data)
         setStatus('ready')
@@ -54,7 +99,9 @@ export function useWorkDetail(id: string | undefined): WorkDetailData {
     return () => {
       cancelled = true
     }
-  }, [id])
+  }, [key, legacy, cat, sub, work])
 
-  return { detail, status }
+  const canonicalPath = legacy && key && status === 'ready' ? canonicalPathCache.get(key) ?? null : null
+
+  return { detail, status, canonicalPath }
 }

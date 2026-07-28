@@ -20,7 +20,9 @@ npm run preview  # serve the production build locally
 
 SPA на **Vite 6 + React 18 + TypeScript strict**. Зависимостей минимум: `react`, `react-dom`, `react-router` (7.x) и `react-masonry-css` (~2 КБ, без транзитивных зависимостей; собственные TS-типы — листинг тайлов проектов). Никаких UI-библиотек и CSS-фреймворков — своя дизайн-система на CSS-токенах. Точка входа — `src/main.tsx` (`BrowserRouter` → `App`).
 
-**Данные — из API** (`src/api/`: `client.ts` тонкие fetch-обёртки, `types.ts`, хуки `useProjects`/`useWorkDetail`). Хуки держат **сессионный кэш** (модульные Map'ы: категории, тайлы по виду листинга, деталь по id) — повторная навигация и закрытие модалки не перезапрашивают данные и не мигают скелетонами; ревалидации нет (контент меняется редко, свежее — со следующей загрузкой страницы). База — `/api` (в dev проксируется на `back:3001`, в проде Caddy `handle_path /api/*`). Картинки — same-origin `/media/*`. Dev-proxy `/api`+`/media` настроен в `vite.config.ts` (dev-сервер на 5005). Статических массивов контента больше нет.
+**Данные — из API** (`src/api/`: `client.ts` тонкие fetch-обёртки, `types.ts`, хуки `useProjects`/`useWorkDetail`/`useTags`/`useFeatured`/`useCategory`/`useInfiniteWorks`). Хуки держат **сессионный кэш** (модульные Map'ы: категории, тайлы по виду листинга, деталь работы, теги, витрины, категория по слагу, догруженные порции `/works`) — повторная навигация и закрытие модалки не перезапрашивают данные и не мигают скелетонами; ревалидации нет (контент меняется редко, свежее — со следующей загрузкой страницы). База — `/api` (в dev проксируется на `back:3001`, в проде Caddy `handle_path /api/*`). Картинки — same-origin `/media/*`. Dev-proxy `/api`+`/media` настроен в `vite.config.ts` (dev-сервер на 5005). Статических массивов контента больше нет.
+
+Эндпоинты редизайна (`docs/projects-redesign.md` §5): `getTags()`, `getFeatured()`, `getCategory(cat)`, `getWorksFiltered({category, subcategory, tag, offset, limit})`, `getWorkBySlug(cat, sub, work)`. `useInfiniteWorks({cat, sub, tag})` — инфинити-скролл: ключ кэша `` `${cat}/${sub}?tag=${tag}` ``, порция 24, `hasMore`/`loadingMore`, и `sentinelRef` — колбэк-ref, который вешает нативный `IntersectionObserver` (rootMargin 600px, отключается при `!hasMore || loadingMore`; новых зависимостей нет). Кэш хранит достигнутый offset, поэтому возврат из модалки и переключение табов не сбрасывают догруженное.
 
 > Исторически фронт был на Astro + React islands; миграция на чистый Vite+React SPA завершена — никаких `.astro`, SSR и `@astrojs/*` больше нет.
 
@@ -34,7 +36,7 @@ SPA на **Vite 6 + React 18 + TypeScript strict**. Зависимостей м�
 
 - `/` — home (about)
 - `/projects` и `/projects/:cat/:sub`
-- `/projects/:cat/:sub/:work` (+ `?img=<imageId>`) — **модалка работы** поверх листинга (карусель картинок, шарящийся URL; `Esc`/клик вне → `navigate` назад на листинг)
+- `/projects/:cat/:sub/:work` (+ `?img=<imageId>`) — **модалка работы** поверх листинга (карусель картинок, шарящийся URL; `Esc`/клик вне → `navigate` назад на листинг). `:work` — **слаг** работы (`GET /works/:cat/:sub/:work`); если сегмент — целое число (легаси-ссылки), деталь грузится по id и `useWorkModal` делает `replace`-редирект на канонический слаговый URL (слаги пути берутся из ответа, `?img=` переносится, история не засоряется)
 - `/contacts`
 - `*` — `<Navigate to="/" replace />`
 
@@ -42,7 +44,11 @@ URL реально меняется, история работает. Навиг
 
 ### Двойное дерево компонентов (не адаптив через CSS)
 
-`App.tsx` через `useIsMobile()` (хук на `matchMedia('(max-width: 767.98px)')`) выбирает **одно из двух полностью отдельных деревьев** — `components/desktop/*` или `components/mobile/*`. Это не один отзывчивый layout: десктоп и мобайл — разные компоненты с разной разметкой. Любую фичу, затрагивающую обе платформы, нужно реализовывать в обоих деревьях (напр. `ProjectsScreen.tsx` + `MobileProjects.tsx`, модалка `WorkModal.tsx` + `MobileWorkModal.tsx`). Данные оба дерева тянут из общих API-хуков (`src/api/`), а не из дублированных статических массивов.
+`App.tsx` через `useIsMobile()` (хук на `matchMedia('(max-width: 767.98px)')`) выбирает **одно из двух полностью отдельных деревьев** — `components/desktop/*` или `components/mobile/*`. Это не один отзывчивый layout: десктоп и мобайл — разные компоненты с разной разметкой. Любую фичу, затрагивающую обе платформы, нужно реализовывать в обоих деревьях (напр. `ProjectsScreen.tsx` + `MobileProjects.tsx`, модалка `WorkModal.tsx` + `MobileWorkModal.tsx`, футер `desktop/ProjectsFooter.tsx` + `mobile/ProjectsFooter.tsx`). Данные оба дерева тянут из общих API-хуков (`src/api/`), а не из дублированных статических массивов.
+
+**`components/shared/`** — общие атомы БЕЗ развилок разметки, одинаковые в обоих деревьях; платформа передаётся пропом `mobile` (он лишь переключает класс с `--*-mob`-токенами). Сейчас там `FilterChip` (label + count, active/inactive; полиморфный — с пропом `to` рендерится `<Link>`, с `onClick` — `<button>`) и `CountBadge` («68 РАБОТ», плюрализация из `lib/format.ts`). Всё, что требует разной вёрстки на платформах, в `shared/` не кладём.
+
+Общие хелперы — `src/lib/`: `format.ts` (`formatUpdated('2026-07-15…') → «ИЮЛЬ 2026»`, `pluralizeWorks`/`formatWorksCount`), `contacts.ts` (**единственный** источник email/Telegram/Behance/CV и текстов футера — читают и `/contacts`, и футеры; строки не дублировать), `scroll.ts`.
 
 ### Листинг проектов — masonry (react-masonry-css)
 
@@ -60,6 +66,8 @@ Hero — это **fixed-оверлей поверх всего** (z-index 1000),
 
 ### Респонсив — токеновые тиры, без scale/clamp
 
+Часть токенов — **компонентные, вне тиров** (в дизайне это литералы): `--t-overline/-chip/-meta/-desc/-lead`, `--chip-pad(-mob)`, `--badge-pad(-mob)`, `--tile-caption`, `--cta-btn-pad`/`--cta-btn-h-mob` (блок «Редизайн листинга проектов» в `:root`). Их не нужно дублировать в медиа-блоках.
+
 Размеры не «резинятся». `tokens.css` переопределяет набор токенов в тирах: база в `:root` (`≥1400`), `@media 1100–1399.98`, `@media 768–1099.98`, и `<768` — мобильное дерево, использующее токены с суффиксом `--*-mob` (заданы в `:root`). Внутри тира всё фиксировано; fluid остаётся только ширина контентных колонок. Чтобы поправить размеры — меняй токены в нужном медиа-блоке `tokens.css`, не добавляй `transform: scale()` или `clamp()` в компонентах.
 
 ## Project structure
@@ -70,11 +78,13 @@ src/
 ├── App.tsx              # react-router (URL) + занавес-герой + выбор дерева
 ├── types.ts             # Route ('home'|'projects'|'contacts'), HeroPhase
 ├── api/                 # client.ts (fetch → /api) · types.ts · useProjects · useWorkDetail
-├── hooks/useIsMobile.ts # брейкпоинт <768px (matchMedia)
-├── lib/scroll.ts        # smoothScrollTo — общий плавный скролл для nav-деревьев
+│                        #   · useTags · useFeatured · useCategory · useInfiniteWorks
+├── hooks/               # useIsMobile (<768px) · useWorkModal (контроллер модалки) · …
+├── lib/                 # scroll.ts (smoothScrollTo) · format.ts · contacts.ts
 ├── styles/              # tokens.css (глобальный) + layout.module.css
 ├── App.module.css       # chrome: curtain / nav-host / stage
 └── components/
-    ├── desktop/  TopNav · HeroSection · AboutSection · ProjectsScreen · WorkModal · ContactsScreen
-    └── mobile/   MobileTabBar · MobileHero · MobileAbout · MobileProjects · MobileWorkModal · MobileContacts
+    ├── shared/   FilterChip · CountBadge (атомы обоих деревьев)
+    ├── desktop/  TopNav · HeroSection · AboutSection · ProjectsScreen · WorkModal · ContactsScreen · ProjectsFooter
+    └── mobile/   MobileTabBar · MobileHero · MobileAbout · MobileProjects · MobileWorkModal · MobileContacts · ProjectsFooter
 ```

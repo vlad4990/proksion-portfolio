@@ -1,12 +1,8 @@
+import { CONTACT_CHANNELS } from '../../lib/contacts'
 import { MobileTabBar } from './MobileTabBar'
 import styles from './MobileContacts.module.css'
 
-const ROWS = [
-  { label: 'TELEGRAM', value: '@kristina_pr', href: 'https://t.me/kristina_pr' },
-  { label: 'EMAIL', value: 'hi@proksion.ru', href: 'mailto:hi@proksion.ru' },
-  { label: 'BEHANCE', value: 'behance.net/proksion', href: 'https://behance.net/proksion' },
-  { label: 'CV / PDF', value: 'Скачать резюме →', href: '#' },
-]
+const ROWS = CONTACT_CHANNELS
 
 export function MobileContacts() {
   return (
@@ -32,7 +28,7 @@ export function MobileContacts() {
             <a key={r.label} className={styles.rowLink} href={r.href} data-test="contacts-row">
               <div className={styles.row}>
                 <span className={styles.rowLabel}>{r.label}</span>
-                <span className={styles.rowValue}>{r.value}</span>
+                <span className={styles.rowValue}>{r.download ? `${r.value} →` : r.value}</span>
               </div>
             </a>
           ))}

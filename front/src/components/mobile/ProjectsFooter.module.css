@@ -1,0 +1,83 @@
+/* Футер /projects* — мобайл. Дизайн: фрейм N8NrSi, узел «Footer»
+   (vertical gap 24, паддинг 40 / --mob-pad, верхняя hairline; нижний бар — столбик:
+   соцссылки, затем ©, своя верхняя hairline, паддинг 16/20). */
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 40px var(--mob-pad) 0;
+  border-top: var(--stroke-hairline) solid var(--hairline);
+  background: var(--bg);
+}
+
+.cta {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-section-mob);
+  line-height: var(--lh-tight);
+  /* В дизайне трекинг CTA — 1px на кегле --t-section-mob (44px). */
+  letter-spacing: 0.023em;
+  text-transform: uppercase;
+  color: var(--fg-strong);
+}
+
+.email {
+  align-self: flex-start;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-section-sm-mob);
+  line-height: 1;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.tgButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: var(--cta-btn-h-mob);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--t-chip-mob);
+  line-height: 1;
+  letter-spacing: 0.07em;
+  color: var(--fg-strong);
+  text-decoration: none;
+}
+
+.tgArrow {
+  font-size: var(--t-chip-mob);
+  line-height: 1;
+}
+
+.bottomBar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 0 20px;
+  border-top: var(--stroke-hairline) solid var(--hairline);
+}
+
+.socials {
+  display: flex;
+  gap: 16px;
+}
+
+.copy,
+.social {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--t-small-mob);
+  line-height: 1;
+  letter-spacing: 0.09em;
+  color: var(--fg-dim);
+}
+
+.social {
+  text-decoration: none;
+}

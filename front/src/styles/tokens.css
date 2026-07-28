@@ -126,6 +126,21 @@
   /* Components */
   --load-more-pad: 12px 28px 10px;  /* «Показать ещё» — padding (desktop) */
 
+  /* Редизайн листинга проектов (docs/projects-redesign.md §3) — КОМПОНЕНТНЫЕ размеры:
+     по тирам НЕ меняются (в дизайне это литералы, а не тир-переменные). */
+  --t-overline:     15px;  /* оверлайны «// …»                              */
+  --t-chip:         14px;  /* чипы, ссылки-действия, счётчик показа         */
+  --t-meta:         13px;  /* мета-строки, крошки, бейджи, подписи          */
+  --t-desc:         16px;  /* описание секции на корневой, текст карточек   */
+  --t-lead:         18px;  /* подзаголовок hero, описание категории         */
+  --chip-pad:      9px 16px;
+  --chip-pad-mob:  8px 14px;
+  --badge-pad:     5px 12px;
+  --badge-pad-mob: 4px 10px;   /* мобильный бейдж плотнее (фрейм N8NrSi)   */
+  --tile-caption:  12px;       /* пилюля-подпись hero-тайла витрины        */
+  --cta-btn-pad:   14px 28px;  /* кнопка «НАПИСАТЬ В TELEGRAM» в футере    */
+  --cta-btn-h-mob: 52px;       /* та же кнопка на мобайле — во всю ширину  */
+
   /* === MOBILE tokens — used by the mobile component tree ============= */
   --breakpoint-mobile: 768px;
 

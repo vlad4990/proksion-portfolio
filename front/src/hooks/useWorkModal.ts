@@ -1,7 +1,9 @@
 // Контроллер модалки работы (задача 10), общий для ОБОИХ деревьев (desktop + mobile) —
 // вся не-визуальная логика здесь, разметка остаётся раздельной по конвенции двойного дерева.
 //
-// • Грузит деталь работы по слагам из URL (useWorkDetail).
+// • Грузит деталь работы по слагам из URL (useWorkDetail): `:work` — СЛАГ работы.
+//   Легаси-ссылки с числовым id продолжают открываться (деталь по id) и сразу же
+//   `replace`-редиректятся на канонический слаговый URL — история не засоряется.
 // • Активный слайд — производное от `?img=<imageId>` (единственный источник правды = URL):
 //   шаринг конкретной картинки работает, канонический путь работы дублей не плодит.
 // • Esc / стрелки клавиатуры; close() → navigate назад на листинг `/projects/:cat/:sub`.
@@ -11,11 +13,11 @@ import { useEffect } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { useWorkDetail, type WorkStatus } from '../api/useWorkDetail'
 import { ROUTE_TITLES, workTitle } from '../seo'
-import type { ImageDetail, WorkDetailById } from '../api/types'
+import type { ImageDetail, WorkDetail } from '../api/types'
 
 export interface WorkModalController {
   status: WorkStatus
-  detail: WorkDetailById | null
+  detail: WorkDetail | null
   images: ImageDetail[]
   count: number
   activeIndex: number
@@ -29,11 +31,11 @@ export interface WorkModalController {
 }
 
 export function useWorkModal(): WorkModalController {
-  // `work` — числовой id работы (вариант B), а не slug.
+  // `work` — СЛАГ работы; числовое значение = легаси-ссылка (см. useWorkDetail).
   const { cat, sub, work } = useParams()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
-  const { detail, status } = useWorkDetail(work)
+  const { detail, status, canonicalPath } = useWorkDetail(cat, sub, work)
 
   const images = detail?.images ?? []
   const count = images.length
@@ -67,6 +69,14 @@ export function useWorkModal(): WorkModalController {
   useEffect(() => {
     if (status === 'notfound') navigate(listingPath, { replace: true })
   }, [status, listingPath, navigate])
+
+  // Легаси-ссылка с числовым id → канонический слаговый URL. `replace` — история не
+  // засоряется (кнопка «назад» ведёт на листинг), `?img=` переносим как есть.
+  const search = searchParams.toString()
+  useEffect(() => {
+    if (!canonicalPath) return
+    navigate(search ? `${canonicalPath}?${search}` : canonicalPath, { replace: true })
+  }, [canonicalPath, search, navigate])
 
   // Заголовок вкладки = название работы; при закрытии возвращаем заголовок листинга
   // (route не меняется — эффект App не перезапустится).
