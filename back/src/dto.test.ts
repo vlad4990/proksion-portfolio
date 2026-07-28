@@ -20,6 +20,7 @@ function makeWork(over: Partial<Work> = {}): Work {
     description: 'Описание',
     cover_image_id: 9,
     sort_order: 0,
+    featured_order: null,
     created_at: 't',
     updated_at: 't',
     ...over,
@@ -116,7 +117,7 @@ describe('toWorkDetailById', () => {
 
 describe('category/subcategory serializers', () => {
   function makeCategory(over: Partial<Category> = {}): Category {
-    return { id: 1, slug: 'brending', title: 'Брендинг', description: null, sort_order: 0, created_at: 't', updated_at: 't', ...over }
+    return { id: 1, slug: 'brending', title: 'Брендинг', description: null, sort_order: 0, kicker: null, meta_role: null, period: null, description_long: null, display_variant: 'showcase', created_at: 't', updated_at: 't', ...over }
   }
   function makeSub(over: Partial<Subcategory> = {}): Subcategory {
     return { id: 2, category_id: 1, slug: 'logotipy', title: 'Логотипы', description: null, sort_order: 0, created_at: 't', updated_at: 't', ...over }

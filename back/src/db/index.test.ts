@@ -56,6 +56,106 @@ describe('openDb — schema (§3)', () => {
   })
 })
 
+describe('openDb — schema 0002 (теги, витрина, меты категории)', () => {
+  test('both migrations are recorded in _migrations', () => {
+    const names = db
+      .query<{ name: string }, []>('SELECT name FROM _migrations ORDER BY name')
+      .all()
+      .map((r) => r.name)
+    expect(names).toEqual(['0001_init.sql', '0002_tags_featured_category_meta.sql'])
+  })
+
+  test('creates tag / work_tag tables and their indexes', () => {
+    const names = db
+      .query<{ name: string }, []>("SELECT name FROM sqlite_master WHERE type='table'")
+      .all()
+      .map((r) => r.name)
+    expect(names).toContain('tag')
+    expect(names).toContain('work_tag')
+
+    const idx = db
+      .query<{ name: string }, []>("SELECT name FROM sqlite_master WHERE type='index'")
+      .all()
+      .map((r) => r.name)
+    expect(idx).toContain('idx_work_tag_tag')
+    expect(idx).toContain('idx_work_featured')
+  })
+
+  test('category gets the new content columns; display_variant defaults to showcase', () => {
+    db.run("INSERT INTO category (id, slug, title) VALUES (1, 'c', 'C')")
+    const row = db
+      .query<
+        {
+          kicker: string | null
+          meta_role: string | null
+          period: string | null
+          description_long: string | null
+          display_variant: string
+        },
+        []
+      >('SELECT kicker, meta_role, period, description_long, display_variant FROM category WHERE id = 1')
+      .get()
+    expect(row?.kicker).toBeNull()
+    expect(row?.meta_role).toBeNull()
+    expect(row?.period).toBeNull()
+    expect(row?.description_long).toBeNull()
+    expect(row?.display_variant).toBe('showcase')
+  })
+
+  test('display_variant accepts the enum and rejects anything else (CHECK)', () => {
+    db.run("INSERT INTO category (id, slug, title) VALUES (1, 'c', 'C')")
+    for (const variant of ['showcase', 'strip', 'cards']) {
+      expect(() => db.run(`UPDATE category SET display_variant = '${variant}' WHERE id = 1`)).not.toThrow()
+    }
+    expect(() => db.run("UPDATE category SET display_variant = 'grid' WHERE id = 1")).toThrow()
+    expect(() =>
+      db.run("INSERT INTO category (slug, title, display_variant) VALUES ('d', 'D', 'nope')"),
+    ).toThrow()
+  })
+
+  test('work.featured_order is nullable and writable', () => {
+    db.run("INSERT INTO category (id, slug, title) VALUES (1, 'c', 'C')")
+    db.run("INSERT INTO subcategory (id, category_id, slug, title) VALUES (1, 1, 's', 'S')")
+    db.run("INSERT INTO work (id, subcategory_id, slug) VALUES (1, 1, 'w')")
+    const read = () =>
+      db.query<{ featured_order: number | null }, []>('SELECT featured_order FROM work WHERE id = 1').get()
+        ?.featured_order
+    expect(read()).toBeNull()
+    db.run('UPDATE work SET featured_order = 0 WHERE id = 1')
+    expect(read()).toBe(0)
+  })
+
+  test('tag.slug is UNIQUE; work_tag rows require existing parents', () => {
+    db.run("INSERT INTO tag (slug, title) VALUES ('promo', 'Промо')")
+    expect(() => db.run("INSERT INTO tag (slug, title) VALUES ('promo', 'Другой')")).toThrow()
+    expect(() => db.run('INSERT INTO work_tag (work_id, tag_id) VALUES (999, 1)')).toThrow()
+  })
+
+  test('work_tag cascades on both sides (work deleted / tag deleted)', () => {
+    db.run("INSERT INTO category (id, slug, title) VALUES (1, 'c', 'C')")
+    db.run("INSERT INTO subcategory (id, category_id, slug, title) VALUES (1, 1, 's', 'S')")
+    db.run("INSERT INTO work (id, subcategory_id, slug) VALUES (1, 1, 'w1')")
+    db.run("INSERT INTO work (id, subcategory_id, slug) VALUES (2, 1, 'w2')")
+    db.run("INSERT INTO tag (id, slug, title) VALUES (1, 't1', 'T1')")
+    db.run("INSERT INTO tag (id, slug, title) VALUES (2, 't2', 'T2')")
+    db.run('INSERT INTO work_tag (work_id, tag_id) VALUES (1, 1), (1, 2), (2, 1)')
+
+    db.run('DELETE FROM work WHERE id = 1')
+    expect(count('SELECT count(*) AS c FROM work_tag')).toBe(1)
+    db.run('DELETE FROM tag WHERE id = 1')
+    expect(count('SELECT count(*) AS c FROM work_tag')).toBe(0)
+  })
+
+  test('work_tag pair is unique (PRIMARY KEY)', () => {
+    db.run("INSERT INTO category (id, slug, title) VALUES (1, 'c', 'C')")
+    db.run("INSERT INTO subcategory (id, category_id, slug, title) VALUES (1, 1, 's', 'S')")
+    db.run("INSERT INTO work (id, subcategory_id, slug) VALUES (1, 1, 'w')")
+    db.run("INSERT INTO tag (id, slug, title) VALUES (1, 't', 'T')")
+    db.run('INSERT INTO work_tag (work_id, tag_id) VALUES (1, 1)')
+    expect(() => db.run('INSERT INTO work_tag (work_id, tag_id) VALUES (1, 1)')).toThrow()
+  })
+})
+
 describe('openDb — invariants (§3)', () => {
   test('category.slug is globally UNIQUE', () => {
     db.run("INSERT INTO category (slug, title) VALUES ('a', 'A')")

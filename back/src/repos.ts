@@ -6,12 +6,14 @@ import { createCategoryRepo, type CategoryRepo } from './db/repositories/categor
 import { createSubcategoryRepo, type SubcategoryRepo } from './db/repositories/subcategory.ts'
 import { createWorkRepo, type WorkRepo } from './db/repositories/work.ts'
 import { createImageRepo, type ImageRepo } from './db/repositories/image.ts'
+import { createTagRepo, type TagRepo } from './db/repositories/tag.ts'
 
 export interface Repos {
   category: CategoryRepo
   subcategory: SubcategoryRepo
   work: WorkRepo
   image: ImageRepo
+  tag: TagRepo
 }
 
 export function createRepos(db: Database): Repos {
@@ -20,5 +22,6 @@ export function createRepos(db: Database): Repos {
     subcategory: createSubcategoryRepo(db),
     work: createWorkRepo(db),
     image: createImageRepo(db),
+    tag: createTagRepo(db),
   }
 }

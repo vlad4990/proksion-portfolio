@@ -159,6 +159,24 @@ CREATE TABLE image (
 сначала без cover, проставлять после загрузки первой картинки. `image` ссылается на `work`
 с CASCADE; `cover_image_id` — `SET NULL`.
 
+### Расширение схемы под редизайн листинга (миграция `0002`)
+
+Редизайн `/projects` ([`projects-redesign.md`](./projects-redesign.md) §4) добавляет
+поверх схемы выше — миграцией `0002_tags_featured_category_meta.sql`:
+
+- **`category`** — контентные поля секции/страницы: `kicker`, `meta_role`, `period`,
+  `description_long` (все TEXT NULL) и `display_variant`
+  (`TEXT NOT NULL DEFAULT 'showcase'`, CHECK `showcase|strip|cards`) — вариант вёрстки секции.
+- **`work.featured_order`** (INTEGER NULL) — позиция в **кураторской витрине** категории,
+  `0` = hero-слот, `NULL` = вне витрины. Уникальность порядка в пределах категории —
+  инвариант кода (`workRepo.setFeatured` переписывает весь список одной транзакцией),
+  не констрейнт: категория работы известна только через её подкатегорию.
+- **`tag`** (`id`, `slug` UNIQUE, `title`, `sort_order`, `created_at`, `updated_at`) —
+  глобальные теги-фильтры чипов на `/projects`; **`work_tag`** (`work_id`, `tag_id`,
+  PK по паре, обе стороны `ON DELETE CASCADE`) — m2m работа↔тег.
+- Индексы: `idx_work_tag_tag` (выборка по тегу; выборку по работе покрывает PK `work_tag`)
+  и частичный `idx_work_featured` (`WHERE featured_order IS NOT NULL`).
+
 ### Слаги
 
 Генерируются на сервере из русского `title`: транслит ru→lat (своя маленькая таблица,
