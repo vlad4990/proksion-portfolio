@@ -70,6 +70,24 @@ describe('WorkTagsCard', () => {
     expect(save()).toBeDisabled()
   })
 
+  it('чипы идут в порядке /tags (sort_order), а не в порядке tag_ids работы', () => {
+    renderCard([3, 1])
+    const chips = screen
+      .getAllByRole('button')
+      .filter((b) => b.hasAttribute('aria-pressed'))
+      .map((b) => b.textContent)
+    expect(chips).toEqual(['Айдентика', 'Плакаты', 'SMM'])
+  })
+
+  it('набор тегов неупорядочен: тот же состав в другом порядке — не «изменения»', async () => {
+    // сервер отдаёт tag_ids по tag.sort_order; порядок кликов сохранять не нужно
+    renderCard([3, 1])
+    expect(save()).toBeDisabled()
+    await userEvent.click(chip('SMM'))
+    await userEvent.click(chip('SMM'))
+    expect(save()).toBeDisabled()
+  })
+
   it('пустой список тегов → подсказка вместо чипов', () => {
     render(
       <MemoryRouter>

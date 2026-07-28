@@ -2,6 +2,7 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { ApiError } from '@/api/client'
 import type { FeaturedSection, FeaturedWork, Tile } from '@/api/types'
 
 const mocks = vi.hoisted(() => ({
@@ -123,6 +124,35 @@ describe('FeaturedEditor', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Очистить витрину' }))
 
     await waitFor(() => expect(mocks.setCategoryFeatured).toHaveBeenCalledWith(7, []))
+  })
+
+  it('работа из витрины не предлагается к добавлению повторно (дубли в work_ids → 400)', async () => {
+    mocks.getFeatured.mockResolvedValue(section(true, [work(2)]))
+    mocks.getWorksByCategory.mockResolvedValue([tile(2), tile(5)])
+    renderEditor()
+
+    await screen.findByText('Работа 2')
+    // единственный кандидат — работа вне витрины; кнопки «добавить» для работы 2 нет вовсе
+    expect(screen.getAllByRole('button', { name: /Добавить в витрину/ })).toHaveLength(1)
+    expect(
+      screen.queryByRole('button', { name: 'Добавить в витрину: Работа 2' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('отказ сервера (400) показывает ошибку и перечитывает витрину', async () => {
+    mocks.getFeatured.mockResolvedValue(section(true, [work(2)]))
+    mocks.getWorksByCategory.mockResolvedValue([tile(2), tile(5)])
+    mocks.setCategoryFeatured.mockRejectedValue(
+      new ApiError(400, { error: 'bad_request', detail: 'work 5 does not belong to this category' }),
+    )
+    renderEditor()
+
+    await screen.findByText('Работа 2')
+    await userEvent.click(screen.getByRole('button', { name: 'Добавить в витрину: Работа 5' }))
+
+    await waitFor(() => expect(mocks.getFeatured).toHaveBeenCalledTimes(2))
+    // витрина осталась прежней: оптимистично список не менялся
+    expect(screen.getByText('Работа 2')).toBeInTheDocument()
   })
 
   it('работа без названия подписана номером', async () => {
