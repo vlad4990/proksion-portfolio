@@ -1,12 +1,12 @@
 // Витрины секций корневой /projects (GET /featured, спека редизайна §5.3): по секции
 // на категорию, работы — кураторский список либо fallback (`curated: false`).
 //
-// Сессионный кэш — как в useTags/useProjects: один запрос на сессию, возврат из модалки
+// Сессионный кэш — как в useTags/useCategories: один запрос на сессию, возврат из модалки
 // и смена таба тегов витрину не перезапрашивают.
 
 import { useEffect, useState } from 'react'
 import { getFeatured } from './client'
-import type { LoadStatus } from './useProjects'
+import type { LoadStatus } from './status'
 import type { FeaturedSection } from './types'
 
 let featuredCache: FeaturedSection[] | null = null

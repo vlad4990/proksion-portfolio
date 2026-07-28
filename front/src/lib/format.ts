@@ -46,3 +46,20 @@ export function pluralizeWorks(count: number): string {
 export function formatWorksCount(count: number): string {
   return `${Math.abs(Math.trunc(count))} ${pluralizeWorks(count)}`
 }
+
+/** Форма слова «раздел»: 1 РАЗДЕЛ, 2 РАЗДЕЛА, 5 РАЗДЕЛОВ, 11 РАЗДЕЛОВ. */
+export function pluralizeSections(count: number): string {
+  const n = Math.abs(Math.trunc(count))
+  const tail = n % 100
+  if (tail >= 11 && tail <= 14) return 'РАЗДЕЛОВ'
+  const last = n % 10
+  if (last === 1) return 'РАЗДЕЛ'
+  if (last >= 2 && last <= 4) return 'РАЗДЕЛА'
+  return 'РАЗДЕЛОВ'
+}
+
+/** Подсказка-скролл корневой /projects: «05 РАЗДЕЛОВ» (номер с ведущим нулём, как в дизайне). */
+export function formatSectionsCount(count: number): string {
+  const n = Math.abs(Math.trunc(count))
+  return `${String(n).padStart(2, '0')} ${pluralizeSections(n)}`
+}

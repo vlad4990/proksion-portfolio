@@ -1,12 +1,12 @@
 // Глобальные теги-фильтры чипов корневой /projects (GET /tags, спека редизайна §5.3).
 //
-// СЕССИОННЫЙ КЭШ (модульный, живёт до перезагрузки страницы) — как в useProjects:
+// СЕССИОННЫЙ КЭШ (модульный, живёт до перезагрузки страницы) — как в useCategories:
 // повторный маунт (возврат из модалки, смена дерева desktop/mobile) не перезапрашивает
 // и не мигает скелетоном; ревалидации нет осознанно (теги меняются через админку редко).
 
 import { useEffect, useState } from 'react'
 import { getTags } from './client'
-import type { LoadStatus } from './useProjects'
+import type { LoadStatus } from './status'
 import type { TagNav } from './types'
 
 let tagsCache: TagNav[] | null = null

@@ -3,7 +3,7 @@
 //
 // СЕССИОННЫЙ КЭШ достигнутого offset'а (модульная Map, ключ = вид листинга): возврат из
 // модалки работы и переключение табов подкатегорий не перезапрашивают уже догруженное и не
-// мигают скелетонами — состояние инициализируется из кэша синхронно (как в useProjects).
+// мигают скелетонами — состояние инициализируется из кэша синхронно (как в useCategories).
 //
 // Сентинел — нативный IntersectionObserver (новых зависимостей не добавляем): `sentinelRef`
 // вешается на пустой div под гридом; наблюдение отключается, когда грузить нечего
@@ -11,7 +11,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { getWorksFiltered } from './client'
-import type { LoadStatus } from './useProjects'
+import type { LoadStatus } from './status'
 import type { Tile } from './types'
 
 /** Порция догрузки = дефолтный лимит `/works` (спека §5.4). */
