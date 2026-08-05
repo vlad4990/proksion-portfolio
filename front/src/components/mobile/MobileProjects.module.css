@@ -231,6 +231,10 @@
 }
 
 /* ── Слоты витрины ─────────────────────────────────────────── */
+/* Выровненные ряды (justified): слот несёт inline aspect-ratio и `--ar` (= w/h) из данных
+   картинки, ряд — flex, ширина слота ∝ пропорциям (flex-grow: var(--ar)), высота ряда
+   выводится сама. Слот повторяет пропорции картинки → она видна целиком, без обрезки
+   (object-fit: cover лишь гасит субпиксельное округление ширин). */
 .slot {
   position: relative;
   display: block;
@@ -285,40 +289,20 @@
   gap: var(--tile-gap-mob);
 }
 
-.heroSlot {
-  height: var(--show-hero-h-mob);
-}
-
+/* Пары showcase/strip и тройка dense-strip — одна механика выровненного ряда. */
 .pairRow {
   display: flex;
   gap: var(--tile-gap-mob);
 }
 
 .pairRow > * {
-  flex: 1 1 0;
+  flex: var(--ar, 1) 1 0%;
+  min-width: 0;
 }
 
-.pairSlot {
-  height: var(--show-pair-h-mob);
-}
-
-/* strip ≤4 — пары повыше; strip 5+ — один ряд низких тайлов. */
-.artSlot {
-  height: var(--strip-pair-h-mob);
-}
-
-.stripRow {
-  display: flex;
-  gap: var(--tile-gap-mob);
-}
-
-.stripRow > * {
-  flex: 1 1 0;
-}
-
-.stripSlot {
-  height: var(--strip-row-h-mob);
-}
+/* Скелетоны слотов: пропорции-заглушки, пока витрина не пришла. */
+.skelHero { aspect-ratio: 3 / 2; --ar: 1.5; }
+.skelPair { aspect-ratio: 4 / 3; --ar: 1.33; }
 
 /* ── Карточки (cards) ──────────────────────────────────────── */
 .cards {
@@ -335,8 +319,8 @@
   overflow: hidden;
 }
 
+/* Высота превью — из aspect-ratio картинки (inline): целиком, без обрезки. */
 .cardPreview {
-  height: var(--card-preview-mob);
   flex: 0 0 auto;
 }
 

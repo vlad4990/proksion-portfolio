@@ -1,6 +1,7 @@
 /* Корневая /projects — десктоп. Дизайн: фрейм tVnqG (спека docs/projects-redesign.md §2.1).
    Hero со статами → ряд чипов-тегов → секции категорий (showcase / strip / cards) → футер.
-   Все размеры/цвета — токены; высоты слотов витрин ступают по тирам (tokens.css). */
+   Все размеры/цвета — токены; витрины — выровненные ряды (justified), высоты выводятся
+   из пропорций картинок. */
 
 .screen {
   position: relative;
@@ -270,8 +271,10 @@
 }
 
 /* ── Слот витрины ──────────────────────────────────────────── */
-/* Слоты — фиксированной высоты (токены по тирам): место зарезервировано, картинка
-   обрезается под слот (object-fit: cover), скролл не прыгает. */
+/* Выровненные ряды (justified): слот несёт inline aspect-ratio и `--ar` (= w/h) из данных
+   картинки, ряд — flex, ширина слота ∝ пропорциям (flex-grow: var(--ar)), высота ряда
+   выводится сама. Слот повторяет пропорции картинки → она видна целиком, без обрезки
+   (object-fit: cover лишь гасит субпиксельное округление ширин). */
 .slot {
   position: relative;
   display: block;
@@ -332,64 +335,25 @@
   gap: var(--tile-gap);
 }
 
-.rowA {
-  display: flex;
-  gap: var(--tile-gap);
-  height: var(--show-row-a);
-}
-
-/* Пропорции ряда A из дизайна: hero 864 против колонки 428 (≈ 2 : 1). */
-.heroSlot {
-  flex: 2 1 0;
-}
-
-.heroSlotWide {
-  flex: 1 1 0;
-}
-
-.sideCol {
-  display: flex;
-  flex-direction: column;
-  gap: var(--tile-gap);
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-.sideSlot {
-  flex: 1 1 0;
-}
-
-.rowB {
-  display: flex;
-  gap: var(--tile-gap);
-  height: var(--show-row-b);
-}
-
-/* Ширины ряда B из дизайна: 260 / 146 / 462 / 384. */
-.rowB > *:nth-child(1) { flex: 260 1 0; }
-.rowB > *:nth-child(2) { flex: 146 1 0; }
-.rowB > *:nth-child(3) { flex: 462 1 0; }
-.rowB > *:nth-child(4) { flex: 384 1 0; }
-
-/* ── Витрина strip ─────────────────────────────────────────── */
+/* Ряды showcase (A: hero + до 2, B: до 4) и strip (4–5 работ) — одна механика. */
+.rowA,
+.rowB,
 .strip {
   display: flex;
   gap: var(--tile-gap);
-  height: var(--strip-h);
 }
 
-/* Ширины ряда из дизайна: 285 / 380 / 285 / 302. */
-.strip > *:nth-child(1) { flex: 285 1 0; }
-.strip > *:nth-child(2) { flex: 380 1 0; }
-.strip > *:nth-child(3) { flex: 285 1 0; }
-.strip > *:nth-child(4) { flex: 302 1 0; }
-
-/* 5+ работ — низкий ряд равных тайлов. */
-.stripDense {
-  height: var(--strip-h-dense);
+.rowA > *,
+.rowB > *,
+.strip > * {
+  flex: var(--ar, 1) 1 0%;
+  min-width: 0;
 }
 
-.stripDense > * { flex: 1 1 0; }
+/* Скелетоны слотов: пропорции-заглушки, пока витрина не пришла. */
+.skelHero   { aspect-ratio: 16 / 10; --ar: 1.6; }
+.skelTall   { aspect-ratio: 3 / 4;   --ar: 0.75; }
+.skelSquare { aspect-ratio: 5 / 4;   --ar: 1.25; }
 
 /* ── Витрина cards ─────────────────────────────────────────── */
 .cards {
@@ -406,14 +370,15 @@
   overflow: hidden;
 }
 
+/* Высота превью — из aspect-ratio картинки (inline): целиком, без обрезки. */
 .cardPreview {
-  height: var(--card-preview);
   flex: 0 0 auto;
 }
 
 .cardText {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   gap: 10px;
   padding: 24px;
 }
@@ -436,11 +401,13 @@
   color: var(--fg);
 }
 
+/* Превью карточек теперь разной высоты — мету прижимаем к низу карточки. */
 .cardMeta {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  margin-top: auto;
   padding-top: 6px;
 }
 

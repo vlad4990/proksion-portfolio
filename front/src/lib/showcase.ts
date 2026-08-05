@@ -13,11 +13,11 @@ export const STRIP_MAX_WIDE = 4
 export const STRIP_MAX_DENSE = 5
 export const CARDS_MAX = 4
 
-/** Ряды варианта `showcase`: hero-тайл + колонка из 2 + нижний ряд из 4. */
+/** Ряды варианта `showcase`: hero-тайл + до 2 работ ряда A + нижний ряд из 4. */
 export interface ShowcaseRows {
   /** Hero-слот (первая работа витрины) — с пилюлей-подписью; `undefined`, если работ нет. */
   hero: FeaturedWork | undefined
-  /** Колонка справа от hero: до 2 работ. */
+  /** Соседи hero в ряду A: до 2 работ. */
   side: FeaturedWork[]
   /** Нижний ряд: до 4 работ. */
   rowB: FeaturedWork[]

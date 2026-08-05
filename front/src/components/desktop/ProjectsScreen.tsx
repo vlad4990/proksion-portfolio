@@ -7,7 +7,7 @@
 // работ категории с этим тегом; секции без совпадений исчезают.
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import Masonry from 'react-masonry-css'
 import { useCategories } from '../../api/useCategories'
@@ -20,7 +20,7 @@ import { FilterChip } from '../shared/FilterChip'
 import { formatSectionsCount } from '../../lib/format'
 import { categoryHref, tagHref, workHref } from '../../lib/links'
 import { smoothScrollTo } from '../../lib/scroll'
-import { cardWorks, isDenseStrip, splitShowcase, stripWorks } from '../../lib/showcase'
+import { cardWorks, splitShowcase, stripWorks } from '../../lib/showcase'
 import { ProjectsFooter } from './ProjectsFooter'
 import layout from '../../styles/layout.module.css'
 import styles from './ProjectsScreen.module.css'
@@ -62,12 +62,21 @@ interface SlotProps {
   caption?: boolean
 }
 
-/** Слот витрины: настоящая ссылка на канонический URL работы, картинка обрезается под слот. */
+/**
+ * Слот витрины: настоящая ссылка на канонический URL работы. Слот повторяет пропорции
+ * картинки (`aspect-ratio` из w/h), а `--ar` (= w/h) отдаёт flex-grow ряда — в выровненном
+ * ряду ширина тайла пропорциональна его пропорциям, картинка видна целиком, без обрезки.
+ */
 function Slot({ work, className, eager = false, caption = false }: SlotProps) {
+  const ratio = {
+    aspectRatio: `${work.w} / ${work.h}`,
+    '--ar': String(work.w / work.h),
+  } as CSSProperties
   return (
     <Link
       to={workHref(work)}
       className={`${styles.slot}${className ? ` ${className}` : ''}`}
+      style={ratio}
       aria-label={work.title ?? 'Открыть работу'}
       data-test="showcase-slot"
     >
@@ -105,26 +114,17 @@ function SlotSkeleton({ className }: { className?: string }) {
 
 // ── Витрины трёх вариантов ─────────────────────────────────────────────────────
 
-/** `showcase`: ряд A (hero ~2/3 ширины + колонка из двух) и ряд B (до четырёх тайлов). */
+/** `showcase`: выровненные ряды — ряд A (hero с подписью + до 2 работ) и ряд B (до 4). */
 function ShowcaseGrid({ works, eager }: { works: FeaturedWork[]; eager: boolean }) {
   const { hero, side, rowB } = splitShowcase(works)
   if (!hero) return null
   return (
     <div className={styles.showcase} data-test="showcase-showcase">
       <div className={styles.rowA}>
-        <Slot
-          work={hero}
-          className={side.length > 0 ? styles.heroSlot : styles.heroSlotWide}
-          eager={eager}
-          caption
-        />
-        {side.length > 0 && (
-          <div className={styles.sideCol}>
-            {side.map((w) => (
-              <Slot key={w.id} work={w} className={styles.sideSlot} eager={eager} />
-            ))}
-          </div>
-        )}
+        <Slot work={hero} eager={eager} caption />
+        {side.map((w) => (
+          <Slot key={w.id} work={w} eager={eager} />
+        ))}
       </div>
       {rowB.length > 0 && (
         <div className={styles.rowB}>
@@ -137,16 +137,12 @@ function ShowcaseGrid({ works, eager }: { works: FeaturedWork[]; eager: boolean 
   )
 }
 
-/** `strip`: один ряд фиксированной высоты — высокий при ≤4 работах, низкий при 5+. */
+/** `strip`: один выровненный ряд — до 4 работ, при 5+ ряд плотнее (и потому ниже). */
 function StripGrid({ works, eager }: { works: FeaturedWork[]; eager: boolean }) {
   const list = stripWorks(works)
   if (list.length === 0) return null
-  const dense = isDenseStrip(works.length)
   return (
-    <div
-      className={`${styles.strip}${dense ? ` ${styles.stripDense}` : ''}`}
-      data-test="showcase-strip"
-    >
+    <div className={styles.strip} data-test="showcase-strip">
       {list.map((w, i) => (
         <Slot key={w.id} work={w} eager={eager && i < 4} />
       ))}
@@ -288,11 +284,9 @@ function SectionSkeleton() {
       </div>
       <div className={styles.showcase}>
         <div className={styles.rowA}>
-          <SlotSkeleton className={styles.heroSlot} />
-          <div className={styles.sideCol}>
-            <SlotSkeleton className={styles.sideSlot} />
-            <SlotSkeleton className={styles.sideSlot} />
-          </div>
+          <SlotSkeleton className={styles.skelHero} />
+          <SlotSkeleton className={styles.skelTall} />
+          <SlotSkeleton className={styles.skelSquare} />
         </div>
       </div>
     </SectionShell>
@@ -319,11 +313,9 @@ function FeaturedCategorySection({
       {featuredLoading ? (
         <div className={styles.showcase}>
           <div className={styles.rowA}>
-            <SlotSkeleton className={styles.heroSlot} />
-            <div className={styles.sideCol}>
-              <SlotSkeleton className={styles.sideSlot} />
-              <SlotSkeleton className={styles.sideSlot} />
-            </div>
+            <SlotSkeleton className={styles.skelHero} />
+            <SlotSkeleton className={styles.skelTall} />
+            <SlotSkeleton className={styles.skelSquare} />
           </div>
         </div>
       ) : (

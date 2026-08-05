@@ -5,7 +5,7 @@
 // мини-хедер экрана и общий MobileTabBar.
 
 import { useCallback, useEffect, useState } from 'react'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import Masonry from 'react-masonry-css'
 import { useCategories } from '../../api/useCategories'
@@ -58,12 +58,21 @@ interface SlotProps {
   caption?: boolean
 }
 
-/** Слот витрины: ссылка на канонический URL работы, картинка обрезается под слот. */
+/**
+ * Слот витрины: ссылка на канонический URL работы. Слот повторяет пропорции картинки
+ * (`aspect-ratio` из w/h), а `--ar` (= w/h) отдаёт flex-grow ряда — в выровненном ряду
+ * ширина тайла пропорциональна его пропорциям, картинка видна целиком, без обрезки.
+ */
 function Slot({ work, className, eager = false, caption = false }: SlotProps) {
+  const ratio = {
+    aspectRatio: `${work.w} / ${work.h}`,
+    '--ar': String(work.w / work.h),
+  } as CSSProperties
   return (
     <Link
       to={workHref(work)}
       className={`${styles.slot}${className ? ` ${className}` : ''}`}
+      style={ratio}
       aria-label={work.title ?? 'Открыть работу'}
       data-test="showcase-slot"
     >
@@ -98,18 +107,18 @@ function SlotSkeleton({ className }: { className?: string }) {
   )
 }
 
-/** `showcase`: hero-тайл во всю ширину + пары тайлов. */
+/** `showcase`: hero-тайл во всю ширину + выровненные пары тайлов. */
 function ShowcaseGrid({ works, eager }: { works: FeaturedWork[]; eager: boolean }) {
   const { hero, side, rowB } = splitShowcase(works)
   if (!hero) return null
   const pairs = chunk([...side, ...rowB], 2)
   return (
     <div className={styles.showcase} data-test="showcase-showcase">
-      <Slot work={hero} className={styles.heroSlot} eager={eager} caption />
+      <Slot work={hero} eager={eager} caption />
       {pairs.map((row, i) => (
         <div key={i} className={styles.pairRow}>
           {row.map((w) => (
-            <Slot key={w.id} work={w} className={styles.pairSlot} eager={eager && i === 0} />
+            <Slot key={w.id} work={w} eager={eager && i === 0} />
           ))}
         </div>
       ))}
@@ -117,15 +126,15 @@ function ShowcaseGrid({ works, eager }: { works: FeaturedWork[]; eager: boolean 
   )
 }
 
-/** `strip`: пары тайлов (до 4 работ) либо один ряд низких тайлов (5+). */
+/** `strip`: выровненные пары (до 4 работ) либо один ряд из трёх (5+). */
 function StripGrid({ works, eager }: { works: FeaturedWork[]; eager: boolean }) {
   const list = stripWorks(works)
   if (list.length === 0) return null
   if (isDenseStrip(works.length)) {
     return (
-      <div className={styles.stripRow} data-test="showcase-strip">
+      <div className={styles.pairRow} data-test="showcase-strip">
         {list.slice(0, 3).map((w) => (
-          <Slot key={w.id} work={w} className={styles.stripSlot} eager={eager} />
+          <Slot key={w.id} work={w} eager={eager} />
         ))}
       </div>
     )
@@ -135,7 +144,7 @@ function StripGrid({ works, eager }: { works: FeaturedWork[]; eager: boolean }) 
       {chunk(list, 2).map((row, i) => (
         <div key={i} className={styles.pairRow}>
           {row.map((w) => (
-            <Slot key={w.id} work={w} className={styles.artSlot} eager={eager && i === 0} />
+            <Slot key={w.id} work={w} eager={eager && i === 0} />
           ))}
         </div>
       ))}
@@ -243,10 +252,10 @@ function FeaturedCategorySection({
       <SectionHead category={category} index={index} />
       {featuredLoading ? (
         <div className={styles.showcase}>
-          <SlotSkeleton className={styles.heroSlot} />
+          <SlotSkeleton className={styles.skelHero} />
           <div className={styles.pairRow}>
-            <SlotSkeleton className={styles.pairSlot} />
-            <SlotSkeleton className={styles.pairSlot} />
+            <SlotSkeleton className={styles.skelPair} />
+            <SlotSkeleton className={styles.skelPair} />
           </div>
         </div>
       ) : (
@@ -378,7 +387,7 @@ function SectionSkeleton() {
         <span className={`${styles.lineSkeleton} ${styles.lineSkeletonWide}`} />
       </div>
       <div className={styles.showcase}>
-        <SlotSkeleton className={styles.heroSlot} />
+        <SlotSkeleton className={styles.skelHero} />
       </div>
     </SectionShell>
   )

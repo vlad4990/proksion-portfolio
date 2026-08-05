@@ -138,15 +138,9 @@
   --cta-btn-pad:   14px 28px;  /* кнопка «НАПИСАТЬ В TELEGRAM» в футере    */
   --cta-btn-h-mob: 52px;       /* та же кнопка на мобайле — во всю ширину  */
 
-  /* Витрины секций корневой /projects — высоты слотов ПО ТИРАМ (фрейм tVnqG, tier xl).
-     Слоты фиксированной высоты резервируют место (нет скачков layout), картинка
-     обрезается object-fit: cover. */
+  /* Витрины секций корневой /projects — выровненные ряды (justified): высоты слотов
+     выводятся из пропорций картинок (aspect-ratio + flex-grow: --ar), токенов высот нет. */
   --t-projects-hero: 100px;  /* заголовок «ПРОЕКТЫ» (= --t-hero на xl)     */
-  --show-row-a:      486px;  /* showcase: ряд A (hero + колонка из 2)      */
-  --show-row-b:      256px;  /* showcase: ряд B (до 4 тайлов)              */
-  --strip-h:         380px;  /* strip: ряд при ≤4 работах                  */
-  --strip-h-dense:   230px;  /* strip: ряд при 5+ работах                  */
-  --card-preview:    340px;  /* cards: превью карточки                     */
 
   /* === MOBILE tokens — used by the mobile component tree ============= */
   --breakpoint-mobile: 768px;
@@ -166,12 +160,6 @@
   /* Mobile layout */
   --mob-pad:           22px;   /* horizontal page gutter              */
   --tile-gap-mob:      12px;   /* gutter between masonry tiles        */
-  /* Витрины секций /projects — мобильные высоты слотов (фрейм N8NrSi) */
-  --show-hero-h-mob:  240px;   /* showcase: hero-тайл во всю ширину   */
-  --show-pair-h-mob:  150px;   /* showcase: тайлы пар                 */
-  --strip-pair-h-mob: 180px;   /* strip ≤4: тайлы пар                 */
-  --strip-row-h-mob:  110px;   /* strip 5+: ряд из трёх               */
-  --card-preview-mob: 200px;   /* cards: превью карточки              */
 
   --mob-header-h:      56px;   /* top mini-header height              */
   --mob-status:        56px;   /* space above header (status bar)     */
@@ -218,11 +206,6 @@
     --sp-xl:             110px;
 
     --t-projects-hero:    72px;
-    --show-row-a:        400px;
-    --show-row-b:        216px;
-    --strip-h:           312px;
-    --strip-h-dense:     196px;
-    --card-preview:      280px;
   }
 }
 
@@ -255,11 +238,6 @@
     --sp-xl:              72px;
 
     --t-projects-hero:    56px;
-    --show-row-a:        320px;
-    --show-row-b:        176px;
-    --strip-h:           250px;
-    --strip-h-dense:     160px;
-    --card-preview:      230px;
   }
 }
 
