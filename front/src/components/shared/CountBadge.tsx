@@ -1,9 +1,9 @@
 // Бейдж счётчика работ (спека редизайна §6): «1 РАБОТА» / «2 РАБОТЫ» / «68 РАБОТ».
-// Общий атом обоих деревьев; мобильный вариант — те же элементы, плотнее и мельче.
-// Плюрализация — formatWorksCount из src/lib/format.ts.
+// Общий атом обоих деревьев; вся визуальная часть — в Badge, здесь только плюрализация
+// (formatWorksCount из src/lib/format.ts).
 
 import { formatWorksCount } from '../../lib/format'
-import styles from './CountBadge.module.css'
+import { Badge } from './Badge'
 
 export interface CountBadgeProps {
   count: number
@@ -15,11 +15,8 @@ export interface CountBadgeProps {
 
 export function CountBadge({ count, mobile = false, testId = 'count-badge' }: CountBadgeProps) {
   return (
-    <span
-      className={`${styles.badge}${mobile ? ` ${styles.badgeMobile}` : ''}`}
-      data-test={testId}
-    >
+    <Badge mobile={mobile} testId={testId}>
       {formatWorksCount(count)}
-    </span>
+    </Badge>
   )
 }

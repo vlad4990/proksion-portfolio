@@ -1,0 +1,30 @@
+/* Бейдж в рамке-hairline у заголовков секций. Дизайн — «Count Badge» / «Duration Badge»
+   во фреймах tVnqG / h16xA / P6kgA (13px, рамка --hairline, внешняя высота 29)
+   и N8NrSi / fQvBp / q7llNK (11px, высота 24).
+   Высота задана токеном, а не паддингом с лидингом: бейдж однострочный, а рамка должна
+   совпадать с макетом при нашем 1px border (box-sizing: border-box). */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: var(--badge-h);
+  /* Верхний паддинг — оптическая компенсация (см. комментарий у токена), не отступ макета. */
+  padding: var(--badge-pad-top) var(--badge-pad-x) 0;
+  border: var(--stroke-hairline) solid var(--hairline);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: var(--t-meta);
+  font-weight: 400;
+  line-height: 1;
+  /* В дизайне трекинг бейджа — 1px на 13px кегле. */
+  letter-spacing: 0.077em;
+  color: var(--fg-dim);
+  white-space: nowrap;
+}
+
+.badgeMobile {
+  height: var(--badge-h-mob);
+  padding: var(--badge-pad-top-mob) var(--badge-pad-x-mob) 0;
+  font-size: var(--t-small-mob);
+  letter-spacing: 0.09em;
+}

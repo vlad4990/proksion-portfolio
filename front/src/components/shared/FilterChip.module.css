@@ -7,7 +7,10 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: var(--chip-pad);
+  /* Высота — токеном (в макете она рваная), верхний паддинг — оптическая компенсация
+     асимметричного em-box Kanit; см. комментарии у токенов. */
+  height: var(--chip-h);
+  padding: var(--chip-pad-top) var(--chip-pad-x) 0;
   border: var(--stroke-hairline) solid var(--hairline);
   border-radius: var(--radius-pill);
   background: none;
@@ -31,10 +34,11 @@
   border-color: var(--accent);
 }
 
-/* Мобильное дерево — та же анатомия, плотнее (--chip-pad-mob, --t-chip-mob). */
+/* Мобильное дерево — та же анатомия, плотнее (--chip-h-mob, --chip-pad-x-mob). */
 .chipMobile {
   gap: 6px;
-  padding: var(--chip-pad-mob);
+  height: var(--chip-h-mob);
+  padding: var(--chip-pad-top-mob) var(--chip-pad-x-mob) 0;
   font-size: var(--t-chip-mob);
 }
 

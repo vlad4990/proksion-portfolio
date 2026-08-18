@@ -134,8 +134,10 @@
   flex: 0 0 auto;
 }
 
+/* flex, а не block: иначе вокруг inline-бейджа остаётся люфт от strut родителя
+   (в макете «Badge Wrap» — 24 + 8 = 32). */
 .badgeWrap {
-  display: block;
+  display: flex;
   margin-bottom: 8px;
   flex: 0 0 auto;
 }

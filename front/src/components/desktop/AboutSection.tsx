@@ -1,110 +1,131 @@
+// Страница «Обо мне» — десктоп (дизайн: фрейм P6kgA «1. Обо мне — Hero-сплит»).
+// Hero-сплит (лид + пилюли «чем занимаюсь» слева, фото справа) → секция «ОПЫТ РАБОТЫ»
+// (карточка компании слева, буллеты в две колонки справа) → секция «ОБРАЗОВАНИЕ» → футер.
+// Контент — из lib/about.ts (общий с мобильным деревом), контакты футера — lib/contacts.ts.
+
+import markerPixel from '../../assets/icon-marker-pixel.svg'
 import photoMasked1 from '../../assets/photo-masked-1-full.webp'
-import photoMasked2 from '../../assets/photo-masked-2.webp'
+import {
+  ABOUT_LEAD,
+  ABOUT_SKILLS_LABEL,
+  ABOUT_SKILL_ROWS,
+  EDUCATION,
+  EDUCATION_BADGE,
+  EDUCATION_HEADING,
+  EDUCATION_META,
+  EXPERIENCE_BADGE,
+  EXPERIENCE_HEADING,
+  EXPERIENCE_META,
+  JOBS,
+} from '../../lib/about'
+import type { Education, Job } from '../../lib/about'
+import { Badge } from '../shared/Badge'
 import layout from '../../styles/layout.module.css'
+import { ProjectsFooter } from './ProjectsFooter'
 import styles from './AboutSection.module.css'
 
-interface Job {
-  company: string
-  role: string
-  duration: string
-  dim?: boolean
-  bullets: string[]
+/** Голова секции: глиф-курсор + титул + бейдж слева, мета-строка справа. */
+function SectionHead({ title, badge, meta }: { title: string; badge: string; meta: string }) {
+  return (
+    <div className={styles.head} data-test="about-section-head">
+      <div className={styles.headLine}>
+        <img className={styles.glyph} src={markerPixel} alt="" />
+        <h2 className={styles.headTitle}>{title}</h2>
+        <Badge testId="about-section-badge">{badge}</Badge>
+      </div>
+      <span className={styles.headMeta}>{meta}</span>
+    </div>
+  )
 }
-
-const JOBS: Job[] = [
-  {
-    company: 'LOFTY.',
-    role: 'ГРАФИЧЕСКИЙ ДИЗАЙНЕР',
-    duration: '1.5 ГОДА',
-    bullets: [
-      'Работа с креативами: баннеры, оформление smm-постов',
-      'Обновление и формирование фирменного стиля для smm и коммуникация с отделом маркетинга',
-      'Подготовка материалов на сайт, передача материалов продуктовому дизайну и коммуникация с отделом разработки',
-      'Работа с UI-kit компании, разработка макетов под ивенты на сайт, создание витрин под продукты, общение с разработчиками',
-      'Оптимизация работы графического дизайна, точечное внедрение ИИ, создание шаблонов для ведения каналов и контента',
-      'Планирование и распределение нагрузки, ответственность за качество выполняемых задач',
-    ],
-  },
-  {
-    company: 'КОПИРКА',
-    role: 'ГРАФИЧЕСКИЙ ДИЗАЙНЕР',
-    duration: '6 МЕСЯЦЕВ',
-    dim: true,
-    bullets: [
-      'Создание дизайн-проектов / дизайн и верстка сувенирной и полиграфической продукции',
-      'Фото на документы, ретуширование, печать фотографий.',
-      'Консультирование клиентов по услугам, прямая работа с заказчиками.',
-      'Периодическое выполнение копировальных и печатных работ, передача заказов на производство.',
-      'Создание визиток/брошюр.',
-      'Разработка печатей/штампов по заказу и оттиску.',
-    ],
-  },
-]
-
-const EDUCATION = [
-  {
-    degree: 'Художник-мастер, педагог.',
-    school: 'Колледж декоративно-прикладного искусства им. Карла Фаберже',
-  },
-  {
-    degree: 'Монументальная живопись',
-    school: 'РГУ ИМ. А.Н.КОСЫГИНА, Институт искусств',
-  },
-]
 
 function JobEntry({ company, role, duration, bullets, dim }: Job) {
   return (
     <div className={styles.job} data-test="about-job">
-      <div className={styles.jobHead}>
+      <div className={styles.jobLeft}>
         <span className={dim ? styles.companyDim : styles.company}>{company}</span>
         <span className={styles.role}>{role}</span>
-        <span className={styles.duration}>{duration}</span>
+        <span className={styles.duration}>
+          <Badge testId="about-job-duration">{duration}</Badge>
+        </span>
       </div>
       <ul className={styles.bullets}>
-        {bullets.map((b, i) => (
-          <li key={i}>{b}</li>
+        {bullets.map((b) => (
+          <li key={b}>{b}</li>
         ))}
       </ul>
     </div>
   )
 }
 
-function EducationEntry({ degree, school }: { degree: string; school: string }) {
+function EducationEntry({ degree, school }: Education) {
   return (
     <div className={styles.edu} data-test="about-education">
-      <div className={styles.eduDegree}>{degree}</div>
-      <div className={styles.eduSchool}>{school}</div>
+      <h3 className={styles.eduDegree}>{degree}</h3>
+      <span className={styles.eduSchool}>{school}</span>
     </div>
   )
 }
 
 export function AboutSection() {
   return (
-    <section id="about" className={styles.section} data-screen-label="01 About" data-test="about">
-      <div className={`${layout.page} ${styles.grid}`}>
-        <div className={styles.photos} data-test="about-photos">
-          <img className={styles.photo1} src={photoMasked1} alt="" />
-          <img className={styles.photo2} src={photoMasked2} alt="" />
+    <div className={styles.screen} data-screen-label="01 About" data-test="about">
+      <section className={styles.hero}>
+        <div className={`${layout.page} ${styles.heroInner}`}>
+          <div className={styles.heroLeft}>
+            <p className={styles.lead} data-test="about-intro">
+              {ABOUT_LEAD}
+            </p>
+
+            <div className={styles.skills} data-test="about-skills">
+              <span className={styles.skillsLabel}>{ABOUT_SKILLS_LABEL}</span>
+              {ABOUT_SKILL_ROWS.map((row) => (
+                <ul key={row[0]} className={styles.chips}>
+                  {row.map((skill) => (
+                    <li key={skill} className={styles.chip}>
+                      {skill}
+                    </li>
+                  ))}
+                </ul>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.photoFrame} data-test="about-photo">
+            {/* Окно обрезки отдельным слоем: оно продлено ниже кадра — до hairline секции. */}
+            <div className={styles.photoClip}>
+              <img className={styles.photo} src={photoMasked1} alt="" />
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div data-test="about-body">
-          <p className={styles.intro} data-test="about-intro">
-            С детства я рисую, играю в компьютер, занимаюсь музыкой и полностью
-            погружена в творчество по сей день: люблю комиксы, фильмы, путешествия,
-            активно веду скетчбук, пробую себя в разных хобби.
-          </p>
-
-          <h2 className={styles.heading} data-test="about-experience-heading">Опыт работы</h2>
-          {JOBS.map((job) => (
-            <JobEntry key={job.company} {...job} />
-          ))}
-
-          <h2 className={styles.heading} data-test="about-education-heading">Образование</h2>
-          {EDUCATION.map((e) => (
-            <EducationEntry key={e.degree} {...e} />
-          ))}
+      <section className={styles.section} data-test="about-experience">
+        <div className={layout.page}>
+          <SectionHead
+            title={EXPERIENCE_HEADING}
+            badge={EXPERIENCE_BADGE}
+            meta={EXPERIENCE_META}
+          />
+          <div className={styles.jobs}>
+            {JOBS.map((job) => (
+              <JobEntry key={job.company} {...job} />
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <section className={`${styles.section} ${styles.sectionLast}`} data-test="about-education-section">
+        <div className={layout.page}>
+          <SectionHead title={EDUCATION_HEADING} badge={EDUCATION_BADGE} meta={EDUCATION_META} />
+          <div className={styles.eduList}>
+            {EDUCATION.map((e) => (
+              <EducationEntry key={e.degree} {...e} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <ProjectsFooter />
+    </div>
   )
 }

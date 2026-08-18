@@ -144,8 +144,10 @@
 }
 
 /* Бейдж «68 РАБОТ» садится чуть выше базовой линии (Badge Wrap — отступ снизу 14). */
+/* flex, а не block: у inline-бейджа иначе остаётся люфт от strut родителя, и «Badge Wrap»
+   перестаёт совпадать с макетом (29 + 14 = 43). */
 .badgeWrap {
-  display: block;
+  display: flex;
   margin-bottom: 14px;
   flex: 0 0 auto;
 }
