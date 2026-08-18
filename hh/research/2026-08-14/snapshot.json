@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "date": "2026-08-14",
+    "query": "графический дизайнер",
+    "sources": {
+      "main": "https://hh.ru/vacancies/graficheskiy_dizayner (лендинг, Москва, 16 страниц по 50)",
+      "remote_moscow": "https://hh.ru/vacancies/graficheskiy_dizayner/udalennaya_rabota (5 страниц по 50)",
+      "remote_russia": "https://hh.ru/search/vacancy?text=графический дизайнер&area=113&work_format=REMOTE (8 страниц по 20)"
+    },
+    "counts": {
+      "main_unique": 688,
+      "main_with_salary": 366,
+      "deep_sample": 113,
+      "deep_sample_rule": "каждая 6-я вакансия основной выдачи (i % 6 === 0)",
+      "remote_pool_unique": 277,
+      "remote_moscow": 207,
+      "remote_russia_new_vs_moscow": 70,
+      "remote_with_salary": 145
+    },
+    "salary_normalization": "все суммы приведены к net («на руки»): gross × 0.87; за точку взята середина вилки (mid); только from → from; только to → to"
+  },
+  "salary_net": {
+    "overall": { "min": 2750, "p25": 82650, "median": 110000, "p75": 150000, "p90": 180000, "max": 408900 },
+    "histogram_mid": {
+      "<60k": 26, "60-80k": 51, "80-100k": 53, "100-120k": 77, "120-150k": 52, "150-200k": 76, "200k+": 31
+    },
+    "by_experience": {
+      "нет опыта/не указан": { "n": 42, "p25": 63075, "median": 72500, "p75": 87000 },
+      "1-3 года": { "n": 209, "p25": 80000, "median": 100000, "p75": 130000 },
+      "3-6 лет": { "n": 103, "p25": 115000, "median": 150000, "p75": 174000 },
+      "6+ лет": { "n": 12, "p25": 100000, "median": 130500, "p75": 215000 }
+    },
+    "by_segment_median": {
+      "lead/senior/арт-директор": { "n": 20, "median": 151000 },
+      "презентации": { "n": 4, "median": 137000 },
+      "брендинг/айдентика": { "n": 10, "median": 130000 },
+      "смм/креативы/реклама": { "n": 29, "median": 117450 },
+      "маркетплейсы/инфографика": { "n": 32, "median": 100000 },
+      "веб/digital": { "n": 40, "median": 100000 },
+      "полиграфия/вёрстка": { "n": 10, "median": 100000 },
+      "motion/анимация": { "n": 5, "median": 90000 }
+    }
+  },
+  "experience_distribution": {
+    "1-3 года": 360, "3-6 лет": 244, "более 6 лет": 34, "не указан/без опыта": 50
+  },
+  "segments_by_title": {
+    "смм/креативы/реклама": 67, "lead/senior/арт-дир": 65, "веб/digital/ux-ui": 63,
+    "маркетплейсы/инфографика": 39, "ai в названии": 23, "junior": 20, "брендинг/айдентика": 19,
+    "презентации": 16, "полиграфия/вёрстка": 15, "motion/анимация": 14, "иллюстрация": 11
+  },
+  "deep_sample_113": {
+    "tools_mentions": {
+      "photoshop": 62, "illustrator": 55, "figma": 52, "ai_tools": 45, "presentation": 40,
+      "polygraphy": 38, "layout_verstka": 31, "branding": 30, "video": 29, "banners": 27,
+      "typography": 24, "packaging": 24, "smm": 25, "marketplace": 21, "indesign": 20,
+      "motion": 19, "infographics": 18, "corel": 17, "blender_c4d_3d": 15, "ux_ui": 15,
+      "after_effects": 12, "powerpoint": 11, "retouch": 11, "premiere": 7, "pos": 6, "tilda": 5
+    },
+    "ai_tools_regex": "нейросет|midjourney|stable diffusion|chatgpt|dall-e|генеративн|\\bAI\\b|ИИ[пунктуация]|искусственный интеллект",
+    "requirements": { "portfolio": 53, "test_task": 9, "higher_education": 15 },
+    "work_format": {
+      "офис": 61, "офис или гибрид": 11, "гибрид": 8, "удалённо": 23,
+      "офис/удалённо/гибрид": 3, "удалённо или гибрид": 3, "прочее": 4
+    },
+    "top_key_skills": {
+      "adobe photoshop": 38, "adobe illustrator": 30, "графический дизайн": 26, "figma": 20,
+      "дизайн": 19, "coreldraw": 10, "полиграфический дизайн": 10, "графические редакторы": 9,
+      "adobe indesign": 8, "цветокоррекция": 8, "smm": 6, "ретушь": 5, "видеомонтаж": 5,
+      "верстка рассылок": 4, "разработка фирменного стиля": 4, "типографика": 4,
+      "ms powerpoint": 4, "3ds max": 4, "допечатная подготовка": 4
+    }
+  },
+  "remote_pool_277": {
+    "salary_net": { "p25": 50000, "median": 75000, "p75": 120000 },
+    "by_experience_median": {
+      "1-3 года": { "n": 83, "median": 69600 },
+      "3-6 лет": { "n": 43, "median": 130000 },
+      "не указан": { "n": 18, "median": 50000 }
+    },
+    "experience_distribution": { "1-3 года": 144, "3-6 лет": 101, "более 6 лет": 11, "не указан": 21 },
+    "candidates_1_3y_85k_plus": 20
+  },
+  "kristina_baseline": {
+    "resume_updated": "2026-02-10",
+    "desired_salary_net": 100000,
+    "experience_total": "1 год 8 месяцев",
+    "cohort": "1-3 года",
+    "priority_2026_08": "полная удалёнка (зимовка ~полгода)"
+  },
+  "shortlist_vacancy_ids": {
+    "remote_priority": [135726777, 136168404, 133992834, 136017994, 135999220, 135624416, 135729496, 134739309, 135989536, 135632613, 136223589, 135773290, 135794088, 135977216, 135940626, 136158432],
+    "office_hybrid_reserve": [135759961, 136067170, 135898852, 135048639, 134993349, 136075613, 135841577]
+  }
+}

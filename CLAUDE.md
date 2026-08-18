@@ -16,6 +16,7 @@ PROKSION — графический-дизайн портфолио для Krist
 /back    ← Bun + ElysiaJS: public-API, bun:sqlite, MinIO+sharp, auth, admin-API, backup (rclone)
 /docs    ← architecture.md (спека функц. части) + deploy.md (прод-деплой-гайд)
 /tasks   ← нарезка работ по функциональной части (01–12) + _legacy-astro/ (история Astro-фаз)
+/hh      ← НЕ часть сайта: поиск работы для Кристины (резюме + датированные снапшоты исследования рынка hh.ru для сравнения динамики; методология — hh/README.md)
 # в корне: Dockerfile (multi-stage front+admin→caddy), Caddyfile, docker-compose.yml, .env.example, Makefile
 ```
 
