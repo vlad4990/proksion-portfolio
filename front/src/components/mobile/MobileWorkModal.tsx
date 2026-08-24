@@ -1,72 +1,80 @@
-// Полноэкранная модалка работы — мобайл (задача 10, спека §8). То же поведение, что и на
-// десктопе (общий контроллер useWorkModal), мобильная разметка: верхняя панель (закрыть +
-// счётчик), карусель со свайпом и тап-стрелками, прокручиваемое описание. Скролл фона
-// заблокирован; внутренняя мета-область скроллится сама.
+// Модалка работы — мобайл. Фулскрин (как и была), но вместо карусели — вертикальная
+// лента картинок (flex-col, gap токеном); тайтл и описание — внизу под лентой (серый
+// блок с чертой, как на десктопе). Открытие — spring-слайд снизу вверх (iOS-шторка),
+// закрытие — слайд вниз; всё на WAAPI поверх ref'ов, без ререндеров React в кадре.
 
-import { useRef, type MouseEvent, type TouchEvent } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { useWorkModal } from '../../hooks/useWorkModal'
 import { useScrollLock } from '../../hooks/useScrollLock'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
-import { PreloadImage, WorkImage } from '../WorkImage'
+import { getFlipSource, type FlipSource } from '../../lib/flip'
+import { prefersReducedMotion, springTo, whenDone } from '../../lib/spring'
+import { WorkImage } from '../WorkImage'
 import styles from './MobileWorkModal.module.css'
 
-/** Минимальный сдвиг (px) горизонтального свайпа для смены слайда. */
-const SWIPE_THRESHOLD = 40
+/** Шторка: критически задемпфированный спринг — плавный доезд без дребезга. */
+const SHEET = { stiffness: 260, damping: 32 }
 
 export function MobileWorkModal() {
+  const overlayRef = useRef<HTMLDivElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
-  const touchStartX = useRef<number | null>(null)
-  const modal = useWorkModal()
+  // Источник клика (lib/flip) — на мобилке без FLIP, но thumb тайла из кэша идёт
+  // фоном первой картинки: full проявляется поверх без «дыры».
+  const sourceRef = useRef<FlipSource | null | undefined>(undefined)
+
+  // Закрытие: слайд вниз, затем навигация назад. Клики на время анимации продолжает
+  // перехватывать статичный .root (сквозь уехавшую шторку листинг не кликается).
+  const runClose = (finish: () => void): void => {
+    const overlay = overlayRef.current
+    if (!overlay || prefersReducedMotion()) {
+      finish()
+      return
+    }
+    const anim = overlay.animate(
+      [{ transform: 'translateY(0)' }, { transform: `translateY(100%)` }],
+      { duration: 260, easing: 'cubic-bezier(.4, 0, .7, 1)', fill: 'both' },
+    )
+    void whenDone([anim]).then(finish)
+  }
+
+  const modal = useWorkModal(runClose)
+  if (sourceRef.current === undefined) sourceRef.current = getFlipSource(modal.work)
+  const source = sourceRef.current
+
   useScrollLock(true)
   useFocusTrap(dialogRef, modal.status !== 'notfound')
 
+  // Открытие: шторка выезжает снизу (до первого пейнта — без мигания финальным кадром).
+  // openedRef — гард от двойного маунта StrictMode (не плодим вторую анимацию).
+  const openedRef = useRef(false)
+  useLayoutEffect(() => {
+    const overlay = overlayRef.current
+    if (openedRef.current || !overlay || prefersReducedMotion()) return
+    openedRef.current = true
+    springTo(overlay, { x: 0, y: window.innerHeight }, { spring: SHEET })
+  }, [])
+
   if (modal.status === 'notfound') return null
 
-  const title = modal.detail?.title ?? 'Работа'
-
-  // Соседние слайды греем заранее скрытыми <picture> — свайп без ожидания сети.
-  // При двух картинках prev === next, второго прелоадера не нужно.
-  const nextImage =
-    modal.count > 1 ? modal.images[(modal.activeIndex + 1) % modal.count] : undefined
-  const prevImage =
-    modal.count > 2 ? modal.images[(modal.activeIndex - 1 + modal.count) % modal.count] : undefined
-
-  const onBackdrop = (e: MouseEvent<HTMLDivElement>): void => {
-    if (e.target === e.currentTarget) modal.close()
-  }
-
-  const onTouchStart = (e: TouchEvent<HTMLDivElement>): void => {
-    touchStartX.current = e.touches[0]?.clientX ?? null
-  }
-  const onTouchEnd = (e: TouchEvent<HTMLDivElement>): void => {
-    const start = touchStartX.current
-    touchStartX.current = null
-    if (start === null || modal.count < 2) return
-    const dx = (e.changedTouches[0]?.clientX ?? start) - start
-    if (Math.abs(dx) < SWIPE_THRESHOLD) return
-    if (dx < 0) modal.next()
-    else modal.prev()
-  }
+  const detail = modal.detail
+  const images = modal.images
+  const title = detail?.title ?? null
+  const description = detail?.description ?? null
+  const hasMeta = modal.status === 'ready' && Boolean(title || description)
 
   return (
-    <div className={styles.overlay} onClick={onBackdrop} data-test="work-modal">
+    <div className={styles.root} data-test="work-modal">
+      <div ref={overlayRef} className={styles.sheet}>
       <div
         ref={dialogRef}
         className={styles.dialog}
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-label={title ?? 'Работа'}
         tabIndex={-1}
         data-test="work-dialog"
       >
         <div className={styles.bar}>
-          {modal.status === 'ready' && modal.count > 1 ? (
-            <span className={styles.counter} data-test="work-counter">
-              {modal.activeIndex + 1} / {modal.count}
-            </span>
-          ) : (
-            <span />
-          )}
           <button
             type="button"
             className={styles.close}
@@ -78,79 +86,64 @@ export function MobileWorkModal() {
           </button>
         </div>
 
-        {modal.status === 'loading' && (
-          <p className={styles.message} data-test="work-loading">
-            Загрузка…
-          </p>
-        )}
+        <div className={styles.content} data-test="work-content">
+          {modal.status === 'loading' && !source && (
+            <p className={styles.message} data-test="work-loading">
+              Загрузка…
+            </p>
+          )}
 
-        {modal.status === 'error' && (
-          <p className={styles.message} data-test="work-error">
-            Не удалось загрузить работу. Закройте окно и попробуйте снова.
-          </p>
-        )}
+          {modal.status === 'error' && (
+            <p className={styles.message} data-test="work-error">
+              Не удалось загрузить работу. Закройте окно и попробуйте снова.
+            </p>
+          )}
 
-        {modal.status === 'ready' && modal.detail && (
-          <div className={styles.content} data-test="work-content">
+          {modal.status === 'loading' && source && source.ar !== null && (
             <div
-              className={styles.stage}
-              onClick={onBackdrop}
-              onTouchStart={onTouchStart}
-              onTouchEnd={onTouchEnd}
-              data-test="work-stage"
-            >
-              {modal.activeImage && (
-                <WorkImage
-                  key={modal.activeImage.id}
-                  image={modal.activeImage}
-                  className={styles.picture}
-                  imgClassName={styles.img}
-                />
-              )}
-              {nextImage && <PreloadImage key={`pre-${nextImage.id}`} image={nextImage} />}
-              {prevImage && <PreloadImage key={`pre-${prevImage.id}`} image={prevImage} />}
+              className={styles.skeleton}
+              style={{
+                aspectRatio: String(source.ar),
+                backgroundImage: `url("${source.src}")`,
+              }}
+              data-test="work-skeleton"
+            />
+          )}
 
-              {modal.count > 1 && (
-                <>
-                  <button
-                    type="button"
-                    className={`${styles.nav} ${styles.navPrev}`}
-                    onClick={modal.prev}
-                    aria-label="Предыдущая картинка"
-                    data-test="work-prev"
-                  >
-                    <span className={styles.chevron} aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.nav} ${styles.navNext}`}
-                    onClick={modal.next}
-                    aria-label="Следующая картинка"
-                    data-test="work-next"
-                  >
-                    <span className={styles.chevron} aria-hidden="true" />
-                  </button>
-                </>
-              )}
-            </div>
+          {modal.status === 'ready' && (
+            <>
+              <div className={styles.images} data-test="work-images">
+                {images.map((img, i) => (
+                  <WorkImage
+                    key={img.id}
+                    image={img}
+                    className={styles.picture}
+                    imgClassName={styles.img}
+                    placeholderSrc={i === 0 ? source?.src : undefined}
+                    lazy={i > 0}
+                  />
+                ))}
+              </div>
 
-            <div className={styles.meta} data-test="work-meta">
-              <h2 className={styles.title} data-test="work-title">
-                {title}
-              </h2>
-              {modal.detail.description && (
-                <p className={styles.description} data-test="work-description">
-                  {modal.detail.description}
-                </p>
+              {hasMeta && (
+                <div className={styles.meta} data-test="work-meta">
+                  {title && (
+                    <h2 className={styles.title} data-test="work-title">
+                      {title}
+                    </h2>
+                  )}
+                  {title && description && <div className={styles.divider} aria-hidden="true" />}
+                  {description && (
+                    <p className={styles.description} data-test="work-description">
+                      {description}
+                    </p>
+                  )}
+                </div>
               )}
-              {modal.activeImage?.alt && (
-                <p className={styles.caption} data-test="work-caption">
-                  {modal.activeImage.alt}
-                </p>
-              )}
-            </div>
-          </div>
-        )}
+            </>
+          )}
+        </div>
+      </div>
       </div>
     </div>
   )

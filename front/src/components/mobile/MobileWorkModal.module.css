@@ -1,11 +1,18 @@
-/* MobileWorkModal — fullscreen overlay over the mobile listing. Column layout:
-   top bar (counter + close), swipeable carousel, scrollable meta. Brand-strict tokens,
-   sharp corners, CSS-drawn glyphs (no emoji). */
+/* MobileWorkModal — фулскрин-модалка поверх мобильного листинга. Колонка: верхняя панель
+   (красный крестик), скроллируемая лента картинок (flex-col, gap) и мета (тайтл/описание)
+   внизу под лентой. Brand-strict токены, острые углы, CSS-рисованный крестик. */
 
-.overlay {
+/* Статичный перехватчик кликов: живёт до размонтирования, пока шторка (.sheet)
+   уезжает вниз — сквозь неё листинг не кликается (гонки истории исключены). */
+.root {
   position: fixed;
   inset: 0;
   z-index: 500;
+}
+
+.sheet {
+  width: 100%;
+  height: 100dvh;
   background: var(--bg);
 }
 
@@ -17,23 +24,15 @@
   outline: none;
 }
 
-/* ── Top bar ────────────────────────────────────────────────── */
+/* ── Верхняя панель ─────────────────────────────────────────── */
 .bar {
   flex: 0 0 auto;
   height: var(--mob-header-h);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 0 var(--mob-pad);
   border-bottom: 1px solid var(--hairline-soft);
-}
-
-.counter {
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: var(--t-body-mob);
-  letter-spacing: var(--tracking-caps);
-  color: var(--fg-muted);
 }
 
 .close {
@@ -45,7 +44,7 @@
   background: transparent;
   border: 0;
   cursor: pointer;
-  color: var(--fg-strong);
+  color: var(--accent);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -75,31 +74,28 @@
   transform: rotate(-45deg);
 }
 
-/* ── Content (carousel + meta) ──────────────────────────────── */
+/* ── Контент: лента картинок + мета ─────────────────────────── */
 .content {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
+  gap: var(--tile-gap-mob);
   overflow-y: auto;
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
 
-.stage {
-  position: relative;
-  flex: 0 0 auto;
+.images {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-elevated);
-  touch-action: pan-y;
+  flex-direction: column;
+  gap: var(--tile-gap-mob);
 }
 
 .picture {
   display: block;
-  max-width: 100%;
-  max-height: 70dvh;
-  background-color: var(--c-skeleton);
+  width: 100%;
+  background-color: var(--c-skeleton); /* нейтральный тон (или thumb/LQIP) пока full грузится */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -109,88 +105,54 @@
   display: block;
   width: 100%;
   height: auto;
-  max-height: 70dvh;
-  object-fit: contain;
   transition: opacity var(--dur-base) var(--ease-out);
 }
 
-/* ── Prev / next (CSS-drawn chevrons) ───────────────────────── */
-.nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-  color: var(--fg-strong);
-  -webkit-tap-highlight-color: transparent;
+/* Скелетон первой картинки на время загрузки детали: thumb тайла из кэша фоном. */
+.skeleton {
+  width: 100%;
+  background-color: var(--c-skeleton);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-.navPrev {
-  left: 0;
-}
-
-.navNext {
-  right: 0;
-}
-
-.chevron {
-  display: block;
-  width: 14px;
-  height: 14px;
-  border-top: 2px solid currentColor;
-  border-right: 2px solid currentColor;
-}
-
-.navPrev .chevron {
-  transform: rotate(-135deg);
-  margin-left: 5px;
-}
-
-.navNext .chevron {
-  transform: rotate(45deg);
-  margin-right: 5px;
-}
-
-/* ── Meta text ──────────────────────────────────────────────── */
+/* ── Мета: тайтл + черта + описание ─────────────────────────── */
 .meta {
-  flex: 0 0 auto;
-  padding: 20px var(--mob-pad) calc(var(--mob-safe-bottom) + 24px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--modal-meta-pad-mob);
+  padding: var(--modal-meta-pad-mob) var(--modal-meta-pad-mob)
+    calc(var(--mob-safe-bottom) + var(--modal-meta-pad-mob));
+  background: var(--bg-panel);
 }
 
 .title {
-  margin: 0 0 14px;
+  margin: 0;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: var(--t-section-mob);
+  font-size: var(--t-section-sm-mob);
   line-height: var(--lh-tight);
   text-transform: uppercase;
   letter-spacing: var(--tracking-caps);
   color: var(--fg-strong);
 }
 
+/* Черта на всю ширину блока — сквозь паддинг (отрицательные маргины «минуют» его). */
+.divider {
+  height: var(--stroke-hairline);
+  background: var(--hairline);
+  margin: 0 calc(-1 * var(--modal-meta-pad-mob));
+}
+
 .description {
-  margin: 0 0 16px;
+  margin: 0;
   font-family: var(--font-body);
   font-weight: 700;
   font-size: var(--t-body-mob);
   line-height: var(--lh-body);
   color: var(--fg);
   white-space: pre-line;
-}
-
-.caption {
-  margin: 0;
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: var(--t-small-mob);
-  line-height: var(--lh-body);
-  color: var(--fg-muted);
 }
 
 /* ── Loading / error ────────────────────────────────────────── */

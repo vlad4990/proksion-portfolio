@@ -23,6 +23,32 @@ const canonicalPathCache = new Map<string, string>()
 
 const slugKey = (cat: string, sub: string, work: string): string => `slug:${cat}/${sub}/${work}`
 
+/** Слаговые ключи, по которым префетч уже в полёте (дедуп ховеров). */
+const inflight = new Set<string>()
+
+/**
+ * Фоновый префетч детали работы (ховер/тап по тайлу, lib/prefetch): кладёт ответ в тот же
+ * сессионный кэш, что читает useWorkDetail — открытие модалки после ховера мгновенное.
+ * Резолвится деталью (для прогрева картинок); ошибки глотает (это только оптимизация),
+ * при уже идущем запросе резолвится null — второй прогрев не нужен.
+ */
+export function prefetchWorkDetail(cat: string, sub: string, work: string): Promise<WorkDetail | null> {
+  const key = slugKey(cat, sub, work)
+  const hit = detailCache.get(key)
+  if (hit) return Promise.resolve(hit)
+  if (inflight.has(key)) return Promise.resolve(null)
+  inflight.add(key)
+  return getWorkBySlug(cat, sub, work)
+    .then((data) => {
+      detailCache.set(key, data)
+      return data
+    })
+    .catch(() => null)
+    .finally(() => {
+      inflight.delete(key)
+    })
+}
+
 /** `:work` — легаси-ссылка (числовой id работы), а не слаг? */
 export function isLegacyWorkParam(work: string | undefined): boolean {
   return work !== undefined && /^\d+$/.test(work)

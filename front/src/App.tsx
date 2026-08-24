@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, Route as RouterRoute, Routes, useLocation } from 'react-router'
 import { useIsMobile } from './hooks/useIsMobile'
+import { installFlipCapture } from './lib/flip'
+import { installWorkPrefetch } from './lib/prefetch'
 import { ROUTE_TITLES } from './seo'
 import type { HeroPhase, Route } from './types'
 
@@ -60,6 +62,14 @@ export default function App() {
   const dismissHero = useCallback(() => {
     setHeroPhase((p) => (p === 'visible' ? 'dismissing' : p))
   }, [])
+
+  // FLIP-источник модалки работы: capture-слушатель кликов по ссылкам работ (lib/flip)
+  // запоминает картинку тайла — модалка открывается «из тайла» (обоих деревьев касается).
+  useEffect(() => installFlipCapture(), [])
+
+  // Прогрев работы до клика: ховер/тап/фокус по ссылке → деталь в кэш + full первой
+  // картинки в HTTP-кэш (lib/prefetch) — модалка открывается без сети и без пустоты.
+  useEffect(() => installWorkPrefetch(), [])
 
   // Curtain slide-out finishes → remove from the tree
   useEffect(() => {
