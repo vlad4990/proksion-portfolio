@@ -1,5 +1,5 @@
 {
-  "version": "2.14",
+  "version": "2.17",
   "children": [
     {
       "type": "frame",
@@ -2125,6 +2125,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "padding": [
                     22,
                     0
@@ -2184,6 +2185,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "padding": [
                     22,
                     0
@@ -2243,6 +2245,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "padding": [
                     22,
                     0
@@ -2302,6 +2305,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "padding": [
                     22,
                     0
@@ -2361,6 +2365,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "padding": [
                     22,
                     0
@@ -2420,6 +2425,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "padding": [
                     22,
                     0
@@ -2479,6 +2485,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "padding": [
                     22,
                     0
@@ -2800,6 +2807,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -2913,6 +2921,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -3022,6 +3031,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -3131,6 +3141,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -3240,6 +3251,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -3349,6 +3361,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -3458,6 +3471,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -3567,6 +3581,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -3676,6 +3691,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -3785,6 +3801,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -3894,6 +3911,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -4003,6 +4021,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -4112,6 +4131,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -4221,6 +4241,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -4330,6 +4351,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -4439,6 +4461,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -4548,6 +4571,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -4657,6 +4681,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -4766,6 +4791,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -4875,6 +4901,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -4984,6 +5011,7 @@
                   "strokeWidth": {
                     "bottom": 1
                   },
+                  "strokeLinejoin": "round",
                   "alignItems": "center",
                   "children": [
                     {
@@ -5701,6 +5729,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         0,
                         0,
@@ -5730,6 +5759,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -5787,6 +5817,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -5844,6 +5875,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -5901,6 +5933,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -5958,6 +5991,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6015,6 +6049,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6072,6 +6107,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6129,6 +6165,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6186,6 +6223,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6243,6 +6281,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6309,6 +6348,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         0,
                         0,
@@ -6338,6 +6378,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6395,6 +6436,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6452,6 +6494,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6509,6 +6552,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6566,6 +6610,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6623,6 +6668,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6680,6 +6726,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6737,6 +6784,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -6794,6 +6842,7 @@
                       "strokeWidth": {
                         "bottom": 1
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         11,
                         0
@@ -7270,6 +7319,1267 @@
         },
         {
           "type": "frame",
+          "id": "idtD4",
+          "name": "08 · КОМПОНЕНТНЫЕ РАЗМЕРЫ — ВНЕ ТИРОВ",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 32,
+          "children": [
+            {
+              "type": "frame",
+              "id": "QkTVu",
+              "name": "Заголовок секции",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 14,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "I6KDp",
+                  "name": "Титул",
+                  "gap": 18,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "m7qJYG",
+                      "name": "Номер",
+                      "fill": "$pk-accent",
+                      "content": "08",
+                      "fontFamily": "$pk-font-body",
+                      "fontSize": 15,
+                      "fontWeight": "normal",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "tL0ei",
+                      "name": "Название",
+                      "fill": "$pk-fg-strong",
+                      "content": "КОМПОНЕНТНЫЕ РАЗМЕРЫ — ВНЕ ТИРОВ",
+                      "fontFamily": "$pk-font-display",
+                      "fontSize": "$pk-t-section",
+                      "fontWeight": "normal",
+                      "letterSpacing": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "ALFmq",
+                  "name": "Линия",
+                  "fill": "$pk-hairline",
+                  "width": "fill_container",
+                  "height": 1
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "Nhasw",
+              "name": "Пояснение",
+              "fill": "$pk-fg-dim",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Эти значения в макетах — литералы, а не тир-переменные: они одинаковы на всех десктоп-тирах (мобильные пары — с суффиксом -mob). Используют листинг проектов и «Обо мне».",
+              "lineHeight": 1.45,
+              "fontFamily": "$pk-font-body",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "Xjgul",
+              "name": "Колонки",
+              "width": "fill_container",
+              "gap": 48,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "i5CP5T",
+                  "name": "ТИПОГРАФИКА",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "CT1ne",
+                      "name": "Шапка",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        0,
+                        0,
+                        12,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "YbXyc",
+                          "name": "Текст",
+                          "fill": "$pk-fg-muted",
+                          "content": "ТИПОГРАФИКА",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 13,
+                          "fontWeight": "600",
+                          "letterSpacing": 0.8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "CA6hq",
+                      "name": "--t-lead",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "S9hBKv",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "J5bYU",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--t-lead",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "FLO7n",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "подзаголовок hero, описание раздела",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "TV3hr",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "18px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "IKBrz",
+                      "name": "--t-desc",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "hozNN",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "GMzXX",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--t-desc",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "opkQR",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "описание секции, карточки, буллеты",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "DgNmb",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "16px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "b3lHlt",
+                      "name": "--t-overline",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "N8RZJ",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Rdtmh",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--t-overline",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "qxShS",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "оверлайны «// …»",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "ZsnpZ",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "15px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "aHEzD",
+                      "name": "--t-label",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "L3N6vT",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "JaeVT",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--t-label",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "NEuIK",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "роль в опыте, вуз в образовании",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "y2bpU",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "15px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "OrPKf",
+                      "name": "--t-chip",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "yVrX9",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "O96qo",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--t-chip",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "S1mVH",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "чипы, ссылки-действия, кнопки",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "OBxhH",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "14px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "N810GD",
+                      "name": "--t-meta",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Ckmto",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "u27ZzC",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--t-meta",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "FjxZ0",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "мета-строки, крошки, бейджи",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "qyFef",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "13px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "idxig",
+                      "name": "--tile-caption",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "ueEVk",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "aySlw",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--tile-caption",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "auX2F",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "пилюля-подпись hero-тайла витрины",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "TZTJI",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "12px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "aKP0t",
+                      "name": "--t-projects-hero",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "jBCJO",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "jD08I",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--t-projects-hero",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "FiIm0",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "титул «ПРОЕКТЫ» (тировый: 100/72/56)",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "YVypN",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "100px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "mQiSD",
+                  "name": "ПАДДИНГИ И РАЗМЕРЫ",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "xncYL",
+                      "name": "Шапка",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        0,
+                        0,
+                        12,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "NPh0U",
+                          "name": "Текст",
+                          "fill": "$pk-fg-muted",
+                          "content": "ПАДДИНГИ И РАЗМЕРЫ",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 13,
+                          "fontWeight": "600",
+                          "letterSpacing": 0.8
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "LpsNm",
+                      "name": "--chip-h",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "khGYh",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "w8VgrV",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--chip-h",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "t4KP5",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "чип / пилюля навыка — высота",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "FE9xJ",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "39px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "c9CwG",
+                      "name": "--chip-pad-x",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Z2SGPn",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "ocZwk",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--chip-pad-x",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "b0mqL",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "его паддинг по горизонтали",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "t0jaS9",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "16px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "T7nPAR",
+                      "name": "--chip-h-mob",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "z87yZW",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "DLjtF",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--chip-h-mob",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "c7clUG",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "то же на мобайле",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "i8ELU",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "37px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "NtRA6",
+                      "name": "--chip-pad-x-mob",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Fpian",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "K0aSgc",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--chip-pad-x-mob",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "Q0MaR3",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "его паддинг по X на мобайле",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "xF12d",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "14px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "VTgmr",
+                      "name": "--badge-h",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "onYOW",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "uPJn6",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--badge-h",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "gwZWi",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "бейдж в hairline-рамке — высота",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "xGF1d",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "29px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "M5Sn7",
+                      "name": "--badge-pad-x",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "nceIe",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "e3sLCP",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--badge-pad-x",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "jG0ao",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "его паддинг по горизонтали",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "pMH9d",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "12px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "q4YBX",
+                      "name": "--badge-h-mob",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "aMF7w",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "oKWpG",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--badge-h-mob",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "Le6l8",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "то же на мобайле",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "WhVdM",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "24px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "fiub9",
+                      "name": "--badge-pad-x-mob",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Zpufa",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "h6T0J",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--badge-pad-x-mob",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "xRMMI",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "его паддинг по X на мобайле",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "g3EVs",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "10px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "i50BbQ",
+                      "name": "--cta-btn-pad",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "G8b2y",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "GkJcQ",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--cta-btn-pad",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "SnXeF",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "кнопка «НАПИСАТЬ В TELEGRAM»",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "T6Vy5O",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "14 × 28",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "g0xEL",
+                      "name": "--cta-btn-h-mob",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "pjK4E",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "MkyEY",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--cta-btn-h-mob",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "d1BNIh",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "та же кнопка на мобайле, во всю ширину",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "R7WIXk",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "52px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ZAQ5Y",
+                      "name": "--load-more-gap-mob",
+                      "width": "fill_container",
+                      "stroke": "$pk-hairline-soft",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "strokeLinejoin": "round",
+                      "padding": [
+                        11,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "LX2Lo",
+                          "name": "Метка",
+                          "layout": "vertical",
+                          "gap": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "JqCxP",
+                              "name": "Имя",
+                              "fill": "$pk-fg",
+                              "content": "--load-more-gap-mob",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "ChOXg",
+                              "name": "Роль",
+                              "fill": "$pk-fg-dim",
+                              "content": "зазор над «Показать ещё»",
+                              "fontFamily": "$pk-font-body",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "MAWLe",
+                          "name": "Значение",
+                          "fill": "$pk-fg-strong",
+                          "content": "20px",
+                          "fontFamily": "$pk-font-body",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
           "id": "I38iX",
           "name": "Подвал",
           "width": "fill_container",
@@ -7277,6 +8587,7 @@
           "strokeWidth": {
             "top": 1
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 16,
           "padding": [
@@ -7340,6 +8651,7 @@
           "strokeWidth": {
             "bottom": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "padding": [
             0,
             "$pk-gutter"
@@ -7919,6 +9231,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 32,
           "padding": [
@@ -8232,6 +9545,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 32,
           "padding": [
@@ -8537,6 +9851,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 32,
           "padding": [
@@ -8676,6 +9991,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 32,
           "padding": [
@@ -8823,6 +10139,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 32,
           "padding": [
@@ -9115,6 +10432,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 36,
           "padding": [
@@ -9201,6 +10519,7 @@
               "strokeWidth": {
                 "top": "$pk-stroke-hairline"
               },
+              "strokeLinejoin": "round",
               "padding": [
                 20,
                 0
@@ -9289,6 +10608,7 @@
           "strokeWidth": {
             "bottom": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "padding": [
             0,
             "$pk-gutter"
@@ -9412,6 +10732,7 @@
           "strokeWidth": {
             "bottom": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "padding": [
             16,
             "$pk-gutter"
@@ -10074,6 +11395,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 36,
           "padding": [
@@ -10160,6 +11482,7 @@
               "strokeWidth": {
                 "top": "$pk-stroke-hairline"
               },
+              "strokeLinejoin": "round",
               "padding": [
                 20,
                 0
@@ -10286,6 +11609,7 @@
           "strokeWidth": {
             "bottom": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "gap": 10,
           "padding": [
             0,
@@ -10325,6 +11649,7 @@
           "strokeWidth": {
             "bottom": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "padding": [
             0,
             "$pk-mob-pad"
@@ -10813,6 +12138,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 18,
           "padding": [
@@ -11054,6 +12380,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 18,
           "padding": [
@@ -11270,6 +12597,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 18,
           "padding": [
@@ -11437,6 +12765,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 18,
           "padding": [
@@ -11595,6 +12924,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 18,
           "padding": [
@@ -11898,6 +13228,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 24,
           "padding": [
@@ -11975,6 +13306,7 @@
               "strokeWidth": {
                 "top": "$pk-stroke-hairline"
               },
+              "strokeLinejoin": "round",
               "layout": "vertical",
               "gap": 10,
               "padding": [
@@ -12050,6 +13382,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "padding": [
             0,
@@ -12162,6 +13495,7 @@
           "strokeWidth": {
             "bottom": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "gap": 10,
           "padding": [
             0,
@@ -12200,6 +13534,7 @@
           "strokeWidth": {
             "bottom": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "gap": 8,
           "padding": [
             12,
@@ -12744,6 +14079,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 24,
           "padding": [
@@ -12821,6 +14157,7 @@
               "strokeWidth": {
                 "top": "$pk-stroke-hairline"
               },
+              "strokeLinejoin": "round",
               "layout": "vertical",
               "gap": 10,
               "padding": [
@@ -12896,6 +14233,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "padding": [
             0,
@@ -13008,6 +14346,7 @@
           "strokeWidth": {
             "bottom": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "padding": [
             0,
             "$pk-gutter"
@@ -13469,6 +14808,7 @@
                   "strokeWidth": {
                     "top": "$pk-stroke-hairline"
                   },
+                  "strokeLinejoin": "round",
                   "padding": [
                     18,
                     0,
@@ -13574,6 +14914,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 36,
           "padding": [
@@ -14064,6 +15405,7 @@
                   "strokeWidth": {
                     "top": "$pk-stroke-hairline"
                   },
+                  "strokeLinejoin": "round",
                   "gap": 64,
                   "padding": [
                     36,
@@ -14453,6 +15795,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 36,
           "padding": [
@@ -14601,6 +15944,7 @@
                       "strokeWidth": {
                         "top": "$pk-stroke-hairline"
                       },
+                      "strokeLinejoin": "round",
                       "layout": "vertical",
                       "gap": 10,
                       "padding": [
@@ -14672,6 +16016,7 @@
                       "strokeWidth": {
                         "top": "$pk-stroke-hairline"
                       },
+                      "strokeLinejoin": "round",
                       "padding": [
                         14,
                         0,
@@ -14719,6 +16064,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 36,
           "padding": [
@@ -14808,6 +16154,7 @@
               "strokeWidth": {
                 "top": "$pk-stroke-hairline"
               },
+              "strokeLinejoin": "round",
               "padding": [
                 20,
                 0
@@ -14896,6 +16243,7 @@
           "strokeWidth": {
             "bottom": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "gap": 10,
           "padding": [
             0,
@@ -14904,12 +16252,13 @@
           "alignItems": "center",
           "children": [
             {
-              "type": "rectangle",
-              "id": "f8a3PU",
-              "name": "Mark",
-              "fill": "$pk-accent",
-              "width": 10,
-              "height": 10
+              "type": "path",
+              "id": "EzsjH",
+              "rotation": 0.2078761535114671,
+              "geometry": "M3.788 0l-3.788 0 0 3.166 3.788 0 0-3.166z m0 3.166l-3.788 0 0 3.166 3.788 0 0-3.166z m0 3.168l-3.788 0 0 3.166 3.788 0 0-3.166z m0 3.166l-3.788 0 0 3.167 3.788 0 0-3.167z m0 3.167l-3.788 0 0 3.166 3.788 0 0-3.166z m3.789-9.501l-3.787 0 0 3.166 3.788 0-0.001-3.166z m0 3.168l-3.787 0 0 3.166 3.788 0-0.001-3.166z m0 3.166l-3.787 0 0 3.167 3.788 0-0.001-3.167z m3.79-3.166l-3.789 0 0 3.166 3.789 0 0-3.166z m-0.022 6.333l-3.746 0c-0.012 0-0.02-0.009-0.02-0.018l0-3.129q0.002-0.017 0.02-0.018l3.746 0q0.019 0.002 0.02 0.017l0 3.131c0.002 0.01-0.008 0.018-0.02 0.018m3.789-1.585l-3.746 0q-0.019-0.002-0.02-0.017l0-3.131q0.002-0.016 0.02-0.018l3.746 0c0.012 0 0.02 0.009 0.02 0.018l0 3.13c0 0.01-0.01 0.018-0.02 0.018m-7.557 1.584l-3.787 0 0 3.166 3.788 0-0.001-3.166z m-3.789 3.167l-3.788 0 0 3.166 3.788 0 0-3.166z",
+              "fill": "#A62323",
+              "width": 15.154001235961914,
+              "height": 19
             },
             {
               "type": "text",
@@ -14935,6 +16284,7 @@
           "strokeWidth": {
             "bottom": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "padding": [
             0,
             "$pk-mob-pad"
@@ -15000,10 +16350,7 @@
             {
               "type": "frame",
               "id": "EQFau",
-              "x": 22,
-              "y": 32,
               "name": "Title Row",
-              "enabled": false,
               "gap": 10,
               "alignItems": "end",
               "children": [
@@ -15018,28 +16365,6 @@
                   "fontSize": "$pk-t-section-mob",
                   "fontWeight": "500",
                   "letterSpacing": 1
-                },
-                {
-                  "type": "frame",
-                  "id": "E1yZln",
-                  "name": "Dot Wrap",
-                  "layout": "vertical",
-                  "padding": [
-                    0,
-                    0,
-                    6,
-                    0
-                  ],
-                  "children": [
-                    {
-                      "type": "rectangle",
-                      "id": "STukl",
-                      "name": "Red Square",
-                      "fill": "$pk-accent",
-                      "width": 12,
-                      "height": 12
-                    }
-                  ]
                 }
               ]
             },
@@ -15319,90 +16644,6 @@
         },
         {
           "type": "frame",
-          "id": "kRLHG",
-          "name": "Photo Block",
-          "width": "fill_container",
-          "layout": "vertical",
-          "padding": [
-            0,
-            "$pk-mob-pad",
-            24,
-            "$pk-mob-pad"
-          ],
-          "children": [
-            {
-              "type": "frame",
-              "id": "YbNkC",
-              "name": "Photo Crop",
-              "clip": true,
-              "width": "fill_container",
-              "height": 294,
-              "justifyContent": "center",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "Bm7mN",
-                  "name": "Photo Slot",
-                  "width": 368,
-                  "height": 631,
-                  "fill": {
-                    "type": "image",
-                    "enabled": true,
-                    "url": "src/assets/photo-masked-1-full.webp",
-                    "mode": "fit"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "BVnDT",
-              "x": 22,
-              "y": 754,
-              "name": "Photo Caption",
-              "enabled": false,
-              "width": "fill_container(346)",
-              "stroke": "$pk-hairline",
-              "strokeWidth": {
-                "top": "$pk-stroke-hairline"
-              },
-              "padding": [
-                12,
-                0,
-                0,
-                0
-              ],
-              "justifyContent": "space_between",
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "qj82f",
-                  "name": "Cap Name",
-                  "fill": "$pk-fg-strong",
-                  "content": "КРИСТИНА — АВТОР PROKSION",
-                  "fontFamily": "$pk-font-body",
-                  "fontSize": "$pk-t-small-mob",
-                  "fontWeight": "700",
-                  "letterSpacing": 1
-                },
-                {
-                  "type": "text",
-                  "id": "MD3sW",
-                  "name": "Cap Meta",
-                  "fill": "$pk-fg-dim",
-                  "content": "ГРАФИКА · SMM · UI",
-                  "fontFamily": "$pk-font-body",
-                  "fontSize": "$pk-t-small-mob",
-                  "fontWeight": "normal",
-                  "letterSpacing": 1
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
           "id": "rMiYe",
           "x": 0,
           "y": 765,
@@ -15426,6 +16667,7 @@
               "strokeWidth": {
                 "top": "$pk-stroke-hairline"
               },
+              "strokeLinejoin": "round",
               "layout": "vertical",
               "gap": 12,
               "padding": [
@@ -15499,6 +16741,89 @@
         },
         {
           "type": "frame",
+          "id": "kRLHG",
+          "name": "Photo Block",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            0,
+            "$pk-mob-pad"
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "YbNkC",
+              "name": "Photo Crop",
+              "clip": true,
+              "width": "fill_container",
+              "height": 294,
+              "justifyContent": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Bm7mN",
+                  "name": "Photo Slot",
+                  "width": 368,
+                  "height": 631,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "src/assets/photo-masked-1-full.webp",
+                    "mode": "fit"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "BVnDT",
+              "x": 22,
+              "y": 754,
+              "name": "Photo Caption",
+              "enabled": false,
+              "width": "fill_container(346)",
+              "stroke": "$pk-hairline",
+              "strokeWidth": {
+                "top": "$pk-stroke-hairline"
+              },
+              "strokeLinejoin": "round",
+              "padding": [
+                12,
+                0,
+                0,
+                0
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "qj82f",
+                  "name": "Cap Name",
+                  "fill": "$pk-fg-strong",
+                  "content": "КРИСТИНА — АВТОР PROKSION",
+                  "fontFamily": "$pk-font-body",
+                  "fontSize": "$pk-t-small-mob",
+                  "fontWeight": "700",
+                  "letterSpacing": 1
+                },
+                {
+                  "type": "text",
+                  "id": "MD3sW",
+                  "name": "Cap Meta",
+                  "fill": "$pk-fg-dim",
+                  "content": "ГРАФИКА · SMM · UI",
+                  "fontFamily": "$pk-font-body",
+                  "fontSize": "$pk-t-small-mob",
+                  "fontWeight": "normal",
+                  "letterSpacing": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
           "id": "oGO37",
           "name": "Section 01 Опыт",
           "width": "fill_container",
@@ -15506,6 +16831,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 18,
           "padding": [
@@ -16008,6 +17334,7 @@
                   "strokeWidth": {
                     "top": "$pk-stroke-hairline"
                   },
+                  "strokeLinejoin": "round",
                   "layout": "vertical",
                   "gap": 8,
                   "padding": [
@@ -16379,6 +17706,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 18,
           "padding": [
@@ -16521,6 +17849,7 @@
                   "strokeWidth": {
                     "top": "$pk-stroke-hairline"
                   },
+                  "strokeLinejoin": "round",
                   "layout": "vertical",
                   "gap": 6,
                   "padding": [
@@ -16594,6 +17923,7 @@
                   "strokeWidth": {
                     "top": "$pk-stroke-hairline"
                   },
+                  "strokeLinejoin": "round",
                   "padding": [
                     12,
                     0,
@@ -16667,6 +17997,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "gap": 24,
           "padding": [
@@ -16747,6 +18078,7 @@
               "strokeWidth": {
                 "top": "$pk-stroke-hairline"
               },
+              "strokeLinejoin": "round",
               "layout": "vertical",
               "gap": 10,
               "padding": [
@@ -16822,6 +18154,7 @@
           "strokeWidth": {
             "top": "$pk-stroke-hairline"
           },
+          "strokeLinejoin": "round",
           "layout": "vertical",
           "padding": [
             0,
