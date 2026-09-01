@@ -14,6 +14,7 @@ import { useInfiniteWorks } from '../../api/useInfiniteWorks'
 import { useTags } from '../../api/useTags'
 import type { CategoryNav, FeaturedSection, FeaturedWork, Tile } from '../../api/types'
 import { CountBadge } from '../shared/CountBadge'
+import { TileImage } from '../TileImage'
 import { FilterChip } from '../shared/FilterChip'
 import { categoryHref, tagHref, workHref } from '../../lib/links'
 import { cardWorks, chunk, isDenseStrip, splitShowcase, stripWorks } from '../../lib/showcase'
@@ -76,18 +77,12 @@ function Slot({ work, className, eager = false, caption = false }: SlotProps) {
       aria-label={work.title ?? 'Открыть работу'}
       data-test="showcase-slot"
     >
-      <picture className={styles.slotPicture}>
-        <source type="image/avif" srcSet={work.variants.avif} />
-        <source type="image/webp" srcSet={work.variants.webp} />
-        <img
-          src={work.variants.jpg}
-          alt=""
-          loading={eager ? 'eager' : 'lazy'}
-          decoding="async"
-          className={styles.slotImg}
-          {...(eager ? { fetchpriority: 'high' } : {})}
-        />
-      </picture>
+      <TileImage
+        variants={work.variants}
+        className={styles.slotPicture}
+        imgClassName={styles.slotImg}
+        eager={eager}
+      />
       {caption && work.title && (
         <span className={styles.caption} data-test="showcase-caption">
           {work.title}
@@ -100,7 +95,7 @@ function Slot({ work, className, eager = false, caption = false }: SlotProps) {
 function SlotSkeleton({ className }: { className?: string }) {
   return (
     <div
-      className={`${styles.slot}${className ? ` ${className}` : ''}`}
+      className={`${styles.slot} ${styles.fillSkeleton}${className ? ` ${className}` : ''}`}
       data-test="showcase-slot-skeleton"
       aria-hidden="true"
     />
@@ -335,19 +330,13 @@ function TileGrid({ tiles, eager }: { tiles: Tile[]; eager: boolean }) {
               aria-label={t.title ?? 'Открыть работу'}
               data-test="projects-tile"
             >
-              <picture className={styles.tilePicture}>
-                <source type="image/avif" srcSet={t.variants.avif} />
-                <source type="image/webp" srcSet={t.variants.webp} />
-                <img
-                  src={t.variants.jpg}
-                  alt=""
-                  loading={isEager ? 'eager' : 'lazy'}
-                  decoding="async"
-                  className={styles.tileImg}
-                  style={{ aspectRatio: `${t.w} / ${t.h}` }}
-                  {...(isEager ? { fetchpriority: 'high' } : {})}
-                />
-              </picture>
+              <TileImage
+                variants={t.variants}
+                className={styles.tilePicture}
+                imgClassName={styles.tileImg}
+                aspectRatio={`${t.w} / ${t.h}`}
+                eager={isEager}
+              />
             </Link>
           )
         })}
@@ -367,7 +356,7 @@ function TileSkeleton() {
         {SKELETON_HEIGHTS.map((h, i) => (
           <div
             key={i}
-            className={styles.tile}
+            className={`${styles.tile} ${styles.fillSkeleton}`}
             style={{ height: h }}
             data-test="projects-tile-skeleton"
             aria-hidden="true"

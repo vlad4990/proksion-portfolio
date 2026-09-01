@@ -298,6 +298,8 @@ export function WorkModal() {
                       ? { aspectRatio: String(ratio), backgroundImage: `url("${source?.src ?? ''}")` }
                       : undefined
                   }
+                  // Тон-подложка только пока картинки нет — под прозрачным PNG она бы дымила.
+                  {...(first ? {} : { 'data-placeholder': '' })}
                   data-test="work-first"
                 >
                   {first && (

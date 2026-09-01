@@ -249,7 +249,6 @@
   display: block;
   width: 100%;
   margin-bottom: var(--tile-gap);
-  background: var(--c-skeleton);
   text-decoration: none;
   outline: none;
   transition: transform 180ms var(--ease-out);
@@ -257,6 +256,17 @@
 
 .tilePicture {
   display: block; /* убирает inline-baseline зазор под картинкой */
+}
+
+/* Скелетон-тон ТОЛЬКО до загрузки: под PNG с прозрачным фоном он просвечивал бы сквозь
+   прозрачные зоны молочной дымкой (см. TileImage). */
+.tilePicture:not([data-loaded]) {
+  background: var(--c-skeleton);
+}
+
+/* Пустая заглушка-скелетон (тайл без картинки) — фон на самом блоке. */
+.fillSkeleton {
+  background: var(--c-skeleton);
 }
 
 .tileImg {

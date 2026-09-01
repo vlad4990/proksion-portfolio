@@ -90,10 +90,15 @@
 .firstBox {
   position: relative;
   z-index: 2; /* доп. картинки вылетают из-под первой */
-  background-color: var(--c-skeleton);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+/* Тон-подложка только пока самой картинки нет (data-атрибут ставит WorkModal): под
+   загруженным PNG с прозрачным фоном она просвечивала бы сквозь прозрачные зоны. */
+.firstBox[data-placeholder] {
+  background-color: var(--c-skeleton);
 }
 
 .restBox {
@@ -103,10 +108,15 @@
 .picture {
   display: block;
   width: 100%;
-  background-color: var(--c-skeleton); /* нейтральный тон (или thumb/LQIP) пока full грузится */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+/* Нейтральный тон (под thumb/LQIP) — только пока full грузится: после загрузки WorkImage
+   ставит `data-loaded`, и прозрачные зоны PNG остаются честно прозрачными. */
+.picture:not([data-loaded]) {
+  background-color: var(--c-skeleton);
 }
 
 .img {

@@ -240,7 +240,6 @@
   display: block;
   min-width: 0;
   overflow: hidden;
-  background: var(--c-skeleton);
   border-radius: var(--radius-tile);
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
@@ -377,7 +376,6 @@
   display: block;
   width: 100%;
   margin-bottom: var(--tile-gap-mob);
-  background: var(--c-skeleton);
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   transition: opacity var(--dur-base) var(--ease-out);
@@ -386,6 +384,24 @@
 .tilePicture {
   display: block; /* убирает inline-baseline зазор под картинкой */
 }
+
+/* Скелетон-тон ТОЛЬКО до загрузки: у работ бывают PNG с прозрачным фоном — оставленный
+   под ними тон просвечивал бы сквозь прозрачные зоны молочной дымкой (см. TileImage). */
+.tilePicture:not([data-loaded]) {
+  background: var(--c-skeleton);
+}
+
+/* Скелетон-тон ТОЛЬКО до загрузки: у работ бывают PNG с прозрачным фоном — оставленный
+   под ними тон просвечивал бы сквозь прозрачные зоны молочной дымкой (см. TileImage). */
+.slotPicture:not([data-loaded]) {
+  background: var(--c-skeleton);
+}
+
+/* Пустая заглушка-скелетон (тайл/слот без картинки) — фон на самом блоке. */
+.fillSkeleton {
+  background: var(--c-skeleton);
+}
+
 
 .tileImg {
   display: block;

@@ -280,7 +280,6 @@
   display: block;
   min-width: 0;
   overflow: hidden;
-  background: var(--c-skeleton);
   border-radius: var(--radius-tile);
   text-decoration: none;
   outline: none;
@@ -299,6 +298,12 @@
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* Скелетон-тон ТОЛЬКО до загрузки: у работ бывают PNG с прозрачным фоном — оставленный
+   под ними тон просвечивал бы сквозь прозрачные зоны молочной дымкой (см. TileImage). */
+.slotPicture:not([data-loaded]) {
+  background: var(--c-skeleton);
 }
 
 .slotImg {
@@ -449,7 +454,6 @@
   display: block;
   width: 100%;
   margin-bottom: var(--tile-gap);
-  background: var(--c-skeleton);
   text-decoration: none;
   outline: none;
   transition: transform 180ms var(--ease-out);
@@ -457,6 +461,16 @@
 
 .tilePicture {
   display: block; /* убирает inline-baseline зазор под картинкой */
+}
+
+/* Скелетон-тон ТОЛЬКО до загрузки (см. .slotPicture). */
+.tilePicture:not([data-loaded]) {
+  background: var(--c-skeleton);
+}
+
+/* Пустая заглушка-скелетон (тайл/слот без картинки) — фон на самом блоке. */
+.fillSkeleton {
+  background: var(--c-skeleton);
 }
 
 .tileImg {

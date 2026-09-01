@@ -12,6 +12,7 @@ import { useCategory } from '../../api/useCategory'
 import { useInfiniteWorks } from '../../api/useInfiniteWorks'
 import type { CategoryDetail, Tile } from '../../api/types'
 import { CountBadge } from '../shared/CountBadge'
+import { TileImage } from '../TileImage'
 import { FilterChip } from '../shared/FilterChip'
 import { formatUpdated } from '../../lib/format'
 import { categoryHref, subcategoryHref, workHref } from '../../lib/links'
@@ -130,7 +131,7 @@ function tileSkeleton(height: number, key: string) {
   return (
     <div
       key={key}
-      className={styles.tile}
+      className={`${styles.tile} ${styles.fillSkeleton}`}
       style={{ height }}
       data-test="projects-tile-skeleton"
       aria-hidden="true"
@@ -158,19 +159,13 @@ function TileGrid({ tiles, loadingMore }: { tiles: Tile[]; loadingMore: boolean 
                 aria-label={t.title ?? 'Открыть работу'}
                 data-test="projects-tile"
               >
-                <picture className={styles.tilePicture}>
-                  <source type="image/avif" srcSet={t.variants.avif} />
-                  <source type="image/webp" srcSet={t.variants.webp} />
-                  <img
-                    src={t.variants.jpg}
-                    alt=""
-                    loading={eager ? 'eager' : 'lazy'}
-                    decoding="async"
-                    className={styles.tileImg}
-                    style={{ aspectRatio: `${t.w} / ${t.h}` }}
-                    {...(eager ? { fetchpriority: 'high' } : {})}
-                  />
-                </picture>
+                <TileImage
+                  variants={t.variants}
+                  className={styles.tilePicture}
+                  imgClassName={styles.tileImg}
+                  aspectRatio={`${t.w} / ${t.h}`}
+                  eager={eager}
+                />
               </Link>
             )
           }),
