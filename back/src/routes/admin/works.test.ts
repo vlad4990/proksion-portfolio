@@ -162,6 +162,55 @@ describe('admin works CRUD', () => {
     expect(ctx.repos.work.getById(work.id)?.seamless).toBe(0)
   })
 
+  // Флаг «карусель» (десктопная модалка): чекбокс админки → 0|1 в БД → boolean в контракте.
+  test('POST defaults carousel to 0; POST with carousel: true stores 1', async () => {
+    const off = (await (await post({ subcategory_id: subcategoryId, title: 'A' })).json()) as {
+      carousel: number
+    }
+    expect(off.carousel).toBe(0)
+    const on = (await (
+      await post({ subcategory_id: subcategoryId, title: 'B', carousel: true })
+    ).json()) as { carousel: number }
+    expect(on.carousel).toBe(1)
+  })
+
+  test('PATCH toggles carousel both ways and leaves it alone when omitted', async () => {
+    const work = (await (await post({ subcategory_id: subcategoryId, title: 'W' })).json()) as {
+      id: number
+    }
+    const patch = (body: unknown) =>
+      app.handle(
+        req(`/admin/works/${work.id}`, {
+          method: 'PATCH',
+          headers: jsonHeaders(),
+          body: JSON.stringify(body),
+        }),
+      )
+    expect(((await (await patch({ carousel: true })).json()) as { carousel: number }).carousel).toBe(1)
+    // Патч без флага не должен его сбрасывать
+    expect(
+      ((await (await patch({ title: 'Другое' })).json()) as { carousel: number }).carousel,
+    ).toBe(1)
+    expect(((await (await patch({ carousel: false })).json()) as { carousel: number }).carousel).toBe(
+      0,
+    )
+  })
+
+  test('a non-boolean carousel → 400', async () => {
+    const work = (await (await post({ subcategory_id: subcategoryId, title: 'W' })).json()) as {
+      id: number
+    }
+    const res = await app.handle(
+      req(`/admin/works/${work.id}`, {
+        method: 'PATCH',
+        headers: jsonHeaders(),
+        body: JSON.stringify({ carousel: 1 }),
+      }),
+    )
+    expect(res.status).toBe(400)
+    expect(ctx.repos.work.getById(work.id)?.carousel).toBe(0)
+  })
+
   test('DELETE cascades images', async () => {
     const work = (await (await post({ subcategory_id: subcategoryId, title: 'W' })).json()) as {
       id: number

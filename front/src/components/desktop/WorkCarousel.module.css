@@ -1,0 +1,164 @@
+/* WorkCarousel (desktop) — псевдо-карусель модалки работы (флаг `work.carousel`).
+   Центральный слайд по центру экрана, соседи виднеются у краёв под градиентным блюром
+   (у кромки слайда — резко, к краю экрана — максимум), поверх блюра — стрелки.
+   Brand-strict: токены, острые углы; блюр и стрелки — часть заказанного паттерна. */
+
+.stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--modal-edge-y) 0;
+  cursor: pointer; /* свободное поле закрывает */
+}
+
+/* Сцена слайдов: остаток высоты между полями edge-y и метой; края режут соседние слайды. */
+.viewport {
+  position: relative;
+  align-self: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Слайд: статическое центрирование — left/top 50% + отрицательные инлайн-марджины
+   (размеры слайда известны в JS). transform остаётся свободен под навигационный сдвиг
+   (CSS-transition, компоузер) и под WAAPI-полёты открытия/закрытия (lib/spring):
+   свойство `translate` для центрирования НЕ используем — связка «translate +
+   анимируемый transform» рядом с backdrop-filter рисуется Chrome с неверной геометрией. */
+.slide {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  transition: transform 480ms var(--ease-out);
+  cursor: default;
+}
+
+/* Соседний слайд: клик доводит карусель до него. */
+.slideSide {
+  cursor: pointer;
+}
+
+/* ── Градиентный блюр соседних слайдов ──────────────────────── */
+/* Поверх картинки соседа — ступени её же блюр-копии (BlurSlices в WorkCarousel.tsx):
+   вертикальные срезы с нарастающими к краю экрана радиусом и плотностью. Без mask-image
+   и backdrop-filter — Chrome рисует их с неверной геометрией (см. шапку WorkCarousel.tsx).
+   У центрального слайда оверлей гаснет (transition opacity) — блюр «сходит» с картинки
+   синхронно с её приездом в центр. */
+.blurCover {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 480ms var(--ease-out);
+}
+
+.blurCoverOff {
+  opacity: 0;
+}
+
+.blurSlice {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: block;
+  overflow: hidden;
+  transition: opacity 480ms var(--ease-out);
+}
+
+.blurPic {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  transition: filter 480ms var(--ease-out);
+}
+
+.blurPic img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Появление стрелки у границы диапазона (у краёв карусели её нет — неоткуда доехать). */
+@keyframes blur-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Стрелки: панель-квадрат поверх блюра, шеврон текущим цветом ─ */
+.nav {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-panel);
+  border: 0;
+  cursor: pointer;
+  color: var(--accent);
+  outline: none;
+  transition:
+    left 480ms var(--ease-out),
+    right 480ms var(--ease-out),
+    color 180ms var(--ease-out);
+  animation: blur-in 480ms var(--ease-out);
+}
+
+.nav:hover,
+.nav:focus-visible {
+  color: var(--fg-strong);
+}
+
+.nav:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.chevron {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+}
+
+.navNext .chevron {
+  transform: rotate(45deg) translate(-2px, 2px);
+}
+
+.navPrev .chevron {
+  transform: rotate(-135deg) translate(-2px, 2px);
+}
+
+/* ── Мета под слайдом ───────────────────────────────────────── */
+/* База — .meta модалки (панель/типографика); здесь — размеры под колонку stage:
+   фикс-ширина из токенов (не от слайда — ширина слайда меняется на каждом шаге),
+   длинное описание скроллится внутри, не съедая высоту сцены. */
+.stage .metaBox {
+  flex: none;
+  align-self: center;
+  width: min(calc(2 * var(--modal-meta-w)), calc(100vw - 2 * var(--modal-edge-x)));
+  max-height: 32dvh;
+  overflow-y: auto;
+  margin-top: var(--tile-gap);
+  cursor: default;
+}
+
+/* ── Крестик: в углу экрана (модалка-карусель занимает весь вьюпорт) ─ */
+.stage .closeBtn {
+  top: 28px;
+  right: 28px;
+}

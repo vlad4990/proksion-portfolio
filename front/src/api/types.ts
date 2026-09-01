@@ -148,6 +148,8 @@ export interface ImageDetail {
 
 /**
  * Полная работа: описание + упорядоченные картинки ленты + `seamless` (лента без зазоров) +
+ * `carousel` (десктоп: горизонтальная псевдо-карусель вместо вертикальной ленты; мобилка
+ * и работы с одной картинкой флаг игнорируют) +
  * `tag_ids` (id тегов работы; нужны админке для мультивыбора, фронту не мешают).
  */
 export interface WorkDetail {
@@ -161,6 +163,7 @@ export interface WorkDetail {
    * без зазора — для работ, нарезанных из одного макета.
    */
   seamless: boolean
+  carousel: boolean
   tag_ids: number[]
   images: ImageDetail[]
 }

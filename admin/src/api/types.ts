@@ -46,6 +46,8 @@ export interface WorkRow {
   featured_order: number | null
   /** «Единое полотно»: лента картинок в модалке без зазоров. Сырая строка БД → 0|1. */
   seamless: number
+  /** «Карусель»: десктопная модалка — горизонтальная карусель вместо ленты. Сырая строка БД → 0|1. */
+  carousel: number
   created_at: string
   updated_at: string
 }
@@ -187,6 +189,8 @@ export interface WorkDetail {
   cover_image_id: number | null
   /** «Единое полотно»: лента картинок в модалке идёт стык-в-стык (публичный контракт — boolean). */
   seamless: boolean
+  /** «Карусель»: десктопная модалка — горизонтальная карусель вместо ленты (boolean). */
+  carousel: boolean
   tag_ids: number[]
   images: ImageDetail[]
 }

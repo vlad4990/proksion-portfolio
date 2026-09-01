@@ -137,6 +137,7 @@ CREATE TABLE work (
   cover_image_id INTEGER REFERENCES image(id) ON DELETE SET NULL,  -- thumb листинга
   sort_order     INTEGER NOT NULL DEFAULT 0,
   -- + seamless (0|1) из миграции 0003 — лента картинок в модалке без зазоров
+  -- + carousel (0|1) из миграции 0004 — десктопная модалка-карусель вместо ленты
   created_at     TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at     TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE (subcategory_id, slug)
@@ -185,6 +186,17 @@ CHECK `seamless IN (0,1)` — SQLite без BOOLEAN): лента картино�
 **стык-в-стык, без зазора** `--tile-gap`. Нужен для работ, которые сами являются нарезкой
 одного макета (кейсы, лонгриды) — зазор рвал бы картинку. Наружу поле уходит уже как
 `boolean` (`WorkDetail.seamless`), в админке это чекбокс в диалоге работы.
+
+### Флаг «карусель» (миграция `0004`)
+
+`0004_work_carousel.sql` добавляет **`work.carousel`** (`INTEGER NOT NULL DEFAULT 0`,
+CHECK `carousel IN (0,1)`): десктопная модалка работы показывает картинки **горизонтальной
+псевдо-каруселью** (центральный слайд + соседи в градиентном блюре у краёв экрана, стрелки,
+навигация колесом/свайпом/кликом) вместо вертикальной ленты. Нужен работам, где картинки
+после главной сильно ниже её — в ленте ширину задаёт первая картинка, и низкие широкие
+картинки выглядели мелкими. Действует только на десктопе и только при 2+ картинках
+(мобилка и работы с одной картинкой рендерят ленту как раньше). Наружу — `boolean`
+(`WorkDetail.carousel`), в админке — чекбокс «Карусель на десктопе» в диалоге работы.
 
 ### Слаги
 
@@ -314,8 +326,9 @@ Caddy срезает префикс `/api` (`handle_path /api/*` в корнев
   `tag` комбинируются; неизвестный слаг фильтра → пустая страница `total: 0` (не 404).
   Лимит: дефолт **24** (порция инфинити-скролла), максимум 100.
 - Детали работы (`/works/:cat/:sub/:work`, `/works/by-id/:id`) несут `tag_ids: number[]`
-  (мультивыбор тегов в админке) и `seamless: boolean` (лента картинок без зазоров —
-  0|1 в БД разворачивается в honest boolean, см. миграцию `0003`).
+  (мультивыбор тегов в админке), `seamless: boolean` (лента картинок без зазоров —
+  0|1 в БД разворачивается в honest boolean, см. миграцию `0003`) и `carousel: boolean`
+  (десктопная модалка-карусель, миграция `0004`).
 
 Агрегаты и листинги живут в `back/src/queries.ts` (слой SQL-чтений поверх CRUD-репозиториев);
 сериализаторы форм — `back/src/dto.ts`, зеркала типов — `front/src/api/types.ts` и
@@ -331,7 +344,7 @@ Caddy срезает префикс `/api` (`handle_path /api/*` в корнев
 | POST/PATCH/DELETE| `/admin/categories[/:id]`              | CRUD категорий; PATCH принимает и контент секции: `kicker`, `meta_role`, `period`, `description_long` (string\|null) и `display_variant` (`showcase`\|`strip`\|`cards`, иначе 400) |
 | PATCH            | `/admin/categories/:id/featured`       | `{work_ids:[…]}` — кураторская витрина секции: порядок массива = `featured_order` (0 = hero), работы категории вне списка → NULL, пустой массив очищает витрину. Чужая/несуществующая работа или дубликаты → 400 |
 | POST/PATCH/DELETE| `/admin/subcategories[/:id]`           | CRUD подкатегорий                           |
-| POST/PATCH/DELETE| `/admin/works[/:id]`                   | CRUD работ (title/description/cover/order); POST и PATCH принимают `seamless?: boolean` («единое полотно» — лента картинок без зазоров; не-boolean → 400, опущенный флаг на PATCH не сбрасывается); PATCH принимает `tag_ids?: number[]` — полная замена набора тегов (несуществующий id → 400, работа не изменена) |
+| POST/PATCH/DELETE| `/admin/works[/:id]`                   | CRUD работ (title/description/cover/order); POST и PATCH принимают `seamless?: boolean` («единое полотно» — лента картинок без зазоров) и `carousel?: boolean` (десктопная модалка-карусель; для обоих: не-boolean → 400, опущенный флаг на PATCH не сбрасывается); PATCH принимает `tag_ids?: number[]` — полная замена набора тегов (несуществующий id → 400, работа не изменена) |
 | POST             | `/admin/works/:id/images`              | multipart-загрузка → пайплайн §6 → MinIO+БД |
 | PATCH/DELETE     | `/admin/images/:id`                    | alt/порядок/удаление                        |
 | POST/PATCH/DELETE| `/admin/tags[/:id]`                    | CRUD тегов-фильтров (`{title*, slug?, sort_order?}`); слаг уникален глобально, удаление каскадит `work_tag` |

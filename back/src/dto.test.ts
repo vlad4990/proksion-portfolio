@@ -26,6 +26,7 @@ function makeWork(over: Partial<Work> = {}): Work {
     sort_order: 0,
     featured_order: null,
     seamless: 0,
+    carousel: 0,
     created_at: 't',
     updated_at: 't',
     ...over,
@@ -173,6 +174,11 @@ describe('toWorkDetail', () => {
   test('seamless: 0|1 из БД → boolean в контракте', () => {
     expect(toWorkDetail(makeWork({ seamless: 0 }), [], []).seamless).toBe(false)
     expect(toWorkDetail(makeWork({ seamless: 1 }), [], []).seamless).toBe(true)
+  })
+
+  test('carousel: 0|1 из БД → boolean в контракте', () => {
+    expect(toWorkDetail(makeWork({ carousel: 0 }), [], []).carousel).toBe(false)
+    expect(toWorkDetail(makeWork({ carousel: 1 }), [], []).carousel).toBe(true)
   })
 })
 

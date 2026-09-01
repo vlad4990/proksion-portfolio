@@ -69,6 +69,18 @@ describe('workRepo', () => {
     expect(repo.create({ subcategory_id: subId, slug: 'w', seamless: 1 }).seamless).toBe(1)
   })
 
+  test('carousel: create defaults to 0, update toggles the flag both ways', () => {
+    const w = repo.create({ subcategory_id: subId, slug: 'w' })
+    expect(w.carousel).toBe(0)
+    expect(repo.update(w.id, { carousel: 1 })?.carousel).toBe(1)
+    expect(repo.getById(w.id)?.carousel).toBe(1)
+    expect(repo.update(w.id, { carousel: 0 })?.carousel).toBe(0)
+  })
+
+  test('carousel: create can turn the flag on right away', () => {
+    expect(repo.create({ subcategory_id: subId, slug: 'w', carousel: 1 }).carousel).toBe(1)
+  })
+
   test('create leaves the work out of the showcase (featured_order = NULL)', () => {
     expect(repo.create({ subcategory_id: subId, slug: 'w' }).featured_order).toBeNull()
   })

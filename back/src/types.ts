@@ -47,6 +47,12 @@ export interface Work {
    * отдаётся уже как `boolean`.
    */
   seamless: number
+  /**
+   * «Карусель»: десктопная модалка показывает картинки горизонтальной псевдо-каруселью
+   * (центральный слайд + соседи в блюре у краёв экрана) вместо вертикальной ленты
+   * (миграция 0004). Мобилка флаг игнорирует. Хранится как 0|1, в публичном DTO — boolean.
+   */
+  carousel: number
   created_at: string
   updated_at: string
 }
@@ -120,10 +126,12 @@ export interface NewWork {
   sort_order?: number
   /** 0|1; по умолчанию 0 — лента картинок с зазором. */
   seamless?: number
+  /** 0|1; по умолчанию 0 — вертикальная лента (карусель на десктопе выключена). */
+  carousel?: number
 }
 /** `featured_order` сюда НЕ входит: витрина меняется только через `workRepo.setFeatured`. */
 export type WorkPatch = Partial<
-  Pick<Work, 'slug' | 'title' | 'description' | 'cover_image_id' | 'sort_order' | 'seamless'>
+  Pick<Work, 'slug' | 'title' | 'description' | 'cover_image_id' | 'sort_order' | 'seamless' | 'carousel'>
 >
 
 export interface NewTag {

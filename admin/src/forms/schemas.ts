@@ -58,12 +58,16 @@ export type TagFormValues = z.infer<typeof tagSchema>
  * Работа: название необязательно (слаг сгенерится из него или из явного slug).
  * `seamless` — чекбокс «единое полотно»: лента картинок в модалке идёт стык-в-стык,
  * без зазоров (для работ, которые сами являются нарезкой одного макета).
+ * `carousel` — чекбокс «карусель»: десктопная модалка показывает картинки горизонтальной
+ * псевдо-каруселью вместо вертикальной ленты (для работ, где картинки после главной сильно
+ * ниже её); мобилка и работы с одной картинкой флаг игнорируют.
  */
 export const workSchema = z.object({
   title: z.string().trim(),
   slug: z.string().trim(),
   description: z.string(),
   seamless: z.boolean(),
+  carousel: z.boolean(),
 })
 export type WorkFormValues = z.infer<typeof workSchema>
 
@@ -128,27 +132,29 @@ export const toSubcategoryInput = (
   categoryId: number,
 ): SubcategoryInput => ({ category_id: categoryId, ...toNamedEntityPayload(values) })
 
-/** Работа на create: `{ subcategory_id, title|null, slug?, description, seamless }`. */
+/** Работа на create: `{ subcategory_id, title|null, slug?, description, seamless, carousel }`. */
 export function toWorkInput(values: WorkFormValues, subcategoryId: number): WorkInput {
   const input: WorkInput = {
     subcategory_id: subcategoryId,
     title: emptyToNull(values.title),
     description: emptyToNull(values.description),
     seamless: values.seamless,
+    carousel: values.carousel,
   }
   if (values.slug !== '') input.slug = values.slug
   return input
 }
 
 /**
- * Работа на patch: `{ title|null, slug?, description, seamless }` (cover/order меняются отдельно).
- * `seamless` уходит всегда — чекбокс всегда имеет определённое значение.
+ * Работа на patch: `{ title|null, slug?, description, seamless, carousel }` (cover/order
+ * меняются отдельно). Флаги уходят всегда — чекбоксы всегда имеют определённое значение.
  */
 export function toWorkPatch(values: WorkFormValues): WorkPatchInput {
   const patch: WorkPatchInput = {
     title: emptyToNull(values.title),
     description: emptyToNull(values.description),
     seamless: values.seamless,
+    carousel: values.carousel,
   }
   if (values.slug !== '') patch.slug = values.slug
   return patch
@@ -170,6 +176,7 @@ export function workDetailToValues(work: WorkDetail): WorkFormValues {
     slug: work.slug,
     description: work.description ?? '',
     seamless: work.seamless,
+    carousel: work.carousel,
   }
 }
 
@@ -196,5 +203,6 @@ export const emptyWork: WorkFormValues = {
   slug: '',
   description: '',
   seamless: false,
+  carousel: false,
 }
 export const emptyTag: TagFormValues = { title: '', slug: '' }

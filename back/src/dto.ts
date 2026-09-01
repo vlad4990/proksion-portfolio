@@ -92,6 +92,8 @@ export interface ImageDetail {
  * (`tag_ids` — мультивыбор тегов в админке, спека редизайна §5.5; фронту не мешает).
  * `seamless` — лента картинок идёт стык-в-стык, без зазора (миграция 0003): в БД это 0|1,
  * в контракте — честный `boolean`.
+ * `carousel` — десктопная модалка показывает картинки горизонтальной псевдо-каруселью
+ * вместо вертикальной ленты (миграция 0004, тоже 0|1 → boolean); мобилка флаг игнорирует.
  */
 export interface WorkDetail {
   id: number
@@ -100,6 +102,7 @@ export interface WorkDetail {
   description: string | null
   cover_image_id: number | null
   seamless: boolean
+  carousel: boolean
   tag_ids: number[]
   images: ImageDetail[]
 }
@@ -240,6 +243,7 @@ export function toWorkDetail(work: Work, images: Image[], tagIds: number[]): Wor
     description: work.description,
     cover_image_id: work.cover_image_id,
     seamless: work.seamless === 1,
+    carousel: work.carousel === 1,
     tag_ids: tagIds,
     images: images.map(toImageDetail),
   }

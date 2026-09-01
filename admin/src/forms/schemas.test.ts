@@ -40,14 +40,43 @@ describe('namedEntitySchema (категория/подкатегория)', () =
 
 describe('workSchema', () => {
   it('пустой title допустим (работа без названия)', () => {
-    const r = workSchema.safeParse({ title: '', slug: '', description: '', seamless: false })
+    const r = workSchema.safeParse({
+      title: '',
+      slug: '',
+      description: '',
+      seamless: false,
+      carousel: false,
+    })
     expect(r.success).toBe(true)
   })
 
   it('seamless обязателен и строго boolean (чекбокс всегда имеет значение)', () => {
-    expect(workSchema.safeParse({ title: '', slug: '', description: '' }).success).toBe(false)
     expect(
-      workSchema.safeParse({ title: '', slug: '', description: '', seamless: 'yes' }).success,
+      workSchema.safeParse({ title: '', slug: '', description: '', carousel: false }).success,
+    ).toBe(false)
+    expect(
+      workSchema.safeParse({
+        title: '',
+        slug: '',
+        description: '',
+        seamless: 'yes',
+        carousel: false,
+      }).success,
+    ).toBe(false)
+  })
+
+  it('carousel обязателен и строго boolean (чекбокс всегда имеет значение)', () => {
+    expect(
+      workSchema.safeParse({ title: '', slug: '', description: '', seamless: false }).success,
+    ).toBe(false)
+    expect(
+      workSchema.safeParse({
+        title: '',
+        slug: '',
+        description: '',
+        seamless: false,
+        carousel: 'yes',
+      }).success,
     ).toBe(false)
   })
 })
@@ -90,35 +119,51 @@ describe('toSubcategoryInput', () => {
 
 describe('toWorkInput / toWorkPatch', () => {
   it('create: title пустой → null, subcategory_id добавлен', () => {
-    expect(toWorkInput({ title: '', slug: '', description: '', seamless: false }, 3)).toEqual({
+    expect(
+      toWorkInput({ title: '', slug: '', description: '', seamless: false, carousel: false }, 3),
+    ).toEqual({
       subcategory_id: 3,
       title: null,
       description: null,
       seamless: false,
+      carousel: false,
     })
   })
   it('create: title/slug/description заданы', () => {
     expect(
-      toWorkInput({ title: 'Афиша', slug: 'afisha', description: 'd', seamless: false }, 3),
+      toWorkInput(
+        { title: 'Афиша', slug: 'afisha', description: 'd', seamless: false, carousel: false },
+        3,
+      ),
     ).toEqual({
       subcategory_id: 3,
       title: 'Афиша',
       slug: 'afisha',
       description: 'd',
       seamless: false,
+      carousel: false,
     })
   })
   it('patch: без subcategory_id', () => {
-    expect(toWorkPatch({ title: 'Афиша', slug: '', description: '', seamless: false })).toEqual({
+    expect(
+      toWorkPatch({ title: 'Афиша', slug: '', description: '', seamless: false, carousel: false }),
+    ).toEqual({
       title: 'Афиша',
       description: null,
       seamless: false,
+      carousel: false,
     })
   })
   it('«единое полотно»: чекбокс уходит и в create, и в patch', () => {
-    const values = { title: 'Полотно', slug: '', description: '', seamless: true }
+    const values = { title: 'Полотно', slug: '', description: '', seamless: true, carousel: false }
     expect(toWorkInput(values, 3).seamless).toBe(true)
     expect(toWorkPatch(values).seamless).toBe(true)
+  })
+
+  it('«карусель»: чекбокс уходит и в create, и в patch', () => {
+    const values = { title: 'Слайды', slug: '', description: '', seamless: false, carousel: true }
+    expect(toWorkInput(values, 3).carousel).toBe(true)
+    expect(toWorkPatch(values).carousel).toBe(true)
   })
 })
 
@@ -247,7 +292,7 @@ describe('entity → form', () => {
     ).toEqual({ title: 'T', slug: 's', description: '' })
   })
 
-  it('workDetailToValues: null title/description → пустые строки, seamless как есть', () => {
+  it('workDetailToValues: null title/description → пустые строки, флаги как есть', () => {
     const work: WorkDetail = {
       id: 1,
       slug: 'w',
@@ -255,6 +300,7 @@ describe('entity → form', () => {
       description: null,
       cover_image_id: null,
       seamless: false,
+      carousel: false,
       tag_ids: [],
       images: [],
     }
@@ -263,7 +309,9 @@ describe('entity → form', () => {
       slug: 'w',
       description: '',
       seamless: false,
+      carousel: false,
     })
     expect(workDetailToValues({ ...work, seamless: true }).seamless).toBe(true)
+    expect(workDetailToValues({ ...work, carousel: true }).carousel).toBe(true)
   })
 })

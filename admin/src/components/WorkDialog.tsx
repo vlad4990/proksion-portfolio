@@ -36,7 +36,8 @@ interface WorkDialogProps {
 
 /**
  * Диалог создания/редактирования работы: title (опц.), slug, описание (markdown + превью)
- * и чекбокс «единое полотно» (лента картинок в модалке без зазоров).
+ * и чекбоксы показа: «единое полотно» (лента картинок в модалке без зазоров) и «карусель»
+ * (десктопная модалка — горизонтальная карусель вместо вертикальной ленты).
  */
 export function WorkDialog({
   open,
@@ -148,6 +149,34 @@ export function WorkDialog({
                     <FormDescription>
                       Картинки в модалке идут стык-в-стык, без отступов — для работ,
                       нарезанных из одного макета.
+                    </FormDescription>
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="carousel"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start gap-3 space-y-0">
+                  <FormControl>
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 size-4 shrink-0 accent-foreground"
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                    />
+                  </FormControl>
+                  <div className="space-y-1">
+                    <FormLabel className="font-normal">Карусель на десктопе</FormLabel>
+                    <FormDescription>
+                      Вместо вертикальной ленты — горизонтальная карусель картинок
+                      (только десктоп, при двух и более картинках). Для работ, где
+                      картинки после главной сильно ниже её.
                     </FormDescription>
                     <FormMessage />
                   </div>

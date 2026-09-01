@@ -152,6 +152,8 @@ export interface WorkInput {
   description?: string | null
   /** «Единое полотно»: лента картинок в модалке без зазоров (по умолчанию false). */
   seamless?: boolean
+  /** «Карусель»: десктопная модалка — горизонтальная карусель вместо ленты (по умолчанию false). */
+  carousel?: boolean
 }
 
 export interface WorkPatchInput {
@@ -161,6 +163,8 @@ export interface WorkPatchInput {
   cover_image_id?: number | null
   /** «Единое полотно»: лента картинок в модалке без зазоров. */
   seamless?: boolean
+  /** «Карусель»: десктопная модалка — горизонтальная карусель вместо ленты. */
+  carousel?: boolean
   /** Полная замена набора тегов работы (редизайн §5.5): пустой массив снимает все теги. */
   tag_ids?: number[]
 }

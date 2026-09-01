@@ -66,6 +66,7 @@ describe('openDb — schema 0002 (теги, витрина, меты катег�
       '0001_init.sql',
       '0002_tags_featured_category_meta.sql',
       '0003_work_seamless.sql',
+      '0004_work_carousel.sql',
     ])
   })
 
@@ -215,6 +216,16 @@ describe('openDb — invariants (§3)', () => {
     expect(row?.seamless).toBe(0)
     expect(() => db.run('UPDATE work SET seamless = 1 WHERE id = 1')).not.toThrow()
     expect(() => db.run('UPDATE work SET seamless = 2 WHERE id = 1')).toThrow()
+  })
+
+  test('work.carousel defaults to 0 and accepts only 0/1', () => {
+    db.run("INSERT INTO category (id, slug, title) VALUES (1, 'c', 'C')")
+    db.run("INSERT INTO subcategory (id, category_id, slug, title) VALUES (1, 1, 's', 'S')")
+    db.run("INSERT INTO work (id, subcategory_id, slug) VALUES (1, 1, 'w')")
+    const row = db.query<{ carousel: number }, []>('SELECT carousel FROM work WHERE id = 1').get()
+    expect(row?.carousel).toBe(0)
+    expect(() => db.run('UPDATE work SET carousel = 1 WHERE id = 1')).not.toThrow()
+    expect(() => db.run('UPDATE work SET carousel = 2 WHERE id = 1')).toThrow()
   })
 
   test('re-opening the same file is idempotent (migrations already applied)', () => {

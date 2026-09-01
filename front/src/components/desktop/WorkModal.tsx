@@ -23,6 +23,7 @@ import { useFocusTrap } from '../../hooks/useFocusTrap'
 import { findLiveTile, getFlipSource, type FlipSource } from '../../lib/flip'
 import { fade, prefersReducedMotion, springFrom, springTo, whenDone } from '../../lib/spring'
 import { WorkImage } from '../WorkImage'
+import { WorkCarousel } from './WorkCarousel'
 import styles from './WorkModal.module.css'
 
 /** Полёт картинки из/в тайл — лёгкий overshoot (iOS-инерция). */
@@ -38,11 +39,19 @@ const REST_FLY = 120
 export function WorkModal() {
   const rootRef = useRef<HTMLDivElement>(null)
   const backdropRef = useRef<HTMLDivElement>(null)
-  const dialogRef = useRef<HTMLDivElement>(null)
+  // dialogRef/firstRef — mutable: в режиме карусели их наполняет WorkCarousel
+  // (диалог = сцена карусели, «первая картинка» = текущий центральный слайд).
+  const dialogRef = useRef<HTMLDivElement | null>(null)
   const imagesRef = useRef<HTMLDivElement>(null)
-  const firstRef = useRef<HTMLDivElement>(null)
+  const firstRef = useRef<HTMLDivElement | null>(null)
   const metaRef = useRef<HTMLDivElement>(null)
   const closeBtnRef = useRef<HTMLButtonElement>(null)
+  // Режим карусели (флаг работы + 2+ картинок): выставляется при рендере, читается в
+  // runClose/эффектах. Индекс центрального слайда ведёт WorkCarousel — обратный полёт
+  // в тайл имеет смысл только с первого слайда.
+  const carouselActiveRef = useRef(false)
+  const carouselIndexRef = useRef(0)
+  const mountedAtRef = useRef(performance.now())
   // FLIP-источник берём один раз на жизнь модалки (клик мог быть по легаси-id — после
   // replace-канонизации URL источник уже не заматчится, поэтому фиксируем при монтировании).
   const sourceRef = useRef<FlipSource | null | undefined>(undefined)
@@ -56,6 +65,12 @@ export function WorkModal() {
     Array.from(imagesRef.current?.children ?? [])
       .slice(1)
       .filter((n): n is HTMLElement => n instanceof HTMLElement)
+
+  /** Оснастка карусели (блюр/стрелки/мета/крестик + некентральные слайды) — гаснет при закрытии. */
+  const carouselAuxEls = (): HTMLElement[] =>
+    Array.from(
+      dialogRef.current?.querySelectorAll<HTMLElement>('[data-caraux], [data-carslide]') ?? [],
+    ).filter((el) => el !== firstRef.current)
 
   // Анимация закрытия: обратный полёт первой картинки в тайл (если и тайл, и картинка
   // в кадре), мета уезжает под неё, остальное гаснет; иначе — угасание диалога целиком.
@@ -79,7 +94,10 @@ export function WorkModal() {
     const cur = first?.getBoundingClientRect() ?? null
     const tileInView = !!tile && tile.width > 0 && tile.bottom > 0 && tile.top < window.innerHeight
     const curInView = !!cur && cur.bottom > 0 && cur.top < window.innerHeight
-    if (first && cur && tile && tileInView && curInView) {
+    // В карусели обратно в тайл летит только ПЕРВЫЙ слайд — иначе в тайл (первую картинку)
+    // морфилась бы чужая картинка.
+    const carouselFlightOk = !carouselActiveRef.current || carouselIndexRef.current === 0
+    if (first && cur && tile && tileInView && curInView && carouselFlightOk) {
       anims.push(
         springFrom(
           first,
@@ -92,16 +110,20 @@ export function WorkModal() {
           { spring: RETURN },
         ),
       )
-      if (metaRef.current) {
-        const row = restEls().length > 0
-        anims.push(
-          springFrom(metaRef.current, row ? { x: -META_SLIDE, y: 0 } : { x: 0, y: -META_SLIDE }, {
-            spring: RETURN,
-            fade: 'out',
-          }),
-        )
+      if (carouselActiveRef.current) {
+        for (const el of carouselAuxEls()) anims.push(fade(el, 'out', { duration: 150 }))
+      } else {
+        if (metaRef.current) {
+          const row = restEls().length > 0
+          anims.push(
+            springFrom(metaRef.current, row ? { x: -META_SLIDE, y: 0 } : { x: 0, y: -META_SLIDE }, {
+              spring: RETURN,
+              fade: 'out',
+            }),
+          )
+        }
+        for (const el of restEls()) anims.push(fade(el, 'out', { duration: 150 }))
       }
-      for (const el of restEls()) anims.push(fade(el, 'out', { duration: 150 }))
     } else if (dialogRef.current) {
       anims.push(
         springFrom(dialogRef.current, { x: 0, y: 12, sx: 0.98, sy: 0.98 }, {
@@ -137,6 +159,8 @@ export function WorkModal() {
     }
     if (prefersReducedMotion()) return
     if (backdropRef.current) fade(backdropRef.current, 'in', { duration: 260 })
+    // Карусель (данные готовы уже на монтировании) анимирует своё открытие сама (WorkCarousel).
+    if (carouselActiveRef.current) return
     if (closeBtnRef.current) fade(closeBtnRef.current, 'in', { duration: 220, delay: 160 })
     const first = firstRef.current
     const src = sourceRef.current
@@ -173,6 +197,8 @@ export function WorkModal() {
   useLayoutEffect(() => {
     if (modal.status !== 'ready' || revealedRef.current) return
     revealedRef.current = true
+    // Карусель монтируется собственным компонентом и анимирует открытие сама.
+    if (carouselActiveRef.current) return
     if (prefersReducedMotion()) return
     const dialog = dialogRef.current
     const imagesEl = imagesRef.current
@@ -239,6 +265,13 @@ export function WorkModal() {
 
   // «Единое полотно» (флаг работы в админке): лента идёт стык-в-стык, без зазора.
   const seamless = detail?.seamless === true
+  // «Карусель» (флаг работы в админке): горизонтальная псевдо-карусель вместо ленты —
+  // только на готовых данных и при 2+ картинках; иначе поведение прежнее (лента).
+  const carouselMode = modal.status === 'ready' && detail?.carousel === true && images.length > 1
+  carouselActiveRef.current = carouselMode
+  // FLIP-открытие карусели уместно, пока полёт ленты не улетел далеко (кэш/быстрый API);
+  // при поздних данных карусель просто проявляется fade'ом.
+  const carouselFlipOk = performance.now() - mountedAtRef.current < 800
   const withSideMeta = hasMeta && rest.length > 0
   const dialogClass = [styles.dialog, rest.length > 0 ? styles.row : styles.col, withSideMeta ? styles.withSideMeta : '']
     .filter(Boolean)
@@ -252,104 +285,118 @@ export function WorkModal() {
   return (
     <div ref={rootRef} className={styles.root} data-test="work-modal">
       <div ref={backdropRef} className={styles.backdrop} aria-hidden="true" />
-      <div className={styles.scroller}>
-        <div className={styles.wrap} onClick={onBackdrop}>
-          <div
-            ref={dialogRef}
-            className={dialogClass}
-            style={dialogStyle}
-            role="dialog"
-            aria-modal="true"
-            aria-label={title ?? 'Работа'}
-            tabIndex={-1}
-            data-test="work-dialog"
-          >
-            {modal.status === 'error' && (
-              <p className={styles.message} data-test="work-error">
-                Не удалось загрузить работу. Закройте окно и попробуйте снова.
-              </p>
-            )}
+      {carouselMode ? (
+        <WorkCarousel
+          images={images}
+          title={title}
+          description={description}
+          source={source}
+          flipOk={carouselFlipOk}
+          dialogRef={dialogRef}
+          centralRef={firstRef}
+          indexRef={carouselIndexRef}
+          onClose={modal.close}
+        />
+      ) : (
+        <div className={styles.scroller}>
+          <div className={styles.wrap} onClick={onBackdrop}>
+            <div
+              ref={dialogRef}
+              className={dialogClass}
+              style={dialogStyle}
+              role="dialog"
+              aria-modal="true"
+              aria-label={title ?? 'Работа'}
+              tabIndex={-1}
+              data-test="work-dialog"
+            >
+              {modal.status === 'error' && (
+                <p className={styles.message} data-test="work-error">
+                  Не удалось загрузить работу. Закройте окно и попробуйте снова.
+                </p>
+              )}
 
-            {modal.status === 'loading' && !source && (
-              <p className={styles.message} data-test="work-loading">
-                Загрузка…
-              </p>
-            )}
+              {modal.status === 'loading' && !source && (
+                <p className={styles.message} data-test="work-loading">
+                  Загрузка…
+                </p>
+              )}
 
-            {(modal.status === 'ready' || (modal.status === 'loading' && source)) && (
-              <div
-                ref={imagesRef}
-                className={[
-                  styles.images,
-                  withSideMeta ? styles.imagesNarrow : '',
-                  seamless ? styles.imagesSeamless : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-                data-test="work-images"
-              >
-                {/* Первая картинка: единый узел на loading и ready — FLIP не прерывается
-                    сменой контента. Пока full грузится, фоном виден thumb тайла из кэша. */}
+              {(modal.status === 'ready' || (modal.status === 'loading' && source)) && (
                 <div
-                  ref={firstRef}
-                  className={styles.firstBox}
-                  style={
-                    !first && ratio
-                      ? { aspectRatio: String(ratio), backgroundImage: `url("${source?.src ?? ''}")` }
-                      : undefined
-                  }
-                  // Тон-подложка только пока картинки нет — под прозрачным PNG она бы дымила.
-                  {...(first ? {} : { 'data-placeholder': '' })}
-                  data-test="work-first"
+                  ref={imagesRef}
+                  className={[
+                    styles.images,
+                    withSideMeta ? styles.imagesNarrow : '',
+                    seamless ? styles.imagesSeamless : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  data-test="work-images"
                 >
-                  {first && (
-                    <WorkImage
-                      key={first.id}
-                      image={first}
-                      className={styles.picture}
-                      imgClassName={styles.img}
-                      placeholderSrc={source?.src}
-                    />
+                  {/* Первая картинка: единый узел на loading и ready — FLIP не прерывается
+                      сменой контента. Пока full грузится, фоном виден thumb тайла из кэша. */}
+                  <div
+                    ref={firstRef}
+                    className={styles.firstBox}
+                    style={
+                      !first && ratio
+                        ? { aspectRatio: String(ratio), backgroundImage: `url("${source?.src ?? ''}")` }
+                        : undefined
+                    }
+                    // Тон-подложка только пока картинки нет — под прозрачным PNG она бы дымила.
+                    {...(first ? {} : { 'data-placeholder': '' })}
+                    data-test="work-first"
+                  >
+                    {first && (
+                      <WorkImage
+                        key={first.id}
+                        image={first}
+                        className={styles.picture}
+                        imgClassName={styles.img}
+                        placeholderSrc={source?.src}
+                      />
+                    )}
+                  </div>
+                  {rest.map((img, i) => (
+                    // Убывающий z-index — каждая следующая карточка вылетает ИЗ-ПОД предыдущей.
+                    <div key={img.id} className={styles.restBox} style={{ zIndex: rest.length - i }}>
+                      <WorkImage image={img} className={styles.picture} imgClassName={styles.img} lazy />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {hasMeta && (
+                <div ref={metaRef} className={styles.meta} data-test="work-meta">
+                  {title && (
+                    <h2 className={styles.title} data-test="work-title">
+                      {title}
+                    </h2>
+                  )}
+                  {title && description && <div className={styles.divider} aria-hidden="true" />}
+                  {description && (
+                    <p className={styles.description} data-test="work-description">
+                      {description}
+                    </p>
                   )}
                 </div>
-                {rest.map((img, i) => (
-                  // Убывающий z-index — каждая следующая карточка вылетает ИЗ-ПОД предыдущей.
-                  <div key={img.id} className={styles.restBox} style={{ zIndex: rest.length - i }}>
-                    <WorkImage image={img} className={styles.picture} imgClassName={styles.img} lazy />
-                  </div>
-                ))}
-              </div>
-            )}
+              )}
 
-            {hasMeta && (
-              <div ref={metaRef} className={styles.meta} data-test="work-meta">
-                {title && (
-                  <h2 className={styles.title} data-test="work-title">
-                    {title}
-                  </h2>
-                )}
-                {title && description && <div className={styles.divider} aria-hidden="true" />}
-                {description && (
-                  <p className={styles.description} data-test="work-description">
-                    {description}
-                  </p>
-                )}
-              </div>
-            )}
-
-            <button
-              ref={closeBtnRef}
-              type="button"
-              className={styles.close}
-              onClick={modal.close}
-              aria-label="Закрыть"
-              data-test="work-close"
-            >
-              <span className={styles.closeGlyph} aria-hidden="true" />
-            </button>
+              <button
+                ref={closeBtnRef}
+                type="button"
+                className={styles.close}
+                onClick={modal.close}
+                aria-label="Закрыть"
+                data-test="work-close"
+              >
+                <span className={styles.closeGlyph} aria-hidden="true" />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

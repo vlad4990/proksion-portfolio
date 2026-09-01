@@ -59,8 +59,9 @@ export function adminWorkRoutes(deps: AdminDeps) {
           const sort_order =
             optNumber(b, 'sort_order') ??
             nextSortOrder(repos.work.list(subcategoryId).map((w) => w.sort_order))
-          // Флаг «единое полотно» (лента картинок без зазора): boolean снаружи → 0|1 в БД.
+          // Boolean-флаги показа (чекбоксы админки): boolean снаружи → 0|1 в БД.
           const seamless = optBoolean(b, 'seamless') === true ? 1 : 0
+          const carousel = optBoolean(b, 'carousel') === true ? 1 : 0
           // Создаётся без cover — он проставится после первой картинки.
           const row = repos.work.create({
             subcategory_id: subcategoryId,
@@ -69,6 +70,7 @@ export function adminWorkRoutes(deps: AdminDeps) {
             description,
             sort_order,
             seamless,
+            carousel,
           })
           onMutation()
           set.status = 201
@@ -107,6 +109,8 @@ export function adminWorkRoutes(deps: AdminDeps) {
           if (sortOrder !== undefined) patch.sort_order = sortOrder
           const seamless = optBoolean(b, 'seamless')
           if (seamless !== undefined) patch.seamless = seamless ? 1 : 0
+          const carousel = optBoolean(b, 'carousel')
+          if (carousel !== undefined) patch.carousel = carousel ? 1 : 0
           // Теги (§5.5): полная замена набора. Существование тегов проверяем ДО апдейта работы —
           // иначе при невалидном id остальные поля патча уже были бы записаны.
           let tagIds: number[] | undefined
