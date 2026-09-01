@@ -179,9 +179,9 @@ function TileGridSkeleton() {
 
 // ── Экран ──────────────────────────────────────────────────────────────────────
 
-export function MobileCategory() {
-  // `work` определён на маршруте модалки (`/projects/:cat/:sub/:work`) — экран под ней тот же.
-  const { cat, sub, work } = useParams()
+/** `workOpen` — пропом из App (подробнее — в десктопном CategoryScreen). */
+export function MobileCategory({ workOpen = false }: { workOpen?: boolean }) {
+  const { cat, sub } = useParams()
   const { category, status: catStatus } = useCategory(cat)
   const { tiles, total, status, hasMore, loadingMore, sentinelRef } = useInfiniteWorks({
     cat,
@@ -195,12 +195,12 @@ export function MobileCategory() {
 
   // Заголовок вкладки — «KUPIKOD — PROKSION» (подробнее — в десктопном CategoryScreen).
   useEffect(() => {
-    if (!category || work !== undefined) return
+    if (!category || workOpen) return
     document.title = categoryTitle(category.title)
     return () => {
       document.title = ROUTE_TITLES.projects
     }
-  }, [category, work])
+  }, [category, workOpen])
 
   if (missing) return <Navigate to="/projects" replace />
 

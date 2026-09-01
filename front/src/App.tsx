@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, Route as RouterRoute, Routes, useLocation } from 'react-router'
+import type { Location } from 'react-router'
 import { useIsMobile } from './hooks/useIsMobile'
 import { installFlipCapture } from './lib/flip'
+import { isWorkPath } from './lib/links'
 import { installWorkPrefetch } from './lib/prefetch'
 import { ROUTE_TITLES } from './seo'
 import type { HeroPhase, Route } from './types'
@@ -31,12 +33,6 @@ function pathnameToRoute(pathname: string): Route {
   return 'home'
 }
 
-/** Путь модалки работы: `/projects/:cat/:sub/:work` (4 сегмента). */
-function isWorkModalPath(pathname: string): boolean {
-  const seg = pathname.split('/').filter(Boolean)
-  return seg[0] === 'projects' && seg.length === 4
-}
-
 /** Ключ скролла — «идентичность листинга». Пока открыта работа, держим ключ ТОГО листинга,
  *  с которого её открыли: из URL модалки его не вывести (канонический путь работы всегда
  *  содержит подкатегорию, а листингом мог быть и таб «ВСЕ» `/projects/:cat`, и корневая
@@ -44,15 +40,35 @@ function isWorkModalPath(pathname: string): boolean {
  *  скролл листинга не сбрасывается; смена раздела/таба/страницы — меняет. */
 function useScrollKey(pathname: string): string {
   const listingKey = useRef(pathname)
-  if (!isWorkModalPath(pathname)) listingKey.current = pathname
+  if (!isWorkPath(pathname)) listingKey.current = pathname
   return listingKey.current
+}
+
+/** Локация ФОНА под модалкой работы. Пока открыта работа, фоновые Routes рендерятся с той
+ *  локацией листинга, с которой её открыли (`<Routes location={…}>`): URL модалки в фон не
+ *  попадает, листинг за блюром не подменяется на страницу подкатегории и не перерисовывается
+ *  (открытие работы с `/projects` раньше дёргало весь фон). Deep-link на работу фона в
+ *  истории не имеет — фоном берём родительский листинг подкатегории из пути работы. */
+function useBackgroundLocation(location: Location): Location | string {
+  const bg = useRef<Location | string>(
+    isWorkPath(location.pathname)
+      ? location.pathname.split('/').slice(0, -1).join('/')
+      : location,
+  )
+  if (!isWorkPath(location.pathname)) bg.current = location
+  return bg.current
 }
 
 export default function App() {
   const isMobile = useIsMobile()
-  const { pathname } = useLocation()
+  const location = useLocation()
+  const { pathname } = location
   const route = pathnameToRoute(pathname)
   const scrollKey = useScrollKey(pathname)
+  // Модалка работы поверх листинга: фон рендерим по background-локации (см. useBackgroundLocation),
+  // модалку — отдельным <Routes> по реальному URL.
+  const background = useBackgroundLocation(location)
+  const workOpen = isWorkPath(pathname)
 
   // Hero curtain only on a fresh load of the root path; deep links skip it.
   const [heroPhase, setHeroPhase] = useState<HeroPhase>(
@@ -136,23 +152,24 @@ export default function App() {
         )}
 
         {heroPhase === 'gone' && (
-          <Routes>
-            <RouterRoute path="/" element={<MobileAbout />} />
-            <RouterRoute path="/projects" element={<MobileProjects />} />
-            <RouterRoute path="/projects/:cat" element={<MobileCategory />} />
-            <RouterRoute path="/projects/:cat/:sub" element={<MobileCategory />} />
-            <RouterRoute
-              path="/projects/:cat/:sub/:work"
-              element={
-                <>
-                  <MobileCategory />
-                  <MobileWorkModal />
-                </>
-              }
-            />
-            <RouterRoute path="/contacts" element={<MobileContacts />} />
-            <RouterRoute path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <>
+            <Routes location={background}>
+              <RouterRoute path="/" element={<MobileAbout />} />
+              <RouterRoute path="/projects" element={<MobileProjects />} />
+              <RouterRoute path="/projects/:cat" element={<MobileCategory workOpen={workOpen} />} />
+              <RouterRoute
+                path="/projects/:cat/:sub"
+                element={<MobileCategory workOpen={workOpen} />}
+              />
+              <RouterRoute path="/contacts" element={<MobileContacts />} />
+              <RouterRoute path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+            {workOpen && (
+              <Routes>
+                <RouterRoute path="/projects/:cat/:sub/:work" element={<MobileWorkModal />} />
+              </Routes>
+            )}
+          </>
         )}
       </>
     )
@@ -184,23 +201,22 @@ export default function App() {
 
       <div className={styles.stageWrap} data-test="stage-wrap">
         <div className={styles.stage} data-test="stage">
-          <Routes>
+          <Routes location={background}>
             <RouterRoute path="/" element={<AboutSection />} />
             <RouterRoute path="/projects" element={<ProjectsScreen />} />
-            <RouterRoute path="/projects/:cat" element={<CategoryScreen />} />
-            <RouterRoute path="/projects/:cat/:sub" element={<CategoryScreen />} />
+            <RouterRoute path="/projects/:cat" element={<CategoryScreen workOpen={workOpen} />} />
             <RouterRoute
-              path="/projects/:cat/:sub/:work"
-              element={
-                <>
-                  <CategoryScreen />
-                  <WorkModal />
-                </>
-              }
+              path="/projects/:cat/:sub"
+              element={<CategoryScreen workOpen={workOpen} />}
             />
             <RouterRoute path="/contacts" element={<ContactsScreen />} />
             <RouterRoute path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          {workOpen && (
+            <Routes>
+              <RouterRoute path="/projects/:cat/:sub/:work" element={<WorkModal />} />
+            </Routes>
+          )}
         </div>
       </div>
     </>

@@ -195,9 +195,10 @@ function TileGridSkeleton() {
 
 // ── Экран ──────────────────────────────────────────────────────────────────────
 
-export function CategoryScreen() {
-  // `work` определён на маршруте модалки (`/projects/:cat/:sub/:work`) — экран под ней тот же.
-  const { cat, sub, work } = useParams()
+/** `workOpen` приходит пропом из App: экран рендерится по background-локации и URL модалки
+ *  работы не видит (а useLocation внутри `<Routes location={…}>` вернул бы её же). */
+export function CategoryScreen({ workOpen = false }: { workOpen?: boolean }) {
+  const { cat, sub } = useParams()
   const { category, status: catStatus } = useCategory(cat)
   const { tiles, total, status, hasMore, loadingMore, sentinelRef } = useInfiniteWorks({
     cat,
@@ -211,15 +212,15 @@ export function CategoryScreen() {
   const missing = catStatus === 'notfound' || unknownSub
 
   // Заголовок вкладки — «KUPIKOD — PROKSION». Пока открыта работа, заголовок за модалкой
-  // (иначе мы бы затирали её название при канонизации легаси-URL); при закрытии `work`
-  // становится undefined, cleanup модалки отрабатывает раньше — заголовок раздела вернётся.
+  // (иначе мы бы затирали её название при канонизации легаси-URL); при закрытии workOpen
+  // становится false, cleanup модалки отрабатывает раньше — заголовок раздела вернётся.
   useEffect(() => {
-    if (!category || work !== undefined) return
+    if (!category || workOpen) return
     document.title = categoryTitle(category.title)
     return () => {
       document.title = ROUTE_TITLES.projects
     }
-  }, [category, work])
+  }, [category, workOpen])
 
   if (missing) return <Navigate to="/projects" replace />
 

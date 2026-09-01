@@ -22,3 +22,9 @@ export function subcategoryHref(cat: string, sub: string): string {
 export function tagHref(slug?: string | undefined): string {
   return slug ? `/projects?tag=${encodeURIComponent(slug)}` : '/projects'
 }
+
+/** Путь модалки работы: `/projects/:cat/:sub/:work` (4 сегмента). */
+export function isWorkPath(pathname: string): boolean {
+  const seg = pathname.split('/').filter(Boolean)
+  return seg[0] === 'projects' && seg.length === 4
+}
