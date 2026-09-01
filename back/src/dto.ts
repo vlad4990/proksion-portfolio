@@ -90,6 +90,8 @@ export interface ImageDetail {
 /**
  * Полная работа: описание + упорядоченные картинки карусели + id тегов
  * (`tag_ids` — мультивыбор тегов в админке, спека редизайна §5.5; фронту не мешает).
+ * `seamless` — лента картинок идёт стык-в-стык, без зазора (миграция 0003): в БД это 0|1,
+ * в контракте — честный `boolean`.
  */
 export interface WorkDetail {
   id: number
@@ -97,6 +99,7 @@ export interface WorkDetail {
   title: string | null
   description: string | null
   cover_image_id: number | null
+  seamless: boolean
   tag_ids: number[]
   images: ImageDetail[]
 }
@@ -236,6 +239,7 @@ export function toWorkDetail(work: Work, images: Image[], tagIds: number[]): Wor
     title: work.title,
     description: work.description,
     cover_image_id: work.cover_image_id,
+    seamless: work.seamless === 1,
     tag_ids: tagIds,
     images: images.map(toImageDetail),
   }

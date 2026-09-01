@@ -57,6 +57,18 @@ describe('workRepo', () => {
     expect(repo.getById(w.id)).toBeNull()
   })
 
+  test('seamless: create defaults to 0, update toggles the flag both ways', () => {
+    const w = repo.create({ subcategory_id: subId, slug: 'w' })
+    expect(w.seamless).toBe(0)
+    expect(repo.update(w.id, { seamless: 1 })?.seamless).toBe(1)
+    expect(repo.getById(w.id)?.seamless).toBe(1)
+    expect(repo.update(w.id, { seamless: 0 })?.seamless).toBe(0)
+  })
+
+  test('seamless: create can turn the flag on right away', () => {
+    expect(repo.create({ subcategory_id: subId, slug: 'w', seamless: 1 }).seamless).toBe(1)
+  })
+
   test('create leaves the work out of the showcase (featured_order = NULL)', () => {
     expect(repo.create({ subcategory_id: subId, slug: 'w' }).featured_order).toBeNull()
   })

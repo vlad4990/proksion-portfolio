@@ -54,11 +54,16 @@ export const tagSchema = z.object({
 })
 export type TagFormValues = z.infer<typeof tagSchema>
 
-/** Работа: название необязательно (слаг сгенерится из него или из явного slug). */
+/**
+ * Работа: название необязательно (слаг сгенерится из него или из явного slug).
+ * `seamless` — чекбокс «единое полотно»: лента картинок в модалке идёт стык-в-стык,
+ * без зазоров (для работ, которые сами являются нарезкой одного макета).
+ */
 export const workSchema = z.object({
   title: z.string().trim(),
   slug: z.string().trim(),
   description: z.string(),
+  seamless: z.boolean(),
 })
 export type WorkFormValues = z.infer<typeof workSchema>
 
@@ -123,22 +128,27 @@ export const toSubcategoryInput = (
   categoryId: number,
 ): SubcategoryInput => ({ category_id: categoryId, ...toNamedEntityPayload(values) })
 
-/** Работа на create: `{ subcategory_id, title|null, slug?, description }`. */
+/** Работа на create: `{ subcategory_id, title|null, slug?, description, seamless }`. */
 export function toWorkInput(values: WorkFormValues, subcategoryId: number): WorkInput {
   const input: WorkInput = {
     subcategory_id: subcategoryId,
     title: emptyToNull(values.title),
     description: emptyToNull(values.description),
+    seamless: values.seamless,
   }
   if (values.slug !== '') input.slug = values.slug
   return input
 }
 
-/** Работа на patch: `{ title|null, slug?, description }` (cover/order меняются отдельно). */
+/**
+ * Работа на patch: `{ title|null, slug?, description, seamless }` (cover/order меняются отдельно).
+ * `seamless` уходит всегда — чекбокс всегда имеет определённое значение.
+ */
 export function toWorkPatch(values: WorkFormValues): WorkPatchInput {
   const patch: WorkPatchInput = {
     title: emptyToNull(values.title),
     description: emptyToNull(values.description),
+    seamless: values.seamless,
   }
   if (values.slug !== '') patch.slug = values.slug
   return patch
@@ -155,7 +165,12 @@ export function namedEntityToValues(entity: {
 }
 
 export function workDetailToValues(work: WorkDetail): WorkFormValues {
-  return { title: work.title ?? '', slug: work.slug, description: work.description ?? '' }
+  return {
+    title: work.title ?? '',
+    slug: work.slug,
+    description: work.description ?? '',
+    seamless: work.seamless,
+  }
 }
 
 /** Категория → форма: все nullable-поля контента разворачиваются в пустые строки. */
@@ -176,5 +191,10 @@ export function tagToValues(tag: { title: string; slug: string }): TagFormValues
 
 /** Дефолты пустой формы (создание). */
 export const emptyNamedEntity: NamedEntityValues = { title: '', slug: '', description: '' }
-export const emptyWork: WorkFormValues = { title: '', slug: '', description: '' }
+export const emptyWork: WorkFormValues = {
+  title: '',
+  slug: '',
+  description: '',
+  seamless: false,
+}
 export const emptyTag: TagFormValues = { title: '', slug: '' }

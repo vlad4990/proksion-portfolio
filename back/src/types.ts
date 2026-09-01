@@ -41,6 +41,12 @@ export interface Work {
   sort_order: number
   /** Позиция в кураторской витрине категории (0 = hero); `null` — работа вне витрины. */
   featured_order: number | null
+  /**
+   * «Единое полотно»: лента картинок в модалке идёт стык-в-стык, без зазора между ними
+   * (миграция 0003). SQLite не имеет boolean — хранится как 0|1, наружу (публичный DTO)
+   * отдаётся уже как `boolean`.
+   */
+  seamless: number
   created_at: string
   updated_at: string
 }
@@ -112,10 +118,12 @@ export interface NewWork {
   description?: string | null
   cover_image_id?: number | null
   sort_order?: number
+  /** 0|1; по умолчанию 0 — лента картинок с зазором. */
+  seamless?: number
 }
 /** `featured_order` сюда НЕ входит: витрина меняется только через `workRepo.setFeatured`. */
 export type WorkPatch = Partial<
-  Pick<Work, 'slug' | 'title' | 'description' | 'cover_image_id' | 'sort_order'>
+  Pick<Work, 'slug' | 'title' | 'description' | 'cover_image_id' | 'sort_order' | 'seamless'>
 >
 
 export interface NewTag {

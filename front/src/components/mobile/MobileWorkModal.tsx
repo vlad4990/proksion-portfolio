@@ -61,6 +61,8 @@ export function MobileWorkModal() {
   const title = detail?.title ?? null
   const description = detail?.description ?? null
   const hasMeta = modal.status === 'ready' && Boolean(title || description)
+  // «Единое полотно» (флаг работы в админке): лента идёт стык-в-стык, без зазора.
+  const seamless = detail?.seamless === true
 
   return (
     <div className={styles.root} data-test="work-modal">
@@ -112,7 +114,10 @@ export function MobileWorkModal() {
 
           {modal.status === 'ready' && (
             <>
-              <div className={styles.images} data-test="work-images">
+              <div
+                className={`${styles.images}${seamless ? ` ${styles.imagesSeamless}` : ''}`}
+                data-test="work-images"
+              >
                 {images.map((img, i) => (
                   <WorkImage
                     key={img.id}

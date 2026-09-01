@@ -34,7 +34,10 @@ interface WorkDialogProps {
   onSubmit: (values: WorkFormValues) => Promise<void>
 }
 
-/** Диалог создания/редактирования работы: title (опц.), slug, описание (markdown + превью). */
+/**
+ * Диалог создания/редактирования работы: title (опц.), slug, описание (markdown + превью)
+ * и чекбокс «единое полотно» (лента картинок в модалке без зазоров).
+ */
 export function WorkDialog({
   open,
   onOpenChange,
@@ -119,6 +122,35 @@ export function WorkDialog({
                     <MarkdownEditor value={field.value} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="seamless"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start gap-3 space-y-0">
+                  <FormControl>
+                    {/* Нативный чекбокс: своего Checkbox в ui/ нет, а тянуть новую
+                        зависимость под одно поле не нужно. */}
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 size-4 shrink-0 accent-foreground"
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                    />
+                  </FormControl>
+                  <div className="space-y-1">
+                    <FormLabel className="font-normal">Единое полотно</FormLabel>
+                    <FormDescription>
+                      Картинки в модалке идут стык-в-стык, без отступов — для работ,
+                      нарезанных из одного макета.
+                    </FormDescription>
+                    <FormMessage />
+                  </div>
                 </FormItem>
               )}
             />

@@ -113,6 +113,55 @@ describe('admin works CRUD', () => {
     expect(row.slug).toBe(work.slug)
   })
 
+  // Флаг «единое полотно»: чекбокс админки → 0|1 в БД → boolean в публичном контракте.
+  test('POST defaults seamless to 0; POST with seamless: true stores 1', async () => {
+    const off = (await (await post({ subcategory_id: subcategoryId, title: 'A' })).json()) as {
+      seamless: number
+    }
+    expect(off.seamless).toBe(0)
+    const on = (await (
+      await post({ subcategory_id: subcategoryId, title: 'B', seamless: true })
+    ).json()) as { seamless: number }
+    expect(on.seamless).toBe(1)
+  })
+
+  test('PATCH toggles seamless both ways and leaves it alone when omitted', async () => {
+    const work = (await (await post({ subcategory_id: subcategoryId, title: 'W' })).json()) as {
+      id: number
+    }
+    const patch = (body: unknown) =>
+      app.handle(
+        req(`/admin/works/${work.id}`, {
+          method: 'PATCH',
+          headers: jsonHeaders(),
+          body: JSON.stringify(body),
+        }),
+      )
+    expect(((await (await patch({ seamless: true })).json()) as { seamless: number }).seamless).toBe(1)
+    // Патч без флага не должен его сбрасывать
+    expect(
+      ((await (await patch({ title: 'Другое' })).json()) as { seamless: number }).seamless,
+    ).toBe(1)
+    expect(((await (await patch({ seamless: false })).json()) as { seamless: number }).seamless).toBe(
+      0,
+    )
+  })
+
+  test('a non-boolean seamless → 400', async () => {
+    const work = (await (await post({ subcategory_id: subcategoryId, title: 'W' })).json()) as {
+      id: number
+    }
+    const res = await app.handle(
+      req(`/admin/works/${work.id}`, {
+        method: 'PATCH',
+        headers: jsonHeaders(),
+        body: JSON.stringify({ seamless: 1 }),
+      }),
+    )
+    expect(res.status).toBe(400)
+    expect(ctx.repos.work.getById(work.id)?.seamless).toBe(0)
+  })
+
   test('DELETE cascades images', async () => {
     const work = (await (await post({ subcategory_id: subcategoryId, title: 'W' })).json()) as {
       id: number

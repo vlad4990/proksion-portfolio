@@ -25,9 +25,12 @@ export interface WorkRepo {
 export function createWorkRepo(db: Database): WorkRepo {
   // Циклическая ссылка work.cover_image_id ↔ image: работа создаётся без cover,
   // cover проставляется через update(...) после загрузки первой картинки.
-  const insert = db.query<Work, [number, string, string | null, string | null, number | null, number]>(
-    `INSERT INTO work (subcategory_id, slug, title, description, cover_image_id, sort_order)
-     VALUES (?, ?, ?, ?, ?, ?) RETURNING *`,
+  const insert = db.query<
+    Work,
+    [number, string, string | null, string | null, number | null, number, number]
+  >(
+    `INSERT INTO work (subcategory_id, slug, title, description, cover_image_id, sort_order, seamless)
+     VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *`,
   )
   const byId = db.query<Work, [number]>('SELECT * FROM work WHERE id = ?')
   const bySlug = db.query<Work, [number, string]>(
@@ -69,6 +72,7 @@ export function createWorkRepo(db: Database): WorkRepo {
         input.description ?? null,
         input.cover_image_id ?? null,
         input.sort_order ?? 0,
+        input.seamless ?? 0,
       )
       if (!row) throw new Error('work: INSERT ... RETURNING returned no row')
       return row
@@ -86,6 +90,7 @@ export function createWorkRepo(db: Database): WorkRepo {
           ['description', patch.description],
           ['cover_image_id', patch.cover_image_id],
           ['sort_order', patch.sort_order],
+          ['seamless', patch.seamless],
         ],
         id,
         true,

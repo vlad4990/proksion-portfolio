@@ -1,7 +1,8 @@
 // Модалка работы — десктоп. НЕ фулскрин: затемнение (--backdrop) + центрированный
 // ПРОЗРАЧНЫЙ контейнер. Картинки работы — вертикальная лента (flex-col, gap токеном),
-// без карусели; мета (тайтл/описание) — справа при нескольких картинках (flex-row),
-// снизу при одной (flex-col). Размер задаёт ПЕРВАЯ картинка: высота ≤ 100dvh − 2·edge-y,
+// без карусели; работа с флагом `seamless` (чекбокс «единое полотно» в админке) рендерит
+// ленту без зазора — стык-в-стык, как нарезку одного макета. Мета (тайтл/описание) —
+// справа при нескольких картинках (flex-row), снизу при одной (flex-col). Размер задаёт ПЕРВАЯ картинка: высота ≤ 100dvh − 2·edge-y,
 // ширина ≤ 100vw − 2·edge-x (аспект строгий — формула в .images CSS).
 // Скролл — по overlay: лента уходит за верхнюю границу окна.
 //
@@ -236,6 +237,8 @@ export function WorkModal() {
   const ratio = first ? first.w / first.h : (source?.ar ?? null)
   const dialogStyle = ratio ? ({ '--first-ar': String(ratio) } as CSSProperties) : undefined
 
+  // «Единое полотно» (флаг работы в админке): лента идёт стык-в-стык, без зазора.
+  const seamless = detail?.seamless === true
   const withSideMeta = hasMeta && rest.length > 0
   const dialogClass = [styles.dialog, rest.length > 0 ? styles.row : styles.col, withSideMeta ? styles.withSideMeta : '']
     .filter(Boolean)
@@ -276,7 +279,13 @@ export function WorkModal() {
             {(modal.status === 'ready' || (modal.status === 'loading' && source)) && (
               <div
                 ref={imagesRef}
-                className={`${styles.images}${withSideMeta ? ` ${styles.imagesNarrow}` : ''}`}
+                className={[
+                  styles.images,
+                  withSideMeta ? styles.imagesNarrow : '',
+                  seamless ? styles.imagesSeamless : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
                 data-test="work-images"
               >
                 {/* Первая картинка: единый узел на loading и ready — FLIP не прерывается

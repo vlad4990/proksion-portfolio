@@ -150,6 +150,8 @@ export interface WorkInput {
   title?: string | null
   slug?: string
   description?: string | null
+  /** «Единое полотно»: лента картинок в модалке без зазоров (по умолчанию false). */
+  seamless?: boolean
 }
 
 export interface WorkPatchInput {
@@ -157,6 +159,8 @@ export interface WorkPatchInput {
   slug?: string
   description?: string | null
   cover_image_id?: number | null
+  /** «Единое полотно»: лента картинок в модалке без зазоров. */
+  seamless?: boolean
   /** Полная замена набора тегов работы (редизайн §5.5): пустой массив снимает все теги. */
   tag_ids?: number[]
 }

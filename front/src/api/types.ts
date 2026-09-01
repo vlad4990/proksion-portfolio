@@ -147,8 +147,8 @@ export interface ImageDetail {
 }
 
 /**
- * Полная работа: описание + упорядоченные картинки карусели + `tag_ids` (id тегов работы;
- * нужны админке для мультивыбора, фронту не мешают).
+ * Полная работа: описание + упорядоченные картинки ленты + `seamless` (лента без зазоров) +
+ * `tag_ids` (id тегов работы; нужны админке для мультивыбора, фронту не мешают).
  */
 export interface WorkDetail {
   id: number
@@ -156,6 +156,11 @@ export interface WorkDetail {
   title: string | null
   description: string | null
   cover_image_id: number | null
+  /**
+   * «Единое полотно» (флаг работы в админке): лента картинок в модалке идёт стык-в-стык,
+   * без зазора — для работ, нарезанных из одного макета.
+   */
+  seamless: boolean
   tag_ids: number[]
   images: ImageDetail[]
 }

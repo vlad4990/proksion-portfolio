@@ -136,6 +136,7 @@ CREATE TABLE work (
   description     TEXT,                     -- markdown или plain (см. §7)
   cover_image_id INTEGER REFERENCES image(id) ON DELETE SET NULL,  -- thumb листинга
   sort_order     INTEGER NOT NULL DEFAULT 0,
+  -- + seamless (0|1) из миграции 0003 — лента картинок в модалке без зазоров
   created_at     TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at     TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE (subcategory_id, slug)
@@ -176,6 +177,14 @@ CREATE TABLE image (
   PK по паре, обе стороны `ON DELETE CASCADE`) — m2m работа↔тег.
 - Индексы: `idx_work_tag_tag` (выборка по тегу; выборку по работе покрывает PK `work_tag`)
   и частичный `idx_work_featured` (`WHERE featured_order IS NOT NULL`).
+
+### Флаг «единое полотно» (миграция `0003`)
+
+`0003_work_seamless.sql` добавляет **`work.seamless`** (`INTEGER NOT NULL DEFAULT 0`,
+CHECK `seamless IN (0,1)` — SQLite без BOOLEAN): лента картинок работы в модалке идёт
+**стык-в-стык, без зазора** `--tile-gap`. Нужен для работ, которые сами являются нарезкой
+одного макета (кейсы, лонгриды) — зазор рвал бы картинку. Наружу поле уходит уже как
+`boolean` (`WorkDetail.seamless`), в админке это чекбокс в диалоге работы.
 
 ### Слаги
 
@@ -305,7 +314,8 @@ Caddy срезает префикс `/api` (`handle_path /api/*` в корнев
   `tag` комбинируются; неизвестный слаг фильтра → пустая страница `total: 0` (не 404).
   Лимит: дефолт **24** (порция инфинити-скролла), максимум 100.
 - Детали работы (`/works/:cat/:sub/:work`, `/works/by-id/:id`) несут `tag_ids: number[]`
-  (мультивыбор тегов в админке).
+  (мультивыбор тегов в админке) и `seamless: boolean` (лента картинок без зазоров —
+  0|1 в БД разворачивается в honest boolean, см. миграцию `0003`).
 
 Агрегаты и листинги живут в `back/src/queries.ts` (слой SQL-чтений поверх CRUD-репозиториев);
 сериализаторы форм — `back/src/dto.ts`, зеркала типов — `front/src/api/types.ts` и
@@ -321,7 +331,7 @@ Caddy срезает префикс `/api` (`handle_path /api/*` в корнев
 | POST/PATCH/DELETE| `/admin/categories[/:id]`              | CRUD категорий; PATCH принимает и контент секции: `kicker`, `meta_role`, `period`, `description_long` (string\|null) и `display_variant` (`showcase`\|`strip`\|`cards`, иначе 400) |
 | PATCH            | `/admin/categories/:id/featured`       | `{work_ids:[…]}` — кураторская витрина секции: порядок массива = `featured_order` (0 = hero), работы категории вне списка → NULL, пустой массив очищает витрину. Чужая/несуществующая работа или дубликаты → 400 |
 | POST/PATCH/DELETE| `/admin/subcategories[/:id]`           | CRUD подкатегорий                           |
-| POST/PATCH/DELETE| `/admin/works[/:id]`                   | CRUD работ (title/description/cover/order); PATCH принимает `tag_ids?: number[]` — полная замена набора тегов (несуществующий id → 400, работа не изменена) |
+| POST/PATCH/DELETE| `/admin/works[/:id]`                   | CRUD работ (title/description/cover/order); POST и PATCH принимают `seamless?: boolean` («единое полотно» — лента картинок без зазоров; не-boolean → 400, опущенный флаг на PATCH не сбрасывается); PATCH принимает `tag_ids?: number[]` — полная замена набора тегов (несуществующий id → 400, работа не изменена) |
 | POST             | `/admin/works/:id/images`              | multipart-загрузка → пайплайн §6 → MinIO+БД |
 | PATCH/DELETE     | `/admin/images/:id`                    | alt/порядок/удаление                        |
 | POST/PATCH/DELETE| `/admin/tags[/:id]`                    | CRUD тегов-фильтров (`{title*, slug?, sort_order?}`); слаг уникален глобально, удаление каскадит `work_tag` |

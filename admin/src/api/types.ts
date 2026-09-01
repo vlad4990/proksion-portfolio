@@ -44,6 +44,8 @@ export interface WorkRow {
   sort_order: number
   /** Позиция в кураторской витрине категории (0 = hero); `null` — работа вне витрины. */
   featured_order: number | null
+  /** «Единое полотно»: лента картинок в модалке без зазоров. Сырая строка БД → 0|1. */
+  seamless: number
   created_at: string
   updated_at: string
 }
@@ -183,6 +185,8 @@ export interface WorkDetail {
   title: string | null
   description: string | null
   cover_image_id: number | null
+  /** «Единое полотно»: лента картинок в модалке идёт стык-в-стык (публичный контракт — boolean). */
+  seamless: boolean
   tag_ids: number[]
   images: ImageDetail[]
 }

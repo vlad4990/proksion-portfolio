@@ -25,6 +25,7 @@ function makeWork(over: Partial<Work> = {}): Work {
     cover_image_id: 9,
     sort_order: 0,
     featured_order: null,
+    seamless: 0,
     created_at: 't',
     updated_at: 't',
     ...over,
@@ -167,6 +168,11 @@ describe('toWorkDetail', () => {
 
   test('работа без тегов → tag_ids: []', () => {
     expect(toWorkDetail(makeWork(), [], []).tag_ids).toEqual([])
+  })
+
+  test('seamless: 0|1 из БД → boolean в контракте', () => {
+    expect(toWorkDetail(makeWork({ seamless: 0 }), [], []).seamless).toBe(false)
+    expect(toWorkDetail(makeWork({ seamless: 1 }), [], []).seamless).toBe(true)
   })
 })
 

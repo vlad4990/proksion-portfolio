@@ -134,6 +134,17 @@ export function optNumberOrNull(obj: Rec, key: string): number | null | undefine
   return v
 }
 
+/**
+ * Опциональный boolean-флаг (чекбоксы админки, например `seamless`): отсутствует/undefined →
+ * undefined; иначе обязан быть настоящим boolean (0/1/"true" не принимаем — тело JSON строгое).
+ */
+export function optBoolean(obj: Rec, key: string): boolean | undefined {
+  if (!(key in obj) || obj[key] === undefined) return undefined
+  const v = obj[key]
+  if (typeof v !== 'boolean') throw new BadRequest(`"${key}" must be a boolean`)
+  return v
+}
+
 /** Опциональное значение из фиксированного набора строк (иначе 400) — например `display_variant`. */
 export function optEnum<T extends string>(
   obj: Rec,

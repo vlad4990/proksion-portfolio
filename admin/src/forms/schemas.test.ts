@@ -40,8 +40,15 @@ describe('namedEntitySchema (категория/подкатегория)', () =
 
 describe('workSchema', () => {
   it('пустой title допустим (работа без названия)', () => {
-    const r = workSchema.safeParse({ title: '', slug: '', description: '' })
+    const r = workSchema.safeParse({ title: '', slug: '', description: '', seamless: false })
     expect(r.success).toBe(true)
+  })
+
+  it('seamless обязателен и строго boolean (чекбокс всегда имеет значение)', () => {
+    expect(workSchema.safeParse({ title: '', slug: '', description: '' }).success).toBe(false)
+    expect(
+      workSchema.safeParse({ title: '', slug: '', description: '', seamless: 'yes' }).success,
+    ).toBe(false)
   })
 })
 
@@ -83,25 +90,35 @@ describe('toSubcategoryInput', () => {
 
 describe('toWorkInput / toWorkPatch', () => {
   it('create: title пустой → null, subcategory_id добавлен', () => {
-    expect(toWorkInput({ title: '', slug: '', description: '' }, 3)).toEqual({
+    expect(toWorkInput({ title: '', slug: '', description: '', seamless: false }, 3)).toEqual({
       subcategory_id: 3,
       title: null,
       description: null,
+      seamless: false,
     })
   })
   it('create: title/slug/description заданы', () => {
-    expect(toWorkInput({ title: 'Афиша', slug: 'afisha', description: 'd' }, 3)).toEqual({
+    expect(
+      toWorkInput({ title: 'Афиша', slug: 'afisha', description: 'd', seamless: false }, 3),
+    ).toEqual({
       subcategory_id: 3,
       title: 'Афиша',
       slug: 'afisha',
       description: 'd',
+      seamless: false,
     })
   })
   it('patch: без subcategory_id', () => {
-    expect(toWorkPatch({ title: 'Афиша', slug: '', description: '' })).toEqual({
+    expect(toWorkPatch({ title: 'Афиша', slug: '', description: '', seamless: false })).toEqual({
       title: 'Афиша',
       description: null,
+      seamless: false,
     })
+  })
+  it('«единое полотно»: чекбокс уходит и в create, и в patch', () => {
+    const values = { title: 'Полотно', slug: '', description: '', seamless: true }
+    expect(toWorkInput(values, 3).seamless).toBe(true)
+    expect(toWorkPatch(values).seamless).toBe(true)
   })
 })
 
@@ -230,16 +247,23 @@ describe('entity → form', () => {
     ).toEqual({ title: 'T', slug: 's', description: '' })
   })
 
-  it('workDetailToValues: null title/description → пустые строки', () => {
+  it('workDetailToValues: null title/description → пустые строки, seamless как есть', () => {
     const work: WorkDetail = {
       id: 1,
       slug: 'w',
       title: null,
       description: null,
       cover_image_id: null,
+      seamless: false,
       tag_ids: [],
       images: [],
     }
-    expect(workDetailToValues(work)).toEqual({ title: '', slug: 'w', description: '' })
+    expect(workDetailToValues(work)).toEqual({
+      title: '',
+      slug: 'w',
+      description: '',
+      seamless: false,
+    })
+    expect(workDetailToValues({ ...work, seamless: true }).seamless).toBe(true)
   })
 })

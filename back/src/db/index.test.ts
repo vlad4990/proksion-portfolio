@@ -57,12 +57,16 @@ describe('openDb — schema (§3)', () => {
 })
 
 describe('openDb — schema 0002 (теги, витрина, меты категории)', () => {
-  test('both migrations are recorded in _migrations', () => {
+  test('all migrations are recorded in _migrations', () => {
     const names = db
       .query<{ name: string }, []>('SELECT name FROM _migrations ORDER BY name')
       .all()
       .map((r) => r.name)
-    expect(names).toEqual(['0001_init.sql', '0002_tags_featured_category_meta.sql'])
+    expect(names).toEqual([
+      '0001_init.sql',
+      '0002_tags_featured_category_meta.sql',
+      '0003_work_seamless.sql',
+    ])
   })
 
   test('creates tag / work_tag tables and their indexes', () => {
@@ -201,6 +205,16 @@ describe('openDb — invariants (§3)', () => {
     expect(() => db.run('DELETE FROM image WHERE id = 1')).not.toThrow()
     const cover = db.query<{ cover_image_id: number | null }, []>('SELECT cover_image_id FROM work WHERE id = 1').get()
     expect(cover?.cover_image_id).toBeNull()
+  })
+
+  test('work.seamless defaults to 0 and accepts only 0/1', () => {
+    db.run("INSERT INTO category (id, slug, title) VALUES (1, 'c', 'C')")
+    db.run("INSERT INTO subcategory (id, category_id, slug, title) VALUES (1, 1, 's', 'S')")
+    db.run("INSERT INTO work (id, subcategory_id, slug) VALUES (1, 1, 'w')")
+    const row = db.query<{ seamless: number }, []>('SELECT seamless FROM work WHERE id = 1').get()
+    expect(row?.seamless).toBe(0)
+    expect(() => db.run('UPDATE work SET seamless = 1 WHERE id = 1')).not.toThrow()
+    expect(() => db.run('UPDATE work SET seamless = 2 WHERE id = 1')).toThrow()
   })
 
   test('re-opening the same file is idempotent (migrations already applied)', () => {
