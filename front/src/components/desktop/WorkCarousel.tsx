@@ -38,6 +38,8 @@ import styles from './WorkCarousel.module.css'
 
 /** Полёт картинки из тайла — тот же спринг, что у ленты (WorkModal.FLY). */
 const FLY = { stiffness: 300, damping: 30 }
+/** Перелистывание — мягче, без дребезга (как SHIFT ленты). */
+const SLIDE = { stiffness: 280, damping: 32 }
 /** Порог накопленной wheel-делты до перелистывания. */
 const WHEEL_THRESHOLD = 60
 /** Пауза после перелистывания — гасит хвост инерции трекпада. */
@@ -144,6 +146,7 @@ export function WorkCarousel({
 }: WorkCarouselProps) {
   const stageRef = useRef<HTMLDivElement | null>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
+  const slideEls = useRef<(HTMLDivElement | null)[]>([])
   const [index, setIndex] = useState(0)
   const [stage, setStage] = useState<StageMetrics | null>(null)
   indexRef.current = index
@@ -187,6 +190,24 @@ export function WorkCarousel({
     )
   }
   const offsetOf = (i: number): number => (centers[i] ?? 0) - (centers[index] ?? 0)
+
+  // ── Перелистывание — WAAPI-спринг (lib/spring), НЕ CSS-transition на transform:
+  // постоянно промоутнутый transition-слой не перерастеризуется, когда картинка внутри
+  // догружается и проявляется (opacity 0→1 у WorkImage) — слайд оставался невидимым
+  // до любой инвалидации. Спринг промоутит слой только на время полёта и снимается
+  // cancel'ом — финальный кадр растеризуется заново. Делта у всех слайдов одна.
+  const prevCenterRef = useRef<number | null>(null)
+  useLayoutEffect(() => {
+    const prev = prevCenterRef.current
+    const cur = centers[index] ?? 0
+    prevCenterRef.current = cur
+    if (prev === null || prev === cur || prefersReducedMotion()) return
+    for (const el of slideEls.current) {
+      if (el) springTo(el, { x: cur - prev, y: 0 }, { spring: SLIDE })
+    }
+    // centers пересчитываются и от ресайза — но там prev/cur совпадают, спринга нет.
+    // eslint-нет — эффект намеренно завязан только на смену индекса.
+  }, [index, centers[index]])
 
   // ── Колесо/трекпад: вертикальную дельту читаем как горизонтальную; порог + кулдаун
   // гасят инерцию, смена направления сбрасывает накопление. passive: false — жест
@@ -299,6 +320,7 @@ export function WorkCarousel({
               <div
                 key={img.id}
                 ref={(el) => {
+                  slideEls.current[i] = el
                   if (el && central) centralRef.current = el
                 }}
                 className={central ? styles.slide : `${styles.slide} ${styles.slideSide}`}

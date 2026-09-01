@@ -23,16 +23,15 @@
 }
 
 /* Слайд: статическое центрирование — left/top 50% + отрицательные инлайн-марджины
-   (размеры слайда известны в JS). transform остаётся свободен под навигационный сдвиг
-   (CSS-transition, компоузер) и под WAAPI-полёты открытия/закрытия (lib/spring):
-   свойство `translate` для центрирования НЕ используем — связка «translate +
-   анимируемый transform» рядом с backdrop-filter рисуется Chrome с неверной геометрией. */
+   (размеры слайда известны в JS). transform свободен под сдвиги: навигация и полёты
+   открытия/закрытия — WAAPI-спринги (lib/spring). CSS-transition на transform здесь
+   НЕЛЬЗЯ: постоянно промоутнутый слой не перерастеризуется после загрузки картинки
+   (проявление opacity 0→1) — слайд оставался пустым до любой инвалидации. */
 .slide {
   position: absolute;
   left: 50%;
   top: 50%;
   z-index: 1;
-  transition: transform 480ms var(--ease-out);
   cursor: default;
 }
 
@@ -54,11 +53,18 @@
   overflow: hidden;
   pointer-events: none;
   opacity: 1;
+  visibility: visible;
   transition: opacity 480ms var(--ease-out);
 }
 
+/* Погашенный оверлей прячем совсем (visibility ждёт конца фейда) — простаивающие
+   blur-слои не занимают композитор и не рисуются под центральным слайдом. */
 .blurCoverOff {
   opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 480ms var(--ease-out),
+    visibility 0s 480ms;
 }
 
 .blurSlice {
@@ -67,7 +73,6 @@
   bottom: 0;
   display: block;
   overflow: hidden;
-  transition: opacity 480ms var(--ease-out);
 }
 
 .blurPic {
@@ -76,7 +81,6 @@
   bottom: 0;
   left: 0;
   display: block;
-  transition: filter 480ms var(--ease-out);
 }
 
 .blurPic img {
