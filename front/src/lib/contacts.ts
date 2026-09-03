@@ -46,4 +46,8 @@ export const FOOTER_SOCIALS: ContactChannel[] = [BEHANCE, TELEGRAM]
 /** Тексты футера /projects* (дизайн: фреймы tVnqG / N8NrSi). */
 export const FOOTER_CTA = 'ЕСТЬ ЗАДАЧА ПОД ГРАФИКУ?'
 export const FOOTER_TELEGRAM_LABEL = 'НАПИСАТЬ В TELEGRAM'
-export const FOOTER_COPYRIGHT = '© PROKSION — 2026'
+/** Текущий год — подпись в шапке, мета контактов и копирайт футера.
+ *  Считается один раз при загрузке модуля, чтобы год не устаревал вручную. */
+export const CURRENT_YEAR = new Date().getFullYear()
+
+export const FOOTER_COPYRIGHT = `© PROKSION — ${CURRENT_YEAR}`

@@ -1,4 +1,4 @@
-import { CONTACT_CHANNELS, type ContactChannel } from '../../lib/contacts'
+import { CONTACT_CHANNELS, CURRENT_YEAR, type ContactChannel } from '../../lib/contacts'
 import layout from '../../styles/layout.module.css'
 import styles from './ContactsScreen.module.css'
 
@@ -52,7 +52,7 @@ export function ContactsScreen() {
             <span className={styles.statusLabel}>Доступна для работы</span>
           </div>
 
-          <div className={styles.meta} data-test="contacts-meta">МОСКВА · 2025</div>
+          <div className={styles.meta} data-test="contacts-meta">МОСКВА · {CURRENT_YEAR}</div>
         </div>
 
         <div data-test="contacts-channels">

@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router'
 import type { Route } from '../../types'
+import { CURRENT_YEAR } from '../../lib/contacts'
 import { smoothScrollTo } from '../../lib/scroll'
 import layout from '../../styles/layout.module.css'
 import styles from './TopNav.module.css'
@@ -8,7 +9,7 @@ interface TopNavProps {
   route: Route
 }
 
-/** Top bar: PROKSION wordmark (left) → home, centered nav, 2025 (right).
+/** Top bar: PROKSION wordmark (left) → home, centered nav, текущий год (right).
  *  The active item gets the paper-pill treatment. Пункты — настоящие <Link>. */
 export function TopNav({ route }: TopNavProps) {
   const { pathname } = useLocation()
@@ -45,7 +46,7 @@ export function TopNav({ route }: TopNavProps) {
         ))}
       </ul>
 
-      <span className={styles.year} data-test="nav-year">2025</span>
+      <span className={styles.year} data-test="nav-year">{CURRENT_YEAR}</span>
     </nav>
   )
 }
