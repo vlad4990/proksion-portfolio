@@ -74,38 +74,41 @@
 
 /* ── Хореография (только настоящий hover, без reduced-motion; то же условие в WorkLink.tsx) ── */
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  /* ПОКОЙ (уход курсора): сначала веер складывается (delay 0), затем тайл уменьшается,
-     z-index падает последним — иначе уменьшающийся тайл провалился бы под соседей. */
+  /* Увеличение и веер идут ОДНОВРЕМЕННО в обе стороны (задержку между ними заказчик
+     убрал 2026-09-08). ПОКОЙ (уход курсора): z-index падает после самого длинного
+     перехода — иначе уменьшающийся тайл провалился бы под соседей. */
   .host[data-fan] {
     z-index: 1;
     transition:
-      transform var(--dur-slow) var(--ease-out) var(--dur-base),
-      z-index 0s linear calc(var(--dur-base) + var(--dur-slow));
+      transform var(--dur-slow) var(--ease-out),
+      z-index 0s linear var(--dur-slow);
   }
 
   .host[data-fan] .cover,
   .host[data-fan] .peek {
     transition:
-      transform var(--dur-base) var(--ease-out) 0s,
-      opacity var(--dur-base) var(--ease-out) 0s;
+      transform var(--dur-slow) var(--ease-out),
+      opacity var(--dur-slow) var(--ease-out),
+      box-shadow var(--dur-slow) var(--ease-out);
   }
 
-  /* ХОВЕР: увеличение сразу, веер — когда оно закончилось. */
+  /* ХОВЕР: z-index поднимается сразу. */
   .host[data-fan]:hover {
     z-index: 2;
     transform: scale(var(--tile-hover-scale));
     transition:
-      transform var(--dur-slow) var(--ease-out) 0s,
+      transform var(--dur-slow) var(--ease-out),
       z-index 0s linear 0s;
-  }
-
-  .host[data-fan]:hover .cover,
-  .host[data-fan]:hover .peek {
-    transition-delay: var(--dur-slow);
   }
 
   .host[data-fan]:hover .peek {
     opacity: 1;
+  }
+
+  /* Объём стопки: тень у обложки и 2-й карточки (3-я — сзади, ей не нужна). */
+  .host[data-fan]:hover .cover,
+  .host[data-fan]:hover .peek:first-of-type {
+    box-shadow: var(--tile-fan-shadow);
   }
 
   /* Три карточки: обложка → вправо/+угол, 2-я остаётся, 3-я → влево/−угол. */
