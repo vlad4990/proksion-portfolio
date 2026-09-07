@@ -244,7 +244,8 @@
   background-clip: padding-box;
 }
 
-/* Картиночный тайл — <Link> вокруг <picture>; скелетоны — <div> с тем же классом. */
+/* Картиночный тайл — WorkLink (<Link> вокруг обложки + peek-карточки веера, стили стопки —
+   WorkLink.module.css); скелетоны — <div> с тем же классом. */
 .tile {
   display: block;
   width: 100%;
@@ -254,28 +255,13 @@
   transition: transform 180ms var(--ease-out);
 }
 
-.tilePicture {
-  display: block; /* убирает inline-baseline зазор под картинкой */
-}
-
-/* Скелетон-тон ТОЛЬКО до загрузки: под PNG с прозрачным фоном он просвечивал бы сквозь
-   прозрачные зоны молочной дымкой (см. TileImage). */
-.tilePicture:not([data-loaded]) {
-  background: var(--c-skeleton);
-}
-
 /* Пустая заглушка-скелетон (тайл без картинки) — фон на самом блоке. */
 .fillSkeleton {
   background: var(--c-skeleton);
 }
 
-.tileImg {
-  display: block;
-  width: 100%;
-  height: auto; /* натуральные пропорции — без обрезки */
-}
-
-.tile:hover {
+/* Обычный ховер — только у тайлов без веера (с веером — хореография WorkLink). */
+.tile:not([data-fan]):hover {
   transform: scale(1.02);
 }
 

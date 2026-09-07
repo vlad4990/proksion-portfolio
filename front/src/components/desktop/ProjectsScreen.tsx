@@ -16,13 +16,13 @@ import { useInfiniteWorks } from '../../api/useInfiniteWorks'
 import { useTags } from '../../api/useTags'
 import type { CategoryNav, FeaturedSection, FeaturedWork, Tile } from '../../api/types'
 import { CountBadge } from '../shared/CountBadge'
-import { TileImage } from '../TileImage'
 import { FilterChip } from '../shared/FilterChip'
 import { formatSectionsCount } from '../../lib/format'
 import { categoryHref, tagHref, workHref } from '../../lib/links'
 import { smoothScrollTo } from '../../lib/scroll'
 import { cardWorks, splitShowcase, stripWorks } from '../../lib/showcase'
 import { ProjectsFooter } from './ProjectsFooter'
+import { WorkLink } from './WorkLink'
 import layout from '../../styles/layout.module.css'
 import styles from './ProjectsScreen.module.css'
 
@@ -61,38 +61,37 @@ interface SlotProps {
   eager?: boolean
   /** Пилюля-подпись внизу слева (hero-слот витрины) — заголовок работы. */
   caption?: boolean
+  /** Hover-«веер» доп. картинок (WorkLink); выключен у превью карточек `cards`. */
+  fan?: boolean
 }
 
 /**
- * Слот витрины: настоящая ссылка на канонический URL работы. Слот повторяет пропорции
- * картинки (`aspect-ratio` из w/h), а `--ar` (= w/h) отдаёт flex-grow ряда — в выровненном
- * ряду ширина тайла пропорциональна его пропорциям, картинка видна целиком, без обрезки.
+ * Слот витрины: настоящая ссылка на канонический URL работы (`WorkLink` — обложка + веер).
+ * Слот повторяет пропорции картинки (`aspect-ratio` из w/h), а `--ar` (= w/h) отдаёт
+ * flex-grow ряда — в выровненном ряду ширина тайла пропорциональна его пропорциям,
+ * картинка видна целиком, без обрезки.
  */
-function Slot({ work, className, eager = false, caption = false }: SlotProps) {
+function Slot({ work, className, eager = false, caption = false, fan = true }: SlotProps) {
   const ratio = {
     aspectRatio: `${work.w} / ${work.h}`,
     '--ar': String(work.w / work.h),
   } as CSSProperties
   return (
-    <Link
-      to={workHref(work)}
+    <WorkLink
+      work={work}
       className={`${styles.slot}${className ? ` ${className}` : ''}`}
       style={ratio}
-      aria-label={work.title ?? 'Открыть работу'}
+      eager={eager}
+      fill
+      fan={fan}
       data-test="showcase-slot"
     >
-      <TileImage
-        variants={work.variants}
-        className={styles.slotPicture}
-        imgClassName={styles.slotImg}
-        eager={eager}
-      />
       {caption && work.title && (
         <span className={styles.caption} data-test="showcase-caption">
           {work.title}
         </span>
       )}
-    </Link>
+    </WorkLink>
   )
 }
 
@@ -163,7 +162,8 @@ function CardsGrid({
     <div className={styles.cards} data-test="showcase-cards">
       {list.map((w, i) => (
         <article key={w.id} className={styles.card}>
-          <Slot work={w} className={styles.cardPreview} eager={eager && i < 2} />
+          {/* Карточка — рамка с overflow hidden: веер тут порвал бы её, выключаем. */}
+          <Slot work={w} className={styles.cardPreview} eager={eager && i < 2} fan={false} />
           <div className={styles.cardText}>
             {w.title && <h3 className={styles.cardTitle}>{w.title}</h3>}
             {w.description && <p className={styles.cardDesc}>{w.description}</p>}
@@ -386,21 +386,7 @@ function TileGrid({ tiles, eager }: { tiles: Tile[]; eager: boolean }) {
         {tiles.map((t, i) => {
           const isEager = eager && i < EAGER_TILES
           return (
-            <Link
-              key={t.id}
-              to={workHref(t)}
-              className={styles.tile}
-              aria-label={t.title ?? 'Открыть работу'}
-              data-test="projects-tile"
-            >
-              <TileImage
-                variants={t.variants}
-                className={styles.tilePicture}
-                imgClassName={styles.tileImg}
-                aspectRatio={`${t.w} / ${t.h}`}
-                eager={isEager}
-              />
-            </Link>
+            <WorkLink key={t.id} work={t} className={styles.tile} eager={isEager} data-test="projects-tile" />
           )
         })}
       </Masonry>

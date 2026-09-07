@@ -1,7 +1,7 @@
 // Типы ответов публичного API (docs/architecture.md §7; контракты задачи 03 —
 // back/src/dto.ts, расширение редизайна — docs/projects-redesign.md §5, задача 14).
 // Совместимы с masonry-листингом фронта (front/CLAUDE.md): тайл —
-// { id, slug, title, src, w, h, cat, sub, variants }. Зеркалят back/src/dto.ts;
+// { id, slug, title, src, w, h, cat, sub, variants, peek }. Зеркалят back/src/dto.ts;
 // форма СТАБИЛЬНА — менять синхронно с бэкендом.
 
 /**
@@ -10,7 +10,9 @@
  * `src` — URL thumb cover-картинки (`/media/...`, jpg-fallback); `w/h` — натуральные размеры
  * (фронт ставит aspect-ratio → нет скачков layout); `cat`/`sub` — слаги пути: тайл сразу знает
  * свой канонический URL и рендерится настоящей ссылкой (в т.ч. с глобального листинга);
- * `variants` — thumb в avif/webp/jpg для `<picture>` (avif втрое легче jpg).
+ * `variants` — thumb в avif/webp/jpg для `<picture>` (avif втрое легче jpg);
+ * `peek` — до двух СЛЕДУЮЩИХ картинок работы (после обложки) для hover-«веера» тайла на
+ * десктопе (`desktop/WorkLink`): пустой массив — веера нет, тайл ведёт себя как обычно.
  */
 export interface Tile {
   id: number
@@ -21,6 +23,14 @@ export interface Tile {
   h: number
   cat: string
   sub: string
+  variants: VariantUrls
+  peek: PeekImage[]
+}
+
+/** Картинка hover-«веера» тайла: размеры + thumb-варианты. */
+export interface PeekImage {
+  w: number
+  h: number
   variants: VariantUrls
 }
 

@@ -1,0 +1,128 @@
+/* Ссылка-стопка работы (desktop): обложка + peek-карточки hover-«веера».
+   Раскладку в сетке (margin, aspect-ratio, обычный ховер) задаёт класс экрана
+   (.tile / .slot), здесь — только стопка и её хореография. Все величины — токены. */
+
+/* Стопка — свой стекинг-контекст: z-index обложки/peek'ов не течёт в сетку. */
+.host {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Обложка — первая в DOM и СВЕРХУ стопки (справа при раздвижении). */
+.cover {
+  display: block; /* убирает inline-baseline зазор под картинкой */
+  position: relative;
+  z-index: 3;
+  transform-origin: 50% 100%; /* веер раскрывается от нижней кромки, как карты в руке */
+}
+
+/* Скелетон-тон ТОЛЬКО до загрузки: под PNG с прозрачным фоном он просвечивал бы сквозь
+   прозрачные зоны молочной дымкой (см. TileImage). */
+.cover:not([data-loaded]) {
+  background: var(--c-skeleton);
+}
+
+/* Masonry: натуральная высота, пропорции — aspect-ratio на <img>. */
+.coverImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Слот витрины: обложка заполняет бокс ссылки (пропорции несёт сама ссылка). */
+.coverFill {
+  width: 100%;
+  height: 100%;
+}
+
+.coverImgFill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* слот повторяет пропорции картинки; cover лишь гасит субпиксель */
+}
+
+/* Peek-карточка: бокс = обложка, серая подложка, картинка целиком (contain — пропорции
+   могут отличаться от обложки). В покое скрыта — иначе просвечивала бы сквозь прозрачные
+   PNG-обложки. pointer-events: none — раздвинутые карточки не расширяют hit-area на соседей. */
+.peek {
+  position: absolute;
+  inset: 0;
+  z-index: 2; /* 2-я картинка — между обложкой и 3-й */
+  opacity: 0;
+  pointer-events: none;
+  background: var(--tile-peek-bg);
+  transform-origin: 50% 100%;
+}
+
+.peek + .peek {
+  z-index: 1; /* 3-я картинка — сзади */
+}
+
+.peekPicture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.peekImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ── Хореография (только настоящий hover, без reduced-motion; то же условие в WorkLink.tsx) ── */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  /* ПОКОЙ (уход курсора): сначала веер складывается (delay 0), затем тайл уменьшается,
+     z-index падает последним — иначе уменьшающийся тайл провалился бы под соседей. */
+  .host[data-fan] {
+    z-index: 1;
+    transition:
+      transform var(--dur-slow) var(--ease-out) var(--dur-base),
+      z-index 0s linear calc(var(--dur-base) + var(--dur-slow));
+  }
+
+  .host[data-fan] .cover,
+  .host[data-fan] .peek {
+    transition:
+      transform var(--dur-base) var(--ease-out) 0s,
+      opacity var(--dur-base) var(--ease-out) 0s;
+  }
+
+  /* ХОВЕР: увеличение сразу, веер — когда оно закончилось. */
+  .host[data-fan]:hover {
+    z-index: 2;
+    transform: scale(var(--tile-hover-scale));
+    transition:
+      transform var(--dur-slow) var(--ease-out) 0s,
+      z-index 0s linear 0s;
+  }
+
+  .host[data-fan]:hover .cover,
+  .host[data-fan]:hover .peek {
+    transition-delay: var(--dur-slow);
+  }
+
+  .host[data-fan]:hover .peek {
+    opacity: 1;
+  }
+
+  /* Три карточки: обложка → вправо/+угол, 2-я остаётся, 3-я → влево/−угол. */
+  .host[data-fan='2']:hover .cover {
+    transform: translateX(var(--tile-fan-shift)) rotate(var(--tile-fan-angle));
+  }
+
+  .host[data-fan='2']:hover .peek + .peek {
+    transform: translateX(calc(-1 * var(--tile-fan-shift))) rotate(calc(-1 * var(--tile-fan-angle)));
+  }
+
+  /* Две карточки: пара расходится симметрично на половинные величины (обложка всё так же справа). */
+  .host[data-fan='1']:hover .cover {
+    transform: translateX(calc(0.5 * var(--tile-fan-shift))) rotate(calc(0.5 * var(--tile-fan-angle)));
+  }
+
+  .host[data-fan='1']:hover .peek {
+    transform: translateX(calc(-0.5 * var(--tile-fan-shift))) rotate(calc(-0.5 * var(--tile-fan-angle)));
+  }
+}

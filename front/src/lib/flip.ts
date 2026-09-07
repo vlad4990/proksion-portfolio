@@ -6,14 +6,21 @@
 // экране ещё прежние, так что склейка по снимку бесшовна. Для ОБРАТНОГО полёта при
 // закрытии живой тайл ищется заново по канонической ссылке (findLiveTile).
 // Один слушатель покрывает ВСЕ ссылки на работы в обоих деревьях — без правок разметки.
+//
+// Снимок учитывает transform стопки hover-«веера» (desktop/WorkLink): по клику ссылка
+// масштабирована, а обложка сдвинута и повёрнута. bbox повёрнутого элемента раздут, поэтому
+// геометрия считается как визуальный прямоугольник + угол (см. coverGeometry) — модалка
+// стартует ровно из повёрнутой обложки, без рывка.
 
 export interface FlipSource {
   /** Слаг (или легаси-id) работы из href — модалка сверяет со своим URL-параметром. */
   slug: string
   /** Канонический pathname ссылки — поиск живого тайла при закрытии. */
   path: string
-  /** Геометрия картинки тайла на момент клика. */
+  /** Визуальный прямоугольник картинки тайла на момент клика — БЕЗ поворота (см. `rot`). */
   rect: DOMRect
+  /** Поворот картинки в градусах (обложка в раздвинутом веере); 0 — обычный тайл. */
+  rot: number
   /** currentSrc thumb — формат уже в кэше браузера; фон-плейсхолдер первой картинки. */
   src: string
   /** Аспект картинки (natural, иначе из rect) — скелетон/ширина колонки до загрузки детали. */
@@ -56,18 +63,49 @@ function imageAspect(img: HTMLImageElement, rect: DOMRect): number | null {
   return rect.height > 0 ? rect.width / rect.height : null
 }
 
+/**
+ * Визуальная геометрия обложки. Ссылка может быть масштабирована (hover-веер: scale на <a>),
+ * а сама обложка (<picture>) — сдвинута и повёрнута; bbox повёрнутого элемента раздут
+ * (≈+8% при 7°). Поэтому: размер = layout-размер × масштаб ссылки (ссылка не повёрнута —
+ * её bbox честный), центр = центр bbox картинки (поворот центр сохраняет), угол — из
+ * computed transform обложки; верхний-левый угол = центр + поворот вектора (−w/2, −h/2).
+ * Без ховера всё вырождается в обычный getBoundingClientRect (scale 1, угол 0).
+ */
+function coverGeometry(anchor: Element, img: HTMLImageElement): { rect: DOMRect; rot: number } {
+  const bbox = img.getBoundingClientRect()
+  const scale = anchor instanceof HTMLElement && anchor.offsetWidth > 0
+    ? anchor.getBoundingClientRect().width / anchor.offsetWidth
+    : 1
+  const w = img.offsetWidth * scale
+  const h = img.offsetHeight * scale
+  if (w <= 0 || h <= 0) return { rect: bbox, rot: 0 }
+  const picture = img.closest('picture') ?? img
+  const transform = getComputedStyle(picture).transform
+  const m = transform && transform !== 'none' ? new DOMMatrix(transform) : null
+  const theta = m ? Math.atan2(m.b, m.a) : 0
+  const cx = bbox.left + bbox.width / 2
+  const cy = bbox.top + bbox.height / 2
+  const cos = Math.cos(theta)
+  const sin = Math.sin(theta)
+  const left = cx + (-w / 2) * cos - (-h / 2) * sin
+  const top = cy + (-w / 2) * sin + (-h / 2) * cos
+  return { rect: new DOMRect(left, top, w, h), rot: (theta * 180) / Math.PI }
+}
+
 function onClickCapture(e: MouseEvent): void {
   const target = e.target instanceof Element ? e.target : null
   const path = parseWorkLink(target)
   if (!path) return
-  const img = target?.closest('a[href]')?.querySelector('img')
-  if (!img) return
-  const rect = img.getBoundingClientRect()
+  const anchor = target?.closest('a[href]')
+  const img = anchor?.querySelector('img')
+  if (!anchor || !img) return
+  const { rect, rot } = coverGeometry(anchor, img)
   if (rect.width <= 0 || rect.height <= 0) return
   source = {
     slug: path.work,
     path: path.pathname,
     rect,
+    rot,
     src: img.currentSrc || img.src,
     ar: imageAspect(img, rect),
   }

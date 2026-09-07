@@ -65,7 +65,7 @@ describe('public routes (seeded)', () => {
     expect(status).toBe(404)
   })
 
-  test('GET /categories/:cat/:sub → tiles strictly { id, slug, title, src, w, h, cat, sub, variants }', async () => {
+  test('GET /categories/:cat/:sub → tiles strictly { id, slug, title, src, w, h, cat, sub, variants, peek }', async () => {
     const cat = repos.category.list()[0]!
     const sub = repos.subcategory.list(cat.id)[0]!
     const { status, body } = await get(app, `/categories/${cat.slug}/${sub.slug}`)
@@ -78,6 +78,7 @@ describe('public routes (seeded)', () => {
         'cat',
         'h',
         'id',
+        'peek',
         'slug',
         'src',
         'sub',
@@ -233,6 +234,7 @@ describe('public routes (seeded)', () => {
         'cat',
         'h',
         'id',
+        'peek',
         'slug',
         'src',
         'sub',
@@ -321,7 +323,7 @@ function makeVisibleWork(repos: Repos, subcategoryId: number, slug: string, sort
   return work
 }
 
-const TILE_KEYS = ['cat', 'h', 'id', 'slug', 'src', 'sub', 'title', 'variants', 'w']
+const TILE_KEYS = ['cat', 'h', 'id', 'peek', 'slug', 'src', 'sub', 'title', 'variants', 'w']
 
 describe('GET /categories — контент секции и честные счётчики (§5.2)', () => {
   let db: Database
@@ -777,6 +779,46 @@ describe('GET /works — фильтры и SQL-пагинация (§5.4)', () =
     ])
     expect(body.items[0].w).toBe(30)
     expect(body.items[1].w).toBe(50)
+    // peek — остальные картинки работы (без обложки) в порядке sort_order, только thumb
+    expect(body.items[0].peek).toEqual([
+      {
+        w: 20,
+        h: 10,
+        variants: {
+          avif: `/media/images/${noCover.id}/${second.id}/thumb.avif`,
+          webp: `/media/images/${noCover.id}/${second.id}/thumb.webp`,
+          jpg: `/media/images/${noCover.id}/${second.id}/thumb.jpg`,
+        },
+      },
+    ])
+    expect(body.items[1].peek.map((p: { w: number }) => p.w)).toEqual([40])
+  })
+
+  test('peek: не больше двух картинок после обложки, порядок sort_order; одна картинка → []', async () => {
+    const cat = repos.category.create({ slug: 'peek-cat', title: 'Peek', sort_order: 71 })
+    const sub = repos.subcategory.create({ category_id: cat.id, slug: 'peek-sub', title: 'P' })
+    // 4 картинки, обложка — третья по порядку: peek = [1-я, 2-я] (4-я отсекается LIMIT 2)
+    const many = repos.work.create({ subcategory_id: sub.id, slug: 'many', sort_order: 0 })
+    const ids: number[] = []
+    for (const [i, w] of [[0, 11], [1, 22], [2, 33], [3, 44]] as const) {
+      const img = repos.image.create({ work_id: many.id, key_base: 'tmp', width: w, height: 10, sort_order: i })
+      repos.image.update(img.id, { key_base: `images/${many.id}/${img.id}` })
+      ids.push(img.id)
+    }
+    repos.work.update(many.id, { cover_image_id: ids[2]! })
+    // одна картинка → peek пустой
+    const single = repos.work.create({ subcategory_id: sub.id, slug: 'single', sort_order: 1 })
+    const only = repos.image.create({ work_id: single.id, key_base: 'tmp', width: 5, height: 5 })
+    repos.image.update(only.id, { key_base: `images/${single.id}/${only.id}` })
+
+    const { body } = await get(app, `/works?category=${cat.slug}`)
+    expect(body.items[0].w).toBe(33)
+    expect(body.items[0].peek.map((p: { w: number }) => p.w)).toEqual([11, 22])
+    expect(body.items[0].peek[0].variants.jpg).toBe(`/media/images/${many.id}/${ids[0]}/thumb.jpg`)
+    expect(body.items[1].peek).toEqual([])
+    // repo-путь (/categories/:cat/:sub) отдаёт тот же peek
+    const listing = (await get(app, `/categories/${cat.slug}/${sub.slug}`)).body
+    expect(listing.works).toEqual(body.items)
   })
 
   test('тайл фильтрованного листинга совпадает с тайлом листинга подкатегории', async () => {

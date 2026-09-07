@@ -16,7 +16,10 @@ import { imageVariants, mediaUrl, type ImageVariants, type VariantUrls } from '.
  * `cat`/`sub` — слаги пути: тайл ЛЮБОГО листинга (включая глобальный `/works`) сразу знает
  * свой канонический URL, и фронт рендерит настоящую ссылку;
  * `variants` — thumb во всех форматах (avif/webp/jpg) для `<picture>` в листинге
- * (avif втрое легче jpg; `src` остаётся jpg-fallback для потребителей без `<picture>`).
+ * (avif втрое легче jpg; `src` остаётся jpg-fallback для потребителей без `<picture>`);
+ * `peek` — до двух СЛЕДУЮЩИХ картинок работы (после обложки, порядок `sort_order, id`) для
+ * hover-«веера» тайла на десктопе: фронт по нему знает, у каких работ есть что показать,
+ * ещё до клика и без запроса детали.
  */
 export interface Tile {
   id: number
@@ -27,6 +30,14 @@ export interface Tile {
   h: number
   cat: string
   sub: string
+  variants: VariantUrls
+  peek: PeekImage[]
+}
+
+/** Картинка hover-«веера» тайла: размеры + thumb-варианты (full не нужен — это превью). */
+export interface PeekImage {
+  w: number
+  h: number
   variants: VariantUrls
 }
 
@@ -44,6 +55,8 @@ export interface TileRow {
   key_base: string
   width: number
   height: number
+  /** JSON-массив `[key_base, width, height]` остальных картинок (≤2, см. `PEEK_JSON`); `'[]'`, если их нет. */
+  peek_json: string
 }
 
 /** Работа кураторской витрины (`/featured`): тайл + описание для карточек варианта `cards`. */
@@ -186,8 +199,11 @@ export interface WorksPage {
 
 // ── Сериализаторы ──────────────────────────────────────────────────────────────
 
-/** Тайл из плоской строки SQL-листинга (порядок ключей — как в `toTile`). */
-export function tileFromRow(row: TileRow): Tile {
+/** Сколько картинок после обложки несёт тайл (`peek`) — столько же, сколько показывает веер. */
+export const PEEK_LIMIT = 2
+
+/** Общая часть тайла (всё, кроме `peek`) — из полей обложки и пути. */
+function baseTile(row: Omit<TileRow, 'peek_json'>): Omit<Tile, 'peek'> {
   return {
     id: row.id,
     slug: row.slug,
@@ -201,22 +217,55 @@ export function tileFromRow(row: TileRow): Tile {
   }
 }
 
+function peekImage(keyBase: string, w: number, h: number): PeekImage {
+  return { w, h, variants: imageVariants(keyBase).thumb }
+}
+
+/** `peek` из JSON-колонки SQL-листинга: `[[key_base, width, height], …]`. */
+function peekFromJson(json: string): PeekImage[] {
+  const rows = JSON.parse(json) as [string, number, number][]
+  return rows.slice(0, PEEK_LIMIT).map(([keyBase, w, h]) => peekImage(keyBase, w, h))
+}
+
+/** `peek` из доменных картинок (repo-путь): вызывающий уже исключил обложку и отсортировал. */
+function peekFromImages(images: Image[]): PeekImage[] {
+  return images.slice(0, PEEK_LIMIT).map((i) => peekImage(i.key_base, i.width, i.height))
+}
+
+/** Тайл из плоской строки SQL-листинга (порядок ключей — как в `toTile`). */
+export function tileFromRow(row: TileRow): Tile {
+  return { ...baseTile(row), peek: peekFromJson(row.peek_json) }
+}
+
 /** Работа витрины: тайл + описание (для карточек варианта `cards`). */
 export function featuredWorkFromRow(row: FeaturedRow): FeaturedWork {
   return { ...tileFromRow(row), description: row.description }
 }
 
-export function toTile(work: Work, cover: Image, catSlug: string, subSlug: string): Tile {
-  return tileFromRow({
-    id: work.id,
-    slug: work.slug,
-    title: work.title,
-    cat: catSlug,
-    sub: subSlug,
-    key_base: cover.key_base,
-    width: cover.width,
-    height: cover.height,
-  })
+/**
+ * Тайл из доменных строк. `others` — остальные картинки работы БЕЗ обложки в порядке
+ * `sort_order, id` (как отдаёт `repos.image.list`); в `peek` попадают первые `PEEK_LIMIT`.
+ */
+export function toTile(
+  work: Work,
+  cover: Image,
+  catSlug: string,
+  subSlug: string,
+  others: Image[] = [],
+): Tile {
+  return {
+    ...baseTile({
+      id: work.id,
+      slug: work.slug,
+      title: work.title,
+      cat: catSlug,
+      sub: subSlug,
+      key_base: cover.key_base,
+      width: cover.width,
+      height: cover.height,
+    }),
+    peek: peekFromImages(others),
+  }
 }
 
 export function toImageDetail(image: Image): ImageDetail {

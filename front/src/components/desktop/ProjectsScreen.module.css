@@ -274,19 +274,21 @@
 /* Выровненные ряды (justified): слот несёт inline aspect-ratio и `--ar` (= w/h) из данных
    картинки, ряд — flex, ширина слота ∝ пропорциям (flex-grow: var(--ar)), высота ряда
    выводится сама. Слот повторяет пропорции картинки → она видна целиком, без обрезки
-   (object-fit: cover лишь гасит субпиксельное округление ширин). */
+   (object-fit: cover лишь гасит субпиксельное округление ширин). Сам слот — WorkLink
+   (обложка + peek-карточки веера, стили стопки — WorkLink.module.css); overflow НЕ режем —
+   раздвинутый веер выходит за бокс слота (радиус 0, обрезать нечего). */
 .slot {
   position: relative;
   display: block;
   min-width: 0;
-  overflow: hidden;
   border-radius: var(--radius-tile);
   text-decoration: none;
   outline: none;
   transition: opacity var(--dur-base) var(--ease-out);
 }
 
-.slot:hover {
+/* Обычный ховер — только у слотов без веера (с веером — хореография WorkLink). */
+.slot:not([data-fan]):hover {
   opacity: 0.88;
 }
 
@@ -294,28 +296,10 @@
   box-shadow: 0 0 0 3px var(--accent);
 }
 
-.slotPicture {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* Скелетон-тон ТОЛЬКО до загрузки: у работ бывают PNG с прозрачным фоном — оставленный
-   под ними тон просвечивал бы сквозь прозрачные зоны молочной дымкой (см. TileImage). */
-.slotPicture:not([data-loaded]) {
-  background: var(--c-skeleton);
-}
-
-.slotImg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Пилюля-подпись hero-слота — заголовок работы. */
+/* Пилюля-подпись hero-слота — заголовок работы; поверх стопки (обложка в WorkLink — z 3). */
 .caption {
   position: absolute;
+  z-index: 4;
   left: 16px;
   bottom: 16px;
   max-width: calc(100% - 32px);
@@ -449,7 +433,8 @@
   background-clip: padding-box;
 }
 
-/* Картиночный тайл — <Link> вокруг <picture>; скелетоны загрузки — <div> с тем же классом. */
+/* Картиночный тайл — WorkLink (<Link> вокруг обложки + peek-карточки веера, стили стопки —
+   WorkLink.module.css); скелетоны загрузки — <div> с тем же классом. */
 .tile {
   display: block;
   width: 100%;
@@ -459,27 +444,13 @@
   transition: transform 180ms var(--ease-out);
 }
 
-.tilePicture {
-  display: block; /* убирает inline-baseline зазор под картинкой */
-}
-
-/* Скелетон-тон ТОЛЬКО до загрузки (см. .slotPicture). */
-.tilePicture:not([data-loaded]) {
-  background: var(--c-skeleton);
-}
-
 /* Пустая заглушка-скелетон (тайл/слот без картинки) — фон на самом блоке. */
 .fillSkeleton {
   background: var(--c-skeleton);
 }
 
-.tileImg {
-  display: block;
-  width: 100%;
-  height: auto; /* натуральные пропорции — без обрезки */
-}
-
-.tile:hover {
+/* Обычный ховер — только у тайлов без веера (с веером — хореография WorkLink). */
+.tile:not([data-fan]):hover {
   transform: scale(1.02);
 }
 

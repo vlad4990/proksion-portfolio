@@ -35,19 +35,22 @@ function springFrames({ stiffness = 300, damping = 30, mass = 1 }: SpringOptions
   return { frames, duration: ((frames.length - 1) / FPS) * 1000 }
 }
 
-/** Смещение/масштаб элемента относительно его естественного места (identity = 0,0,1,1). */
+/** Смещение/масштаб/поворот элемента относительно его естественного места (identity = 0,0,1,1,0). */
 export interface TransformDelta {
   x: number
   y: number
   sx?: number
   sy?: number
+  /** Поворот, градусы (обложка раздвинутого hover-веера); порядок — translate → scale → rotate. */
+  r?: number
 }
 
 /** transform для доли делты k: k=1 — полная делта (позиция/масштаб тайла), k=0 — identity. */
 function frameTransform(d: TransformDelta, k: number): string {
   const sx = d.sx ?? 1
   const sy = d.sy ?? 1
-  return `translate(${d.x * k}px, ${d.y * k}px) scale(${1 + (sx - 1) * k}, ${1 + (sy - 1) * k})`
+  const base = `translate(${d.x * k}px, ${d.y * k}px) scale(${1 + (sx - 1) * k}, ${1 + (sy - 1) * k})`
+  return d.r ? `${base} rotate(${d.r * k}deg)` : base
 }
 
 export interface SpringAnimateOptions {

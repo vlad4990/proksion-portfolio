@@ -285,11 +285,14 @@ Caddy срезает префикс `/api` (`handle_path /api/*` в корнев
 | GET   | `/works/:cat/:sub/:work`            | полная работа: описание + все картинки (варианты, `w/h`, alt)|
 
 Форма тайла для листинга совместима с masonry-фронтом:
-`{ id, slug, title, src, w, h, cat, sub, variants }` (`slug`/`title` = слаг работы для
+`{ id, slug, title, src, w, h, cat, sub, variants, peek }` (`slug`/`title` = слаг работы для
 канонического URL модалки и заголовок — подпись hero-тайла витрины, aria-label, списки админки;
 `src` = URL `thumb` cover-картинки в jpg — fallback, `variants` = thumb в avif/webp/jpg для
 `<picture>` в листинге, `w/h` = натуральные размеры → aspect-ratio без скачков,
-`cat`/`sub` = слаги пути — тайл любого листинга сразу знает канонический URL
+`cat`/`sub` = слаги пути — тайл любого листинга сразу знает канонический URL,
+`peek` = до двух СЛЕДУЮЩИХ картинок работы после обложки (`{ w, h, variants }`, только thumb,
+порядок `sort_order, id`) для hover-«веера» тайла на десктопе — считается в SQL одной
+JSON-колонкой (`PEEK_JSON` в `queries.ts`), repo-путь (`toTile(..., others)`) даёт ту же форму
 `/projects/:cat/:sub/:slug`, и фронт рендерит настоящую ссылку).
 
 **Расширение под редизайн листинга** (задача 14; контракт — `projects-redesign.md` §5):

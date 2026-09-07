@@ -12,12 +12,12 @@ import { useCategory } from '../../api/useCategory'
 import { useInfiniteWorks } from '../../api/useInfiniteWorks'
 import type { CategoryDetail, Tile } from '../../api/types'
 import { CountBadge } from '../shared/CountBadge'
-import { TileImage } from '../TileImage'
 import { FilterChip } from '../shared/FilterChip'
 import { formatUpdated } from '../../lib/format'
-import { categoryHref, subcategoryHref, workHref } from '../../lib/links'
+import { categoryHref, subcategoryHref } from '../../lib/links'
 import { ROUTE_TITLES, categoryTitle } from '../../seo'
 import { ProjectsFooter } from './ProjectsFooter'
+import { WorkLink } from './WorkLink'
 import layout from '../../styles/layout.module.css'
 import styles from './CategoryScreen.module.css'
 
@@ -152,21 +152,7 @@ function TileGrid({ tiles, loadingMore }: { tiles: Tile[]; loadingMore: boolean 
           ...tiles.map((t, i) => {
             const eager = i < EAGER_TILES
             return (
-              <Link
-                key={t.id}
-                to={workHref(t)}
-                className={styles.tile}
-                aria-label={t.title ?? 'Открыть работу'}
-                data-test="projects-tile"
-              >
-                <TileImage
-                  variants={t.variants}
-                  className={styles.tilePicture}
-                  imgClassName={styles.tileImg}
-                  aspectRatio={`${t.w} / ${t.h}`}
-                  eager={eager}
-                />
-              </Link>
+              <WorkLink key={t.id} work={t} className={styles.tile} eager={eager} data-test="projects-tile" />
             )
           }),
           ...(loadingMore

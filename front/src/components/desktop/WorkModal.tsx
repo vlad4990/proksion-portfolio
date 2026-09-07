@@ -143,6 +143,8 @@ export function WorkModal() {
     if (first && src) {
       // Старт — СНИМОК геометрии тайла на момент клика (см. lib/flip: живой узел к этому
       // моменту мог быть пересоздан реконсиляцией листинга, но пиксели на экране прежние).
+      // `r` — поворот обложки раздвинутого hover-веера (0 у обычного тайла): полёт начинается
+      // из повёрнутой карточки и выпрямляется в пути.
       const from = src.rect
       const to = first.getBoundingClientRect()
       if (to.width > 0 && to.height > 0 && from.width > 0 && from.height > 0) {
@@ -153,6 +155,7 @@ export function WorkModal() {
             y: from.top - to.top,
             sx: from.width / to.width,
             sy: from.height / to.height,
+            r: src.rot,
           },
           { spring: FLY },
         )

@@ -6,7 +6,7 @@
 //
 // Брендово-нейтрален: ни цветов, ни размеров не хардкодит — стили приходят классами.
 
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import type { VariantUrls } from '../api/types'
 import { useImageLoaded } from '../lib/useImageLoaded'
 
@@ -22,6 +22,8 @@ interface TileImageProps {
   /** Первый экран: eager-загрузка + высокий приоритет. */
   eager?: boolean
   alt?: string
+  /** Картинка загружена (или упала) — родитель может домонтировать зависимую от неё вёрстку. */
+  onLoaded?: () => void
 }
 
 export function TileImage({
@@ -31,10 +33,14 @@ export function TileImage({
   aspectRatio,
   eager = false,
   alt = '',
+  onLoaded,
 }: TileImageProps) {
   const imgRef = useRef<HTMLImageElement>(null)
   // Ключ состояния — URL источника: смена картинки в том же узле возвращает скелетон.
   const loaded = useImageLoaded(imgRef, variants.jpg)
+  useEffect(() => {
+    if (loaded) onLoaded?.()
+  }, [loaded, onLoaded])
 
   return (
     <picture className={className} {...(loaded ? { 'data-loaded': '' } : {})}>

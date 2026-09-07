@@ -15,6 +15,7 @@ import type { Database } from 'bun:sqlite'
 import type { Image, Tag, Work } from './types.ts'
 import type { Repos } from './repos.ts'
 import {
+  PEEK_LIMIT,
   featuredWorkFromRow,
   tileFromRow,
   toTagNav,
@@ -47,7 +48,10 @@ export function resolveCover(repos: Repos, work: Work): Image | null {
  *  дополнительных запросов на них не нужно. */
 export function workTile(repos: Repos, work: Work, catSlug: string, subSlug: string): Tile | null {
   const cover = resolveCover(repos, work)
-  return cover ? toTile(work, cover, catSlug, subSlug) : null
+  if (!cover) return null
+  // Остальные картинки (без обложки) уже в порядке sort_order, id — тот же, что у PEEK_JSON.
+  const others = repos.image.list(work.id).filter((image) => image.id !== cover.id)
+  return toTile(work, cover, catSlug, subSlug, others)
 }
 
 /** Тайлы всех работ подкатегории, в порядке `sort_order` (репозиторий уже сортирует). */
@@ -78,10 +82,24 @@ const COVER_ID = `COALESCE(
 /** Критерий видимости работы (см. шапку файла). Используется и листингами, и счётчиками. */
 const VISIBLE = 'EXISTS (SELECT 1 FROM image i WHERE i.work_id = w.id)'
 
+/**
+ * `peek` тайла одной JSON-колонкой: до `PEEK_LIMIT` картинок работы ПОСЛЕ обложки
+ * (`img` — уже отрезолвленный cover из `TILE_FROM`), порядок `sort_order, id` — тот же, что у
+ * `repos.image.list` (паритет SQL- и repo-листингов). Форма — `[[key_base, width, height], …]`,
+ * разбирает `tileFromRow`; на ноль строк `json_group_array` даёт `'[]'`, не NULL. Ссылки на
+ * `w.id`/`img.id` из derived table внутри скалярного подзапроса SQLite разрешает; ORDER BY
+ * внутри агрегата — чтобы порядок массива не зависел от плана.
+ */
+const PEEK_JSON = `(SELECT json_group_array(json_array(p.key_base, p.width, p.height) ORDER BY p.sort_order, p.id)
+        FROM (SELECT key_base, width, height, sort_order, id FROM image
+               WHERE work_id = w.id AND id <> img.id
+               ORDER BY sort_order, id LIMIT ${PEEK_LIMIT}) p)`
+
 /** Колонки тайла — ровно поля `TileRow`. */
 const TILE_COLUMNS = `w.id AS id, w.slug AS slug, w.title AS title,
          c.slug AS cat, s.slug AS sub,
-         img.key_base AS key_base, img.width AS width, img.height AS height`
+         img.key_base AS key_base, img.width AS width, img.height AS height,
+         ${PEEK_JSON} AS peek_json`
 
 /** Работа + путь (категория/подкатегория) + отрезолвленная cover-картинка. */
 const TILE_FROM = `FROM work w

@@ -135,6 +135,15 @@ export interface Tile {
   cat: string
   sub: string
   variants: VariantUrls
+  /** До двух следующих картинок работы для hover-«веера» публичного фронта; админка не использует. */
+  peek?: PeekImage[]
+}
+
+/** Картинка hover-«веера» тайла (публичный фронт): размеры + thumb-варианты. */
+export interface PeekImage {
+  w: number
+  h: number
+  variants: VariantUrls
 }
 
 /** Работа кураторской витрины: тайл + описание. */

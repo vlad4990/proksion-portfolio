@@ -218,11 +218,15 @@ CREATE INDEX idx_work_featured  ON work(featured_order) WHERE featured_order IS 
 ### 5.1 Расширение `Tile`
 
 ```ts
-Tile { id, slug, title, src, w, h, cat, sub, variants }   // + slug, + title (string|null)
+Tile { id, slug, title, src, w, h, cat, sub, variants, peek }   // + slug, + title (string|null), + peek
+PeekImage { w, h, variants }                                     // thumb-варианты
 ```
 
 `slug` нужен для слаговых URL модалки, `title` — для aria-label, подписи hero-тайла
-витрины и списков в админке.
+витрины и списков в админке. `peek` (2026-09-08) — до двух следующих картинок работы после
+обложки для hover-«веера» тайла (`desktop/WorkLink`): пустой массив = веера нет. Витрины
+(`FeaturedWork extends Tile`) получают его автоматически. В админке поле опциональное
+(не используется).
 
 ### 5.2 Категории
 

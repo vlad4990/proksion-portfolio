@@ -69,11 +69,13 @@ describe('toTile', () => {
         webp: '/media/images/42/7/thumb.webp',
         jpg: '/media/images/42/7/thumb.jpg',
       },
+      peek: [],
     })
     expect(Object.keys(tile).sort()).toEqual([
       'cat',
       'h',
       'id',
+      'peek',
       'slug',
       'src',
       'sub',
@@ -85,6 +87,35 @@ describe('toTile', () => {
 
   test('title остаётся null, если у работы его нет', () => {
     expect(toTile(makeWork({ title: null }), makeImage(), 'c', 's').title).toBeNull()
+  })
+
+  test('peek — не больше двух остальных картинок, только thumb-варианты и размеры', () => {
+    const others = [
+      makeImage({ id: 8, key_base: 'images/42/8', width: 640, height: 480 }),
+      makeImage({ id: 9, key_base: 'images/42/9', width: 300, height: 200 }),
+      makeImage({ id: 10, key_base: 'images/42/10', width: 100, height: 100 }),
+    ]
+    const tile = toTile(makeWork({ id: 42 }), makeImage({ key_base: 'images/42/7' }), 'c', 's', others)
+    expect(tile.peek).toEqual([
+      {
+        w: 640,
+        h: 480,
+        variants: {
+          avif: '/media/images/42/8/thumb.avif',
+          webp: '/media/images/42/8/thumb.webp',
+          jpg: '/media/images/42/8/thumb.jpg',
+        },
+      },
+      {
+        w: 300,
+        h: 200,
+        variants: {
+          avif: '/media/images/42/9/thumb.avif',
+          webp: '/media/images/42/9/thumb.webp',
+          jpg: '/media/images/42/9/thumb.jpg',
+        },
+      },
+    ])
   })
 })
 
@@ -102,8 +133,37 @@ describe('tileFromRow / featuredWorkFromRow', () => {
         key_base: 'images/42/7',
         width: 640,
         height: 480,
+        peek_json: '[]',
       }),
     ).toEqual(toTile(work, cover, 'kupikod', 'bannera'))
+  })
+
+  test('tileFromRow разбирает peek_json (SQL) в тот же peek, что toTile из доменных картинок', () => {
+    const others = [
+      makeImage({ id: 8, key_base: 'images/42/8', width: 640, height: 480 }),
+      makeImage({ id: 9, key_base: 'images/42/9', width: 300, height: 200 }),
+    ]
+    const fromRow = tileFromRow({
+      id: 42,
+      slug: 'bannery',
+      title: 'Баннеры',
+      cat: 'kupikod',
+      sub: 'bannera',
+      key_base: 'images/42/7',
+      width: 640,
+      height: 480,
+      peek_json: '[["images/42/8",640,480],["images/42/9",300,200]]',
+    })
+    expect(fromRow.peek).toHaveLength(2)
+    expect(fromRow).toEqual(
+      toTile(
+        makeWork({ id: 42, slug: 'bannery', title: 'Баннеры' }),
+        makeImage({ key_base: 'images/42/7', width: 640, height: 480 }),
+        'kupikod',
+        'bannera',
+        others,
+      ),
+    )
   })
 
   test('featuredWorkFromRow — тайл + description', () => {
@@ -116,6 +176,7 @@ describe('tileFromRow / featuredWorkFromRow', () => {
       key_base: 'images/1/1',
       width: 10,
       height: 20,
+      peek_json: '[]',
       description: 'Описание витрины',
     })
     expect(featured.description).toBe('Описание витрины')
@@ -124,6 +185,7 @@ describe('tileFromRow / featuredWorkFromRow', () => {
       'description',
       'h',
       'id',
+      'peek',
       'slug',
       'src',
       'sub',
