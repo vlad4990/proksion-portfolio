@@ -210,10 +210,35 @@ function TitleLine({ category, index }: { category: CategoryNav; index: number }
   )
 }
 
+/** Шапка секции целиком — одна ссылка в категорию (2026-09-11): клик в любое место
+ *  подсвеченной строки ведёт на `/projects/:cat`; «ВСЕ РАБОТЫ ↗» внутри — просто подпись
+ *  (вложенных `<a>` быть не должно). Ховер — подсветка `--accent-subtle` + акцентный титул,
+ *  как у строк контактов. */
+function HeadLink({
+  category,
+  className,
+  children,
+}: {
+  category: CategoryNav
+  className: string
+  children: ReactNode
+}) {
+  return (
+    <Link
+      to={categoryHref(category.slug)}
+      className={`${styles.headLink} ${className}`}
+      aria-label={`${category.title} — все работы`}
+      data-test="section-head"
+    >
+      {children}
+    </Link>
+  )
+}
+
 /** Полная голова (`showcase`): титул + описание слева, мета и «ВСЕ РАБОТЫ ↗» справа. */
 function FullHead({ category, index }: { category: CategoryNav; index: number }) {
   return (
-    <div className={styles.head}>
+    <HeadLink category={category} className={styles.head}>
       <div className={styles.headLeft}>
         <TitleLine category={category} index={index} />
         {category.description && <p className={styles.caseDesc}>{category.description}</p>}
@@ -221,26 +246,26 @@ function FullHead({ category, index }: { category: CategoryNav; index: number })
       <div className={styles.headRight}>
         {category.meta_role && <span className={styles.meta}>{category.meta_role}</span>}
         {category.period && <span className={styles.meta}>{category.period}</span>}
-        <Link to={categoryHref(category.slug)} className={styles.allLink} data-test="section-all">
+        <span className={styles.allLink} data-test="section-all">
           {ALL_WORKS_LINK}
-        </Link>
+        </span>
       </div>
-    </div>
+    </HeadLink>
   )
 }
 
 /** Лёгкая голова (`strip`/`cards`): титул слева, однострочное описание и ссылка справа. */
 function LightHead({ category, index }: { category: CategoryNav; index: number }) {
   return (
-    <div className={styles.headLight}>
+    <HeadLink category={category} className={styles.headLight}>
       <TitleLine category={category} index={index} />
       <div className={styles.lightRight}>
         {category.description && <span className={styles.meta}>{category.description}</span>}
-        <Link to={categoryHref(category.slug)} className={styles.allLink} data-test="section-all">
+        <span className={styles.allLink} data-test="section-all">
           {ALL_WORKS_LINK}
-        </Link>
+        </span>
       </div>
-    </div>
+    </HeadLink>
   )
 }
 

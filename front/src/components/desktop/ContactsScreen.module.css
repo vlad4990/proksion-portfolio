@@ -101,7 +101,7 @@
 }
 
 .row:hover {
-  background: rgba(166, 35, 35, 0.08);
+  background: var(--accent-subtle);
 }
 
 .index {
