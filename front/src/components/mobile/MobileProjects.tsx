@@ -23,7 +23,6 @@ import { ProjectsFooter } from './ProjectsFooter'
 import styles from './MobileProjects.module.css'
 
 // Тексты hero — константы экрана (дизайн-фрейм N8NrSi; мобильный подзаголовок короче).
-const HERO_OVERLINE = '// ПОРТФОЛИО — ГРАФИЧЕСКИЙ ДИЗАЙНЕР'
 const HERO_TITLE = 'ПРОЕКТЫ'
 const HERO_SUBTITLE =
   'Промо-графика для игровых брендов: соцсети, YouTube-обложки, баннеры и UI. ' +
@@ -422,7 +421,6 @@ export function MobileProjects() {
 
       <div className={styles.content} data-test="projects-content">
         <div className={styles.hero} data-test="projects-hero">
-          <span className={styles.overline}>{HERO_OVERLINE}</span>
           <div className={styles.titleRow}>
             <h1 className={styles.title} data-test="projects-title">
               {HERO_TITLE}

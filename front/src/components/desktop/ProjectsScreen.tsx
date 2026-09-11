@@ -27,7 +27,6 @@ import layout from '../../styles/layout.module.css'
 import styles from './ProjectsScreen.module.css'
 
 // Тексты hero — константы экрана (в БД их нет; дизайн-фрейм tVnqG).
-const HERO_OVERLINE = '// ПОРТФОЛИО — ГРАФИЧЕСКИЙ ДИЗАЙНЕР'
 const HERO_TITLE = 'ПРОЕКТЫ'
 const HERO_SUBTITLE =
   'Промо-графика для игровых брендов: соцсети, YouTube-обложки, баннеры и UI. ' +
@@ -490,7 +489,6 @@ export function ProjectsScreen() {
       <div className={`${layout.page} ${styles.hero}`} data-test="projects-hero">
         <div className={styles.heroTop}>
           <div className={styles.heroLeft}>
-            <span className={styles.overline}>{HERO_OVERLINE}</span>
             <div className={styles.titleRow}>
               <h1 className={styles.title} data-test="projects-title">
                 {HERO_TITLE}
