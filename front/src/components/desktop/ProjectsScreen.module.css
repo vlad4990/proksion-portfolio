@@ -61,7 +61,7 @@
 
 .subtitle {
   margin: 0;
-  max-width: 560px;
+  max-width: 640px;
   font-family: var(--font-body);
   font-size: var(--t-lead);
   font-weight: 400;
