@@ -77,9 +77,14 @@
   margin-top: -0.02em;
 }
 
-/* Red pixel marker — "enter" hint, centered under PORTFOLIO. */
+/* Red pixel marker — "enter" hint, centered under PORTFOLIO. Pulled up into
+   the PORT/FOLIO line box by a fixed fraction of its font-size (not a flat
+   -60px) — that box has empty room below the glyphs proportional to the
+   text size, so scaling the pull the same way keeps the marker just under
+   the letters at every tier instead of biting into them once the lockup
+   shrinks (see height-constrained overrides below). */
 .marker {
-  margin-top: -60px;
+  margin-top: calc(var(--t-hero-portfolio) * -60 / 520);
   height: 30px;
   display: flex;
   justify-content: center;
@@ -91,4 +96,23 @@
   transform: rotate(90deg);
   transform-origin: center center;
   animation: pkBob 1.6s ease-in-out infinite;
+}
+
+/* Height-constrained desktop viewports (short window, no fullscreen, laptop
+   browser chrome eating vertical space) — the wordmark/lockup are sized off
+   width-only tiers (tokens.css), so a wide-but-short window can overflow the
+   100vh canvas and push the arrow (and even PORT/FOLIO) out of view. These
+   are the only two consumers of --t-hero-wordmark/--t-hero-portfolio, so it's
+   safe to fall back here to a narrower tier's values (already designed to
+   fit) without touching tokens.css or any other screen's breakpoints. */
+@media (min-width: 1400px) and (max-height: 1040px) {
+  .screen { --t-hero-wordmark: 72px; --t-hero-portfolio: 340px; }
+}
+
+@media (min-width: 1100px) and (max-height: 720px) {
+  .screen { --t-hero-wordmark: 52px; --t-hero-portfolio: 220px; }
+}
+
+@media (min-width: 768px) and (max-height: 500px) {
+  .screen { --t-hero-wordmark: 40px; --t-hero-portfolio: 170px; }
 }
