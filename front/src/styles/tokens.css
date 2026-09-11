@@ -325,6 +325,6 @@ body { min-height: 100vh; }
 ::selection { background: var(--accent); color: var(--fg-strong); }
 
 @keyframes pkBob {
-  0%, 100% { transform: rotate(90deg) translateX(0); }
-  50%      { transform: rotate(90deg) translateX(8px); }
+  0%, 100% { transform: rotate(90deg) translateX(-2px); }
+  50%      { transform: rotate(90deg) translateX(2px); }
 }

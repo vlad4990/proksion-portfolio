@@ -95,7 +95,10 @@
   height: auto;
   transform: rotate(90deg);
   transform-origin: center center;
-  animation: pkBob 1.6s ease-in-out infinite;
+  /* global(): pkBob is defined once in tokens.css — CSS Modules would
+     otherwise scope this name and silently drop the animation (it did,
+     unnoticed, before this fix). */
+  animation: global(pkBob) 1.6s ease-in-out infinite;
 }
 
 /* Height-constrained desktop viewports (short window, no fullscreen, laptop
