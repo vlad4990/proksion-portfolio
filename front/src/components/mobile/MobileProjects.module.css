@@ -147,6 +147,30 @@
   border-top: var(--stroke-hairline) solid var(--hairline);
 }
 
+/* Шапка секции — единая ссылка в категорию; внутренний gap повторяет .section, подсветка
+   тапа (:active) выходит за --mob-pad отрицательными маргинами без сдвига layout. */
+.headLink {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-sizing: border-box;
+  margin: calc(-1 * var(--head-link-pad-y-mob)) calc(-1 * var(--head-link-pad-x-mob));
+  padding: var(--head-link-pad-y-mob) var(--head-link-pad-x-mob);
+  color: inherit;
+  text-decoration: none;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--dur-base) var(--ease-out);
+}
+
+.headLink:active {
+  background: var(--accent-subtle);
+}
+
+.headLink:active .caseTitle {
+  color: var(--accent);
+}
+
 .titleLine {
   display: flex;
   align-items: center;

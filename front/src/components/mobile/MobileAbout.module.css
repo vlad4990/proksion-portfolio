@@ -157,7 +157,7 @@
 
 .headLine {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   min-width: 0;
 }
@@ -167,6 +167,18 @@
   height: 16px;
   width: auto;
   flex: 0 0 auto;
+  animation: glyphSway 1.6s ease-in-out infinite;
+}
+
+/* Покачивание глифа влево-вправо на ±2px, бесконечно. Keyframes живут в модуле:
+   CSS Modules хэшируют имя в `animation`, и глобальный @keyframes его не находит. */
+@keyframes glyphSway {
+  0%, 100% { transform: translateX(-2px); }
+  50%      { transform: translateX(2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glyph { animation: none; }
 }
 
 .headTitle {
@@ -183,7 +195,7 @@
 
 .headMetaRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: 10px;
 }

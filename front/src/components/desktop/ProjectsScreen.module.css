@@ -161,9 +161,31 @@
   padding-bottom: var(--sp-section-top);
 }
 
+/* Шапка секции — единая ссылка в категорию. Подсветка ховера выходит за контентную
+   колонку на --head-link-pad-x/-y отрицательными маргинами (layout не сдвигается), хореография
+   та же, что у строк контактов: фон + акцентный титул за --dur-base. */
+.headLink {
+  display: flex;
+  box-sizing: border-box;
+  margin: calc(-1 * var(--head-link-pad-y)) calc(-1 * var(--head-link-pad-x));
+  padding: var(--head-link-pad-y) var(--head-link-pad-x);
+  color: inherit;
+  text-decoration: none;
+  background: transparent;
+  outline: none;
+  transition: background var(--dur-base) var(--ease-out);
+}
+
+.headLink:hover {
+  background: var(--accent-subtle);
+}
+
+.headLink:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
 /* Полная голова (showcase) */
 .head {
-  display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 40px;
@@ -187,7 +209,6 @@
 
 /* Лёгкая голова (strip / cards) */
 .headLight {
-  display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 40px;
@@ -227,6 +248,11 @@
   letter-spacing: var(--tracking-display);
   text-transform: uppercase;
   color: var(--fg-strong);
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.headLink:hover .caseTitle {
+  color: var(--accent);
 }
 
 .caseDesc {
@@ -259,14 +285,20 @@
   text-decoration: none;
   white-space: nowrap;
   outline: none;
-  transition: opacity var(--dur-fast) var(--ease-out);
+  transition: transform var(--dur-base) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
 }
 
-.allLink:hover {
+/* Внутри шапки-ссылки подпись едет вправо вместе с подсветкой; самостоятельные ссылки
+   с этим классом («ПОКАЗАТЬ ВСЕ РАБОТЫ ↗») по-прежнему гасятся по opacity. */
+.headLink:hover .allLink {
+  transform: translateX(4px);
+}
+
+a.allLink:hover {
   opacity: 0.75;
 }
 
-.allLink:focus-visible {
+a.allLink:focus-visible {
   box-shadow: 0 0 0 2px var(--accent);
 }
 

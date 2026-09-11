@@ -201,10 +201,17 @@ function Showcase({
 
 // ── Голова и оболочка секции ───────────────────────────────────────────────────
 
+/** Шапка секции целиком — одна ссылка в категорию (2026-09-11): тап в любое место головы
+ *  ведёт на `/projects/:cat`; «ВСЕ РАБОТЫ ↗» внутри — подпись, не вложенная ссылка. */
 function SectionHead({ category, index }: { category: CategoryNav; index: number }) {
   const meta = metaLine(category)
   return (
-    <>
+    <Link
+      to={categoryHref(category.slug)}
+      className={styles.headLink}
+      aria-label={`${category.title} — все работы`}
+      data-test="section-head"
+    >
       <div className={styles.titleLine}>
         <span className={styles.num}>{sectionNum(index)}</span>
         <h2 className={styles.caseTitle}>{category.title}</h2>
@@ -215,11 +222,11 @@ function SectionHead({ category, index }: { category: CategoryNav; index: number
       )}
       <div className={styles.metaRow}>
         {meta ? <span className={styles.meta}>{meta}</span> : <span />}
-        <Link to={categoryHref(category.slug)} className={styles.allLink} data-test="section-all">
+        <span className={styles.allLink} data-test="section-all">
           {ALL_WORKS_LINK}
-        </Link>
+        </span>
       </div>
-    </>
+    </Link>
   )
 }
 
