@@ -4,6 +4,10 @@
 // Строки, которые в дизайне набраны капсом, здесь тоже капсом (капс дублируется
 // в CSS через text-transform — на случай правки контента в нижнем регистре).
 
+import toolFigma from '../assets/icon-tool-figma.svg'
+import toolIllustrator from '../assets/icon-tool-illustrator.svg'
+import toolPhotoshop from '../assets/icon-tool-photoshop.svg'
+
 export const ABOUT_LEAD =
   'С детства я рисую, играю в компьютер, занимаюсь музыкой и полностью погружена ' +
   'в творчество по сей день: люблю комиксы, фильмы, путешествия, активно веду ' +
@@ -21,6 +25,20 @@ export const ABOUT_SKILL_ROWS: string[][] = [
 
 /** Тот же набор одним списком — мобильное дерево раскладывает его переносом строк. */
 export const ABOUT_SKILLS: string[] = ABOUT_SKILL_ROWS.flat()
+
+/** Инструменты под пилюлями «чем занимаюсь» — иконки-ассеты, общие для обоих деревьев. */
+export interface Tool {
+  /** Имя инструмента — уходит в alt картинки. */
+  name: string
+  /** URL svg-ассета (Vite отдаёт импорт svg строкой). */
+  icon: string
+}
+
+export const ABOUT_TOOLS: Tool[] = [
+  { name: 'Adobe Photoshop', icon: toolPhotoshop },
+  { name: 'Adobe Illustrator', icon: toolIllustrator },
+  { name: 'Figma', icon: toolFigma },
+]
 
 export interface Job {
   company: string

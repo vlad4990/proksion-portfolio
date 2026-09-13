@@ -5,11 +5,12 @@
 // мини-хедер экрана и общий MobileTabBar (та же договорённость, что на /projects).
 
 import markerPixel from '../../assets/icon-marker-pixel.svg'
-import photoMasked1 from '../../assets/photo-masked-1-full.webp'
+import aboutPhoto from '../../assets/about-me-photo.webp'
 import {
   ABOUT_LEAD,
   ABOUT_SKILLS,
   ABOUT_SKILLS_LABEL,
+  ABOUT_TOOLS,
   EDUCATION,
   EDUCATION_BADGE,
   EDUCATION_HEADING,
@@ -100,11 +101,19 @@ export function MobileAbout() {
               </li>
             ))}
           </ul>
+
+          <ul className={styles.tools} data-test="about-tools">
+            {ABOUT_TOOLS.map((tool) => (
+              <li key={tool.name}>
+                <img className={styles.tool} src={tool.icon} alt={tool.name} />
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className={styles.photoBlock} data-test="about-photo">
           <div className={styles.photoFrame}>
-            <img className={styles.photo} src={photoMasked1} alt="" />
+            <img className={styles.photo} src={aboutPhoto} alt="" />
           </div>
         </div>
 

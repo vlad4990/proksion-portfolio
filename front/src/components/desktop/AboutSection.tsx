@@ -4,11 +4,12 @@
 // Контент — из lib/about.ts (общий с мобильным деревом), контакты футера — lib/contacts.ts.
 
 import markerPixel from '../../assets/icon-marker-pixel.svg'
-import photoMasked1 from '../../assets/photo-masked-1-full.webp'
+import aboutPhoto from '../../assets/about-me-photo.webp'
 import {
   ABOUT_LEAD,
   ABOUT_SKILLS_LABEL,
   ABOUT_SKILL_ROWS,
+  ABOUT_TOOLS,
   EDUCATION,
   EDUCATION_BADGE,
   EDUCATION_HEADING,
@@ -87,13 +88,21 @@ export function AboutSection() {
                   ))}
                 </ul>
               ))}
+
+              <ul className={styles.tools} data-test="about-tools">
+                {ABOUT_TOOLS.map((tool) => (
+                  <li key={tool.name}>
+                    <img className={styles.tool} src={tool.icon} alt={tool.name} />
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
 
           <div className={styles.photoFrame} data-test="about-photo">
             {/* Окно обрезки отдельным слоем: оно продлено ниже кадра — до hairline секции. */}
             <div className={styles.photoClip}>
-              <img className={styles.photo} src={photoMasked1} alt="" />
+              <img className={styles.photo} src={aboutPhoto} alt="" />
             </div>
           </div>
         </div>

@@ -83,6 +83,22 @@
   white-space: nowrap;
 }
 
+/* Иконки инструментов — ряд под пилюлями навыков. */
+.tools {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.tool {
+  display: block;
+  height: var(--tool-icon-h);
+  width: auto;
+}
+
 /* Кадр фото: пропорции окна из дизайна (556 × 427) — они держат место в потоке. */
 .photoFrame {
   position: relative;
