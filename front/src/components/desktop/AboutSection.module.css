@@ -124,6 +124,7 @@
   /* 468 / 556 — доля ширины кадра, которую занимает фигура в дизайне. */
   width: 84.2%;
   height: auto;
+  border: var(--stroke-hairline) solid var(--hairline);
   pointer-events: none;
 }
 
