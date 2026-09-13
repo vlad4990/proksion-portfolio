@@ -14,16 +14,54 @@
   padding-top: var(--sp-block);
 }
 
-.cta {
+.topRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--tile-gap);
+}
+
+.lead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.leadTitle,
+.leadSubtitle {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--t-header-1);
-  line-height: var(--lh-tight);
-  /* В дизайне трекинг CTA — 1.6px на кегле --t-header-1 (80px). */
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--t-desc);
+  line-height: 1.4;
   color: var(--fg-strong);
+}
+
+.leadSubtitle {
+  font-weight: 400;
+  color: var(--fg-dim);
+}
+
+.availability {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-title);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 6px rgba(166, 35, 35, 0.18);
+  flex: 0 0 auto;
 }
 
 .row {
@@ -45,6 +83,33 @@
 
 .email:hover {
   color: var(--fg-strong);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cvButton {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--cta-btn-pad);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--t-chip);
+  line-height: 1;
+  letter-spacing: 0.07em;
+  color: var(--fg-strong);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.cvButton:hover {
+  background: var(--accent-dim);
 }
 
 .tgButton {

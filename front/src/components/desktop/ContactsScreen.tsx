@@ -34,12 +34,10 @@ export function ContactsScreen() {
     <section id="contacts" className={styles.section} data-screen-label="03 Contacts" data-test="contacts">
       <div className={`${layout.page} ${styles.grid}`}>
         <div data-test="contacts-info">
-          <div className={styles.kicker} data-test="contacts-kicker">[ Связь ]</div>
+          <div className={styles.kicker} data-test="contacts-kicker">// Связь</div>
 
           <h1 className={styles.headline} data-test="contacts-title">
-            Контак-
-            <br />
-            ты
+            Контакты
           </h1>
 
           <p className={styles.note} data-test="contacts-note">

@@ -11,16 +11,46 @@
   background: var(--bg);
 }
 
-.cta {
-  margin: 0;
+.availability {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--t-section-mob);
-  line-height: var(--lh-tight);
-  /* В дизайне трекинг CTA — 1px на кегле --t-section-mob (44px). */
-  letter-spacing: 0.023em;
+  font-weight: 700;
+  font-size: var(--t-job-mob);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 5px rgba(166, 35, 35, 0.18);
+  flex: 0 0 auto;
+}
+
+.lead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.leadTitle,
+.leadSubtitle {
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--t-body-mob);
+  line-height: 1.4;
   color: var(--fg-strong);
+}
+
+.leadSubtitle {
+  font-weight: 400;
+  color: var(--fg-dim);
 }
 
 .email {
@@ -30,6 +60,22 @@
   font-size: var(--t-section-sm-mob);
   line-height: 1;
   color: var(--accent);
+  text-decoration: none;
+}
+
+.cvButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--cta-btn-h-mob);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--t-chip-mob);
+  line-height: 1;
+  letter-spacing: 0.07em;
+  color: var(--fg-strong);
   text-decoration: none;
 }
 

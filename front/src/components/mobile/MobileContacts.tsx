@@ -13,9 +13,7 @@ export function MobileContacts() {
 
       <div className={styles.content} data-test="contacts-content">
         <h1 className={styles.title} data-test="contacts-title">
-          КОНТАК-
-          <br />
-          ТЫ
+          КОНТАКТЫ
         </h1>
 
         <p className={styles.note} data-test="contacts-note">

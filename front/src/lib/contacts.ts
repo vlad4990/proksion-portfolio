@@ -5,7 +5,7 @@
 export interface ContactChannel {
   /** Подпись канала в верхнем регистре («TELEGRAM», «EMAIL»). */
   label: string
-  /** Отображаемое значение («@kristina_pr», «hi@proksion.ru»). */
+  /** Отображаемое значение («@kristina_pr», «Proksion3@gmail.com»). */
   value: string
   href: string
   /** Ссылка-скачивание (резюме) — не внешний переход. */
@@ -14,20 +14,20 @@ export interface ContactChannel {
 
 export const TELEGRAM: ContactChannel = {
   label: 'TELEGRAM',
-  value: '@kristina_pr',
-  href: 'https://t.me/kristina_pr',
+  value: '@Proksion',
+  href: 'https://t.me/Proksion',
 }
 
 export const EMAIL: ContactChannel = {
   label: 'EMAIL',
-  value: 'hi@proksion.ru',
-  href: 'mailto:hi@proksion.ru',
+  value: 'Proksion3@gmail.com',
+  href: 'mailto:Proksion3@gmail.com',
 }
 
 export const BEHANCE: ContactChannel = {
   label: 'BEHANCE',
-  value: 'behance.net/proksion',
-  href: 'https://behance.net/proksion',
+  value: 'behance.net/Proksion',
+  href: 'https://www.behance.net/Proksion',
 }
 
 export const CV: ContactChannel = {
@@ -44,8 +44,12 @@ export const CONTACT_CHANNELS: ContactChannel[] = [TELEGRAM, EMAIL, BEHANCE, CV]
 export const FOOTER_SOCIALS: ContactChannel[] = [BEHANCE, TELEGRAM]
 
 /** Тексты футера /projects* (дизайн: фреймы tVnqG / N8NrSi). */
-export const FOOTER_CTA = 'ЕСТЬ ЗАДАЧА ПОД ГРАФИКУ?'
+export const FOOTER_LEAD_TITLE = 'Открыта к проектным и Full-time предложениям.'
+export const FOOTER_LEAD_SUBTITLE =
+  'Напишите по любому из каналов — обычно отвечаю в течение суток.'
+export const FOOTER_AVAILABILITY_LABEL = 'ДОСТУПНА ДЛЯ РАБОТЫ'
 export const FOOTER_TELEGRAM_LABEL = 'НАПИСАТЬ В TELEGRAM'
+export const FOOTER_CV_LABEL = 'CV/PDF'
 /** Текущий год — подпись в шапке, мета контактов и копирайт футера.
  *  Считается один раз при загрузке модуля, чтобы год не устаревал вручную. */
 export const CURRENT_YEAR = new Date().getFullYear()
