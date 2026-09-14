@@ -7,6 +7,8 @@
 import toolFigma from '../assets/icon-tool-figma.svg'
 import toolIllustrator from '../assets/icon-tool-illustrator.svg'
 import toolPhotoshop from '../assets/icon-tool-photoshop.svg'
+import eduKosygin from '../assets/icon-edu-kosygin.svg'
+import eduFaberje from '../assets/icon-edu-faberje.webp'
 
 export const ABOUT_LEAD =
   'С детства я рисую, играю в компьютер, занимаюсь музыкой и полностью погружена ' +
@@ -88,6 +90,8 @@ export const JOBS: Job[] = [
 export interface Education {
   degree: string
   school: string
+  /** Логотип учебного заведения — svg-ассет, ставится перед school слева. */
+  icon: string
 }
 
 export const EDUCATION_HEADING = 'ОБРАЗОВАНИЕ'
@@ -99,9 +103,11 @@ export const EDUCATION: Education[] = [
   {
     degree: 'МОНУМЕНТАЛЬНАЯ ЖИВОПИСЬ',
     school: 'РГУ им. А.Н. Косыгина, Институт искусств',
+    icon: eduKosygin,
   },
   {
     degree: 'ХУДОЖНИК-МАСТЕР, ПЕДАГОГ',
     school: 'Колледж декоративно-прикладного искусства им. Карла Фаберже',
+    icon: eduFaberje,
   },
 ]

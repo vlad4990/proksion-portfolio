@@ -320,6 +320,9 @@
 
 /* Отступы записей — из дизайна: первая 4/20, следующие 20 сверху, последняя 24 снизу. */
 .edu {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   padding-top: 4px;
   padding-bottom: 20px;
 }
@@ -331,6 +334,16 @@
 
 .edu:last-child {
   padding-bottom: 24px;
+}
+
+.eduIcon {
+  flex: none;
+  width: var(--edu-icon-w-mob);
+  height: auto;
+}
+
+.eduBody {
+  min-width: 0;
 }
 
 .eduDegree {

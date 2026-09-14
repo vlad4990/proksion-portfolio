@@ -58,11 +58,14 @@ function JobEntry({ company, role, duration, bullets, dim }: Job) {
   )
 }
 
-function EducationEntry({ degree, school }: Education) {
+function EducationEntry({ degree, school, icon }: Education) {
   return (
     <div className={styles.edu} data-test="about-education">
-      <h3 className={styles.eduDegree}>{degree}</h3>
-      <span className={styles.eduSchool}>{school}</span>
+      <img className={styles.eduIcon} src={icon} alt="" />
+      <div className={styles.eduBody}>
+        <h3 className={styles.eduDegree}>{degree}</h3>
+        <span className={styles.eduSchool}>{school}</span>
+      </div>
     </div>
   )
 }

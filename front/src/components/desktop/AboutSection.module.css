@@ -299,6 +299,9 @@
 }
 
 .edu {
+  display: flex;
+  align-items: center;
+  gap: 20px;
   padding-top: 8px;
   padding-bottom: 32px;
 }
@@ -306,6 +309,16 @@
 .edu + .edu {
   border-top: var(--stroke-hairline) solid var(--hairline-soft);
   padding-top: 32px;
+}
+
+.eduIcon {
+  flex: none;
+  width: var(--edu-icon-w);
+  height: auto;
+}
+
+.eduBody {
+  min-width: 0;
 }
 
 .eduDegree {
