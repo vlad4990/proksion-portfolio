@@ -23,7 +23,13 @@ export function MobileContacts() {
 
         <div className={styles.rows} data-test="contacts-channels">
           {ROWS.map((r) => (
-            <a key={r.label} className={styles.rowLink} href={r.href} data-test="contacts-row">
+            <a
+              key={r.label}
+              className={styles.rowLink}
+              href={r.href}
+              download={r.download}
+              data-test="contacts-row"
+            >
               <div className={styles.row}>
                 <span className={styles.rowLabel}>{r.label}</span>
                 <span className={styles.rowValue}>{r.download ? `${r.value} →` : r.value}</span>

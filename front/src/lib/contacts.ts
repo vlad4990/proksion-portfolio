@@ -30,10 +30,11 @@ export const BEHANCE: ContactChannel = {
   href: 'https://www.behance.net/Proksion',
 }
 
+/** Файл лежит в `front/public/` — источник и правки резюме в `hh/` (resume.html → PDF). */
 export const CV: ContactChannel = {
   label: 'CV / PDF',
   value: 'Скачать резюме',
-  href: '#',
+  href: '/Torgovtseva-Kristina-CV.pdf',
   download: true,
 }
 
