@@ -8,6 +8,11 @@ import react from '@vitejs/plugin-react'
 // Dev-сервер — на 5006 (публичный фронт держит 5005 для Chrome MCP). Dev-proxy /api →
 // локальный back (3001): Caddy в проде срезает префикс /api, в dev это делает rewrite ниже,
 // поэтому back-роуты остаются от корня (/admin/login → /api/admin/login снаружи).
+// Адреса апстримов переопределяются теми же переменными, что у публичного фронта
+// (дефолты прежние): `MEDIA_PROXY_TARGET` / `API_PROXY_TARGET`.
+const API_TARGET = process.env.API_PROXY_TARGET ?? 'http://localhost:3001'
+const MEDIA_TARGET = process.env.MEDIA_PROXY_TARGET ?? 'http://localhost:9000'
+
 export default defineConfig({
   base: '/admin/',
   plugins: [react()],
@@ -20,13 +25,13 @@ export default defineConfig({
     port: 5006,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: API_TARGET,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
       // Картинки MinIO (public-read) — на случай предпросмотра в админке.
       '/media': {
-        target: 'http://localhost:9000',
+        target: MEDIA_TARGET,
         changeOrigin: true,
       },
     },
