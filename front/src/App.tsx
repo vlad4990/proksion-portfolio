@@ -4,6 +4,7 @@ import type { Location } from 'react-router'
 import { useIsMobile } from './hooks/useIsMobile'
 import { installFlipCapture } from './lib/flip'
 import { isWorkPath } from './lib/links'
+import { metrikaHit } from './lib/metrika'
 import { installWorkPrefetch } from './lib/prefetch'
 import { ROUTE_TITLES } from './seo'
 import type { HeroPhase, Route } from './types'
@@ -125,6 +126,17 @@ export default function App() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [scrollKey])
+
+  // Яндекс.Метрика: просмотр при SPA-переходе. Первый просмотр засчитывает сам счётчик
+  // (init в index.html), поэтому стартовый адрес пропускаем — иначе вход удваивался бы.
+  const lastHitUrl = useRef<string | null>(null)
+  useEffect(() => {
+    const url = window.location.href
+    const prev = lastHitUrl.current
+    lastHitUrl.current = url
+    if (prev === null || prev === url) return
+    metrikaHit(url, prev)
+  }, [pathname, location.search])
 
   // Заголовок вкладки следует разделу; модалка работы ставит свой в useWorkModal
   // (route при этом не меняется — конфликтов нет).
