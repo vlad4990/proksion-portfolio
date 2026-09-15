@@ -1,5 +1,6 @@
 import { CONTACT_CHANNELS } from '../../lib/contacts'
 import { MobileTabBar } from './MobileTabBar'
+import edge from '../../styles/edgeFill.module.css'
 import styles from './MobileContacts.module.css'
 
 const ROWS = CONTACT_CHANNELS
@@ -7,7 +8,7 @@ const ROWS = CONTACT_CHANNELS
 export function MobileContacts() {
   return (
     <div className={styles.page} data-test="contacts">
-      <header className={styles.header} data-test="mobile-header">
+      <header className={`${styles.header} ${edge.top}`} data-test="mobile-header">
         <span className={styles.headerWordmark} data-test="mobile-wordmark">PROKSION</span>
       </header>
 

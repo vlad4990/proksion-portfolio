@@ -23,6 +23,7 @@ import type { Education, Job } from '../../lib/about'
 import { Badge } from '../shared/Badge'
 import { MobileTabBar } from './MobileTabBar'
 import { ProjectsFooter } from './ProjectsFooter'
+import edge from '../../styles/edgeFill.module.css'
 import styles from './MobileAbout.module.css'
 
 interface SectionHeadProps {
@@ -85,7 +86,7 @@ function MobileEduEntry({ degree, school, icon }: Education) {
 export function MobileAbout() {
   return (
     <div className={styles.page} data-test="about">
-      <header className={styles.header} data-test="mobile-header">
+      <header className={`${styles.header} ${edge.top}`} data-test="mobile-header">
         <span className={styles.headerWordmark} data-test="mobile-wordmark">PROKSION</span>
       </header>
 

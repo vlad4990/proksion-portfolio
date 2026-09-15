@@ -18,6 +18,7 @@ import { categoryHref, subcategoryHref, workHref } from '../../lib/links'
 import { ROUTE_TITLES, categoryTitle } from '../../seo'
 import { MobileTabBar } from './MobileTabBar'
 import { ProjectsFooter } from './ProjectsFooter'
+import edge from '../../styles/edgeFill.module.css'
 import styles from './MobileCategory.module.css'
 
 const BREAKPOINT_COLS = { default: 2 }
@@ -206,7 +207,7 @@ export function MobileCategory({ workOpen = false }: { workOpen?: boolean }) {
 
   return (
     <div className={styles.page} data-test="category">
-      <header className={styles.header} data-test="mobile-header">
+      <header className={`${styles.header} ${edge.top}`} data-test="mobile-header">
         <span className={styles.headerWordmark} data-test="mobile-wordmark">
           PROKSION
         </span>

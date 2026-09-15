@@ -24,6 +24,7 @@ import { MobileCategory } from './components/mobile/MobileCategory'
 import { MobileContacts } from './components/mobile/MobileContacts'
 import { MobileWorkModal } from './components/mobile/MobileWorkModal'
 
+import edge from './styles/edgeFill.module.css'
 import styles from './App.module.css'
 
 /** Derive the active top-level screen from the URL path. */
@@ -192,7 +193,7 @@ export default function App() {
       )}
 
       <div
-        className={styles.navHost}
+        className={`${styles.navHost} ${edge.top}`}
         style={{ display: showNav ? 'block' : 'none' }}
         data-test="nav-host"
       >

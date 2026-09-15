@@ -20,6 +20,7 @@ import { categoryHref, tagHref, workHref } from '../../lib/links'
 import { cardWorks, chunk, isDenseStrip, splitShowcase, stripWorks } from '../../lib/showcase'
 import { MobileTabBar } from './MobileTabBar'
 import { ProjectsFooter } from './ProjectsFooter'
+import edge from '../../styles/edgeFill.module.css'
 import styles from './MobileProjects.module.css'
 
 // Тексты hero — константы экрана (дизайн-фрейм N8NrSi; мобильный подзаголовок короче).
@@ -415,7 +416,7 @@ export function MobileProjects() {
 
   return (
     <div className={styles.page} data-test="projects">
-      <header className={styles.header} data-test="mobile-header">
+      <header className={`${styles.header} ${edge.top}`} data-test="mobile-header">
         <span className={styles.headerWordmark} data-test="mobile-wordmark">PROKSION</span>
       </header>
 

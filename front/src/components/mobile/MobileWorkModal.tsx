@@ -10,6 +10,7 @@ import { useFocusTrap } from '../../hooks/useFocusTrap'
 import { getFlipSource, type FlipSource } from '../../lib/flip'
 import { prefersReducedMotion, springTo, whenDone } from '../../lib/spring'
 import { WorkImage } from '../WorkImage'
+import edge from '../../styles/edgeFill.module.css'
 import styles from './MobileWorkModal.module.css'
 
 /** Шторка: критически задемпфированный спринг — плавный доезд без дребезга. */
@@ -65,7 +66,7 @@ export function MobileWorkModal() {
   const seamless = detail?.seamless === true
 
   return (
-    <div className={styles.root} data-test="work-modal">
+    <div className={`${styles.root} ${edge.top} ${edge.bottom}`} data-test="work-modal">
       <div ref={overlayRef} className={styles.sheet}>
       <div
         ref={dialogRef}

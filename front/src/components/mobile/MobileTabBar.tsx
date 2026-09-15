@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router'
 import type { Route } from '../../types'
 import { smoothScrollTo } from '../../lib/scroll'
+import edge from '../../styles/edgeFill.module.css'
 import styles from './MobileTabBar.module.css'
 
 interface MobileTabBarProps {
@@ -22,7 +23,7 @@ export function MobileTabBar({ active }: MobileTabBarProps) {
   }
 
   return (
-    <nav className={styles.bar} data-test="tab-bar">
+    <nav className={`${styles.bar} ${edge.bottom}`} data-test="tab-bar">
       {TABS.map((t) => {
         const isActive = t.id === active
         return (
