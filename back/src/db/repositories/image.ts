@@ -15,10 +15,10 @@ export interface ImageRepo {
 export function createImageRepo(db: Database): ImageRepo {
   const insert = db.query<
     Image,
-    [number, string, number, number, string | null, string | null, number]
+    [number, string, number, number, string | null, string | null, number, string | null]
   >(
-    `INSERT INTO image (work_id, key_base, width, height, alt, lqip, sort_order)
-     VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *`,
+    `INSERT INTO image (work_id, key_base, width, height, alt, lqip, sort_order, anim)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`,
   )
   const byId = db.query<Image, [number]>('SELECT * FROM image WHERE id = ?')
   const byWork = db.query<Image, [number]>(
@@ -36,6 +36,7 @@ export function createImageRepo(db: Database): ImageRepo {
         input.alt ?? null,
         input.lqip ?? null,
         input.sort_order ?? 0,
+        input.anim ?? null,
       )
       if (!row) throw new Error('image: INSERT ... RETURNING returned no row')
       return row
@@ -53,6 +54,7 @@ export function createImageRepo(db: Database): ImageRepo {
           ['alt', patch.alt],
           ['lqip', patch.lqip],
           ['sort_order', patch.sort_order],
+          ['anim', patch.anim],
         ],
         id,
         false,

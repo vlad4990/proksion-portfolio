@@ -3,7 +3,13 @@
 // их потом дорого. Любая правка формы — осознанно и синхронно с фронтом.
 
 import type { Category, DisplayVariant, Image, Subcategory, Tag, Work } from './types.ts'
-import { imageVariants, mediaUrl, type ImageVariants, type VariantUrls } from './media-url.ts'
+import {
+  imageVariants,
+  mediaUrl,
+  type ImageAnim,
+  type ImageVariants,
+  type VariantUrls,
+} from './media-url.ts'
 
 // ── Контракты ответов ─────────────────────────────────────────────────────────
 
@@ -19,7 +25,10 @@ import { imageVariants, mediaUrl, type ImageVariants, type VariantUrls } from '.
  * (avif втрое легче jpg; `src` остаётся jpg-fallback для потребителей без `<picture>`);
  * `peek` — до двух СЛЕДУЮЩИХ картинок работы (после обложки, порядок `sort_order, id`) для
  * hover-«веера» тайла на десктопе: фронт по нему знает, у каких работ есть что показать,
- * ещё до клика и без запроса детали.
+ * ещё до клика и без запроса детали;
+ * `animated` — обложка анимирована (кадры лежат в `variants.webp`): поле есть ТОЛЬКО у таких
+ * тайлов, и по нему фронт не подставляет avif-источник — avif всегда статичный первый кадр.
+ * У тяжёлых лент (`image.anim = 'gif'`) флага нет: там анимацию видно только в модалке.
  */
 export interface Tile {
   id: number
@@ -32,6 +41,7 @@ export interface Tile {
   sub: string
   variants: VariantUrls
   peek: PeekImage[]
+  animated?: boolean
 }
 
 /** Картинка hover-«веера» тайла: размеры + thumb-варианты (full не нужен — это превью). */
@@ -39,6 +49,7 @@ export interface PeekImage {
   w: number
   h: number
   variants: VariantUrls
+  animated?: boolean
 }
 
 /**
@@ -55,7 +66,9 @@ export interface TileRow {
   key_base: string
   width: number
   height: number
-  /** JSON-массив `[key_base, width, height]` остальных картинок (≤2, см. `PEEK_JSON`); `'[]'`, если их нет. */
+  /** Носитель анимации обложки (колонка `image.anim`); `null` — статичная картинка. */
+  anim: ImageAnim | null
+  /** JSON-массив `[key_base, width, height, anim]` остальных картинок (≤2, см. `PEEK_JSON`); `'[]'`, если их нет. */
   peek_json: string
 }
 
@@ -89,7 +102,11 @@ export interface TagNav {
   work_count: number
 }
 
-/** Картинка в детали работы: все варианты/форматы + метаданные. `lqip` — только если задан. */
+/**
+ * Картинка в детали работы: все варианты/форматы + метаданные. `lqip` — только если задан.
+ * `animated` — только у анимированных (кадры в `variants.*.webp`, а у GIF-подстраховки —
+ * ещё и в `variants.full.gif`): по нему фронт не предлагает статичный avif-источник.
+ */
 export interface ImageDetail {
   id: number
   w: number
@@ -98,6 +115,7 @@ export interface ImageDetail {
   sort_order: number
   lqip?: string
   variants: ImageVariants
+  animated?: boolean
 }
 
 /**
@@ -204,7 +222,7 @@ export const PEEK_LIMIT = 2
 
 /** Общая часть тайла (всё, кроме `peek`) — из полей обложки и пути. */
 function baseTile(row: Omit<TileRow, 'peek_json'>): Omit<Tile, 'peek'> {
-  return {
+  const tile: Omit<Tile, 'peek'> = {
     id: row.id,
     slug: row.slug,
     title: row.title,
@@ -215,21 +233,34 @@ function baseTile(row: Omit<TileRow, 'peek_json'>): Omit<Tile, 'peek'> {
     sub: row.sub,
     variants: imageVariants(row.key_base).thumb,
   }
+  // Флаг ставим только анимированным (как `lqip`) — у статики поля в ответе нет.
+  if (thumbAnimated(row.anim)) tile.animated = true
+  return tile
 }
 
-function peekImage(keyBase: string, w: number, h: number): PeekImage {
-  return { w, h, variants: imageVariants(keyBase).thumb }
+/**
+ * Анимирован ли ИМЕННО thumb: только в webp-ветке. У `anim: 'gif'` кадры есть лишь в
+ * оригинале (`full.gif`), а thumb — статичный первый кадр, и тайл листинга не играет.
+ */
+function thumbAnimated(anim: ImageAnim | null): boolean {
+  return anim === 'webp'
 }
 
-/** `peek` из JSON-колонки SQL-листинга: `[[key_base, width, height], …]`. */
+function peekImage(keyBase: string, w: number, h: number, anim: ImageAnim | null): PeekImage {
+  const peek: PeekImage = { w, h, variants: imageVariants(keyBase).thumb }
+  if (thumbAnimated(anim)) peek.animated = true
+  return peek
+}
+
+/** `peek` из JSON-колонки SQL-листинга: `[[key_base, width, height, anim], …]`. */
 function peekFromJson(json: string): PeekImage[] {
-  const rows = JSON.parse(json) as [string, number, number][]
-  return rows.slice(0, PEEK_LIMIT).map(([keyBase, w, h]) => peekImage(keyBase, w, h))
+  const rows = JSON.parse(json) as [string, number, number, ImageAnim | null][]
+  return rows.slice(0, PEEK_LIMIT).map(([keyBase, w, h, anim]) => peekImage(keyBase, w, h, anim))
 }
 
 /** `peek` из доменных картинок (repo-путь): вызывающий уже исключил обложку и отсортировал. */
 function peekFromImages(images: Image[]): PeekImage[] {
-  return images.slice(0, PEEK_LIMIT).map((i) => peekImage(i.key_base, i.width, i.height))
+  return images.slice(0, PEEK_LIMIT).map((i) => peekImage(i.key_base, i.width, i.height, i.anim))
 }
 
 /** Тайл из плоской строки SQL-листинга (порядок ключей — как в `toTile`). */
@@ -263,6 +294,7 @@ export function toTile(
       key_base: cover.key_base,
       width: cover.width,
       height: cover.height,
+      anim: cover.anim,
     }),
     peek: peekFromImages(others),
   }
@@ -275,9 +307,10 @@ export function toImageDetail(image: Image): ImageDetail {
     h: image.height,
     alt: image.alt,
     sort_order: image.sort_order,
-    variants: imageVariants(image.key_base),
+    variants: imageVariants(image.key_base, image.anim),
   }
   if (image.lqip !== null) detail.lqip = image.lqip
+  if (image.anim !== null) detail.animated = true
   return detail
 }
 

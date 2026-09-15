@@ -66,6 +66,7 @@ describe('openDb — schema 0002 (теги, витрина, меты катег�
       '0001_init.sql',
       '0002_tags_featured_category_meta.sql',
       '0003_work_seamless.sql',
+      '0004_image_anim.sql',
     ])
   })
 

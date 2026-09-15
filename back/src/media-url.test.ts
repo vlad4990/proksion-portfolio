@@ -37,3 +37,19 @@ describe('imageVariants', () => {
     }
   })
 })
+
+describe('imageVariants — анимация', () => {
+  test('anim: gif добавляет full.gif и не трогает thumb', () => {
+    const v = imageVariants('images/3/7', 'gif')
+    expect(v.full.gif).toBe('/media/images/3/7/full.gif')
+    expect('gif' in v.thumb).toBe(false)
+  })
+
+  test('anim: webp и статика дополнительных ключей не заводят', () => {
+    for (const anim of ['webp', null] as const) {
+      const v = imageVariants('images/3/7', anim)
+      expect('gif' in v.full).toBe(false)
+      expect('gif' in v.thumb).toBe(false)
+    }
+  })
+})

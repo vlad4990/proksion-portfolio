@@ -90,15 +90,15 @@ const VISIBLE = 'EXISTS (SELECT 1 FROM image i WHERE i.work_id = w.id)'
  * `w.id`/`img.id` из derived table внутри скалярного подзапроса SQLite разрешает; ORDER BY
  * внутри агрегата — чтобы порядок массива не зависел от плана.
  */
-const PEEK_JSON = `(SELECT json_group_array(json_array(p.key_base, p.width, p.height) ORDER BY p.sort_order, p.id)
-        FROM (SELECT key_base, width, height, sort_order, id FROM image
+const PEEK_JSON = `(SELECT json_group_array(json_array(p.key_base, p.width, p.height, p.anim) ORDER BY p.sort_order, p.id)
+        FROM (SELECT key_base, width, height, anim, sort_order, id FROM image
                WHERE work_id = w.id AND id <> img.id
                ORDER BY sort_order, id LIMIT ${PEEK_LIMIT}) p)`
 
 /** Колонки тайла — ровно поля `TileRow`. */
 const TILE_COLUMNS = `w.id AS id, w.slug AS slug, w.title AS title,
          c.slug AS cat, s.slug AS sub,
-         img.key_base AS key_base, img.width AS width, img.height AS height,
+         img.key_base AS key_base, img.width AS width, img.height AS height, img.anim AS anim,
          ${PEEK_JSON} AS peek_json`
 
 /** Работа + путь (категория/подкатегория) + отрезолвленная cover-картинка. */

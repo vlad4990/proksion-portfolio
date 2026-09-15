@@ -1,5 +1,7 @@
 // Картинка тайла листинга / слота витрины — общий лист для обоих деревьев.
-// `<picture>` с источниками AVIF → WebP → JPEG-fallback; пока thumb грузится, на `<picture>`
+// `<picture>` с источниками AVIF → WebP → JPEG-fallback; у АНИМИРОВАННЫХ картинок avif
+// пропускается: кадры бэкенд переносит только в webp (libheif кодирует avif одним кадром),
+// и браузер, выбрав avif первым, показал бы неподвижный кадр. Пока thumb грузится, на `<picture>`
 // виден скелетон-тон (CSS дерева, селектор `:not([data-loaded])`), после загрузки атрибут
 // `data-loaded` его гасит: у работ бывают PNG с прозрачным фоном, и оставленный тон
 // `--c-skeleton` просвечивал бы сквозь прозрачные зоны молочной дымкой.
@@ -13,6 +15,8 @@ import { useImageLoaded } from '../lib/useImageLoaded'
 interface TileImageProps {
   /** URL'ы thumb во всех форматах (avif/webp/jpg). */
   variants: VariantUrls
+  /** Картинка анимирована (кадры — в `variants.webp`): avif-источник не предлагаем. */
+  animated?: boolean
   /** Класс на `<picture>` (несёт скелетон-фон до загрузки). */
   className?: string
   /** Класс на `<img>` (object-fit, размеры). */
@@ -28,6 +32,7 @@ interface TileImageProps {
 
 export function TileImage({
   variants,
+  animated = false,
   className,
   imgClassName,
   aspectRatio,
@@ -44,7 +49,7 @@ export function TileImage({
 
   return (
     <picture className={className} {...(loaded ? { 'data-loaded': '' } : {})}>
-      <source type="image/avif" srcSet={variants.avif} />
+      {!animated && <source type="image/avif" srcSet={variants.avif} />}
       <source type="image/webp" srcSet={variants.webp} />
       <img
         ref={imgRef}

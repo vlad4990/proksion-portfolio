@@ -25,6 +25,8 @@ export interface Tile {
   sub: string
   variants: VariantUrls
   peek: PeekImage[]
+  /** Обложка анимирована — кадры в `variants.webp` (см. `ImageDetail.animated`). */
+  animated?: boolean
 }
 
 /** Картинка hover-«веера» тайла: размеры + thumb-варианты. */
@@ -32,6 +34,7 @@ export interface PeekImage {
   w: number
   h: number
   variants: VariantUrls
+  animated?: boolean
 }
 
 /** Вариант вёрстки секции-витрины категории на `/projects` (спека редизайна §2.1). */
@@ -136,9 +139,12 @@ export interface WorksPage {
 export type ImageFormat = 'avif' | 'webp' | 'jpg'
 /** Размерные варианты: `thumb` — листинг, `full` — модалка. */
 export type ImageVariant = 'thumb' | 'full'
-/** URL'ы одного размерного варианта во всех форматах. */
-export type VariantUrls = Record<ImageFormat, string>
-/** Полный блок вариантов картинки: thumb/full × avif/webp/jpg. */
+/**
+ * URL'ы одного размерного варианта во всех форматах. `gif` приходит только у анимаций,
+ * чью ленту выгоднее отдать оригиналом (бэкенд: `image.anim = 'gif'`), и только у `full`.
+ */
+export type VariantUrls = Record<ImageFormat, string> & { gif?: string }
+/** Полный блок вариантов картинки: thumb/full × avif/webp/jpg (+ full.gif у GIF-анимаций). */
 export type ImageVariants = Record<ImageVariant, VariantUrls>
 
 /**
@@ -154,6 +160,13 @@ export interface ImageDetail {
   sort_order: number
   lqip?: string
   variants: ImageVariants
+  /**
+   * Картинка анимирована (GIF/анимированный WebP): кадры живут в `variants.*.webp`, а у
+   * GIF-подстраховки full-анимацию отдаёт `variants.full.gif`. Поле приходит ТОЛЬКО у таких
+   * картинок — и по нему `<picture>` не предлагает avif: он всегда статичный первый кадр,
+   * и браузер, выбрав его первым, молча показал бы неподвижный кадр.
+   */
+  animated?: boolean
 }
 
 /**

@@ -42,6 +42,7 @@ function makeImage(over: Partial<Image> = {}): Image {
     alt: 'Альт',
     lqip: null,
     sort_order: 0,
+    anim: null,
     created_at: 't',
     ...over,
   }
@@ -133,6 +134,7 @@ describe('tileFromRow / featuredWorkFromRow', () => {
         key_base: 'images/42/7',
         width: 640,
         height: 480,
+        anim: null,
         peek_json: '[]',
       }),
     ).toEqual(toTile(work, cover, 'kupikod', 'bannera'))
@@ -152,7 +154,8 @@ describe('tileFromRow / featuredWorkFromRow', () => {
       key_base: 'images/42/7',
       width: 640,
       height: 480,
-      peek_json: '[["images/42/8",640,480],["images/42/9",300,200]]',
+      anim: null,
+      peek_json: '[["images/42/8",640,480,null],["images/42/9",300,200,null]]',
     })
     expect(fromRow.peek).toHaveLength(2)
     expect(fromRow).toEqual(
@@ -176,6 +179,7 @@ describe('tileFromRow / featuredWorkFromRow', () => {
       key_base: 'images/1/1',
       width: 10,
       height: 20,
+      anim: null,
       peek_json: '[]',
       description: 'Описание витрины',
     })
@@ -196,6 +200,36 @@ describe('tileFromRow / featuredWorkFromRow', () => {
   })
 })
 
+describe('toTile / tileFromRow — анимация', () => {
+  test('флаг animated ставится и обложке, и картинкам веера — из обоих путей сборки', () => {
+    const work = makeWork({ id: 42, slug: 'bannery', title: 'Баннеры' })
+    const cover = makeImage({ key_base: 'images/42/7', width: 640, height: 480, anim: 'webp' })
+    const others = [
+      makeImage({ id: 8, key_base: 'images/42/8', width: 640, height: 480, anim: 'gif' }),
+      makeImage({ id: 9, key_base: 'images/42/9', width: 300, height: 200, anim: null }),
+    ]
+    const fromRow = tileFromRow({
+      id: 42,
+      slug: 'bannery',
+      title: 'Баннеры',
+      cat: 'kupikod',
+      sub: 'bannera',
+      key_base: 'images/42/7',
+      width: 640,
+      height: 480,
+      anim: 'webp',
+      peek_json: '[["images/42/8",640,480,"gif"],["images/42/9",300,200,null]]',
+    })
+
+    expect(fromRow.animated).toBe(true)
+    // anim: 'gif' — тяжёлая лента, thumb статичный: в листинге такой тайл не играет.
+    expect('animated' in (fromRow.peek[0] ?? {})).toBe(false)
+    expect('animated' in (fromRow.peek[1] ?? {})).toBe(false)
+    // SQL- и repo-путь дают одинаковую форму (паритет листингов).
+    expect(fromRow).toEqual(toTile(work, cover, 'kupikod', 'bannera', others))
+  })
+})
+
 describe('toImageDetail', () => {
   test('includes variants, w/h, alt, sort_order', () => {
     const d = toImageDetail(makeImage({ id: 9, width: 1200, height: 800, alt: 'A', sort_order: 3 }))
@@ -211,6 +245,23 @@ describe('toImageDetail', () => {
   test('omits lqip when not set, includes it when present', () => {
     expect('lqip' in toImageDetail(makeImage({ lqip: null }))).toBe(false)
     expect(toImageDetail(makeImage({ lqip: 'data:image/x' })).lqip).toBe('data:image/x')
+  })
+
+  test('анимация: флаг только у анимированных, full.gif — только у GIF-подстраховки', () => {
+    const still = toImageDetail(makeImage({ anim: null }))
+    expect('animated' in still).toBe(false)
+    expect('gif' in still.variants.full).toBe(false)
+
+    const webp = toImageDetail(makeImage({ anim: 'webp' }))
+    expect(webp.animated).toBe(true)
+    // Кадры лежат в webp-вариантах — отдельного ключа не нужно.
+    expect('gif' in webp.variants.full).toBe(false)
+
+    const gif = toImageDetail(makeImage({ anim: 'gif' }))
+    expect(gif.animated).toBe(true)
+    expect(gif.variants.full.gif).toBe('/media/images/5/9/full.gif')
+    // thumb анимацию несёт webp'ом в обеих ветках — gif там не заводим.
+    expect('gif' in gif.variants.thumb).toBe(false)
   })
 })
 

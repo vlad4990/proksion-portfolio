@@ -19,19 +19,25 @@ function warmFirstImage(detail: WorkDetail | null): void {
   const pic = document.createElement('picture')
   pic.hidden = true
   pic.dataset['test'] = 'work-preload'
-  const avif = document.createElement('source')
-  avif.type = 'image/avif'
-  avif.srcset = img.variants.full.avif
-  const webp = document.createElement('source')
-  webp.type = 'image/webp'
-  webp.srcset = img.variants.full.webp
+  // Набор источников — тот же, что в WorkImage (у анимаций без avif, с gif впереди):
+  // иначе прогрели бы файл, который модалка потом не возьмёт, и качали бы картинку дважды.
+  const sources: [type: string, srcset: string][] = []
+  if (img.variants.full.gif) sources.push(['image/gif', img.variants.full.gif])
+  if (!img.animated) sources.push(['image/avif', img.variants.full.avif])
+  sources.push(['image/webp', img.variants.full.webp])
   const el = document.createElement('img')
   el.decoding = 'async'
   el.src = img.variants.full.jpg
   const done = (): void => pic.remove() // файл уже в HTTP-кэше, узел больше не нужен
   el.addEventListener('load', done)
   el.addEventListener('error', done)
-  pic.append(avif, webp, el)
+  for (const [type, srcset] of sources) {
+    const source = document.createElement('source')
+    source.type = type
+    source.srcset = srcset
+    pic.append(source)
+  }
+  pic.append(el)
   document.body.append(pic)
 }
 

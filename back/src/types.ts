@@ -1,6 +1,10 @@
 // Доменные типы PROKSION (см. docs/architecture.md §3).
 // Строки репозиториев типизированы этими интерфейсами — никаких `any`.
 
+import type { ImageAnim } from './media-url.ts'
+
+export type { ImageAnim }
+
 /** Вариант секции-витрины категории на `/projects` (docs/projects-redesign.md §2.1). */
 export type DisplayVariant = 'showcase' | 'strip' | 'cards'
 
@@ -76,6 +80,8 @@ export interface Image {
   alt: string | null
   lqip: string | null
   sort_order: number
+  /** Носитель анимации (миграция 0004): `null` — статичная картинка, см. media-url.ts. */
+  anim: ImageAnim | null
   created_at: string
 }
 
@@ -141,7 +147,8 @@ export interface NewImage {
   alt?: string | null
   lqip?: string | null
   sort_order?: number
+  anim?: ImageAnim | null
 }
 export type ImagePatch = Partial<
-  Pick<Image, 'key_base' | 'width' | 'height' | 'alt' | 'lqip' | 'sort_order'>
+  Pick<Image, 'key_base' | 'width' | 'height' | 'alt' | 'lqip' | 'sort_order' | 'anim'>
 >

@@ -17,6 +17,13 @@ describe('imageKeyBase', () => {
 
 const FIXTURE = join(import.meta.dir, '__fixtures__', 'sample.png')
 const input = new Uint8Array(await Bun.file(FIXTURE).arrayBuffer())
+// Две анимации: градиентная ужимается в webp (anim: 'webp'), плоская — нет (anim: 'gif').
+const animInput = new Uint8Array(
+  await Bun.file(join(import.meta.dir, '__fixtures__', 'sample-anim.gif')).arrayBuffer(),
+)
+const flatInput = new Uint8Array(
+  await Bun.file(join(import.meta.dir, '__fixtures__', 'sample-anim-flat.gif')).arrayBuffer(),
+)
 const config = await reachableS3Config()
 
 describe.skipIf(!config)('storeImage ↔ MinIO (integration)', () => {
@@ -55,6 +62,26 @@ describe.skipIf(!config)('storeImage ↔ MinIO (integration)', () => {
   test('идемпотентность: повторная заливка не плодит ключи (тот же key_base)', async () => {
     await storeImage(store, workId, imageId, input)
     expect(await store.count(keyBase)).toBe(IMAGE_VARIANTS.length * IMAGE_FORMATS.length)
+  })
+
+  test('анимация: webp-ветка не заводит лишних ключей', async () => {
+    const anim = await storeImage(store, workId, imageId, animInput)
+    expect(anim.anim).toBe('webp')
+    expect(await store.exists(`${keyBase}/full.gif`)).toBe(false)
+    expect(await store.count(keyBase)).toBe(IMAGE_VARIANTS.length * IMAGE_FORMATS.length)
+  })
+
+  test('GIF-подстраховка: full.gif появляется у anim: gif и снимается перезаливкой', async () => {
+    const gifKey = `${keyBase}/full.gif`
+    // Плоская лента (16 цветов) в webp не ужимается — подстраховка срабатывает по весу.
+    const flat = await storeImage(store, workId, imageId, flatInput)
+    expect(flat.anim).toBe('gif')
+    expect(await store.exists(gifKey)).toBe(true)
+
+    // Обратно на статичную картинку — ключ анимации не должен пережить перезаливку.
+    const back = await storeImage(store, workId, imageId, input)
+    expect(back.anim).toBeNull()
+    expect(await store.exists(gifKey)).toBe(false)
   })
 
   test('public-read: анонимный GET залитого thumb.webp → 200 с image/webp', async () => {

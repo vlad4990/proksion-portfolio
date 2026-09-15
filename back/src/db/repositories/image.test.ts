@@ -32,7 +32,27 @@ describe('imageRepo', () => {
     expect(img.alt).toBeNull()
     expect(img.lqip).toBeNull()
     expect(img.sort_order).toBe(0)
+    expect(img.anim).toBeNull()
     expect(typeof img.created_at).toBe('string')
+  })
+
+  test('anim: пишется, сбрасывается патчем и ограничен CHECK (миграция 0004)', () => {
+    const img = repo.create({
+      work_id: workId,
+      key_base: 'anim',
+      width: 10,
+      height: 10,
+      anim: 'webp',
+    })
+    expect(img.anim).toBe('webp')
+    expect(repo.update(img.id, { anim: 'gif' })?.anim).toBe('gif')
+    // null здесь осмысленный: перезаливка статикой снимает прежнюю анимацию.
+    expect(repo.update(img.id, { anim: null })?.anim).toBeNull()
+    expect(() =>
+      db
+        .query('INSERT INTO image (work_id, key_base, width, height, anim) VALUES (?, ?, 1, 1, ?)')
+        .run(workId, 'bad', 'mp4'),
+    ).toThrow()
   })
 
   test('getById and list scoped to a work, ordered by sort_order', () => {

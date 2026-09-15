@@ -152,6 +152,7 @@ function TileGrid({ tiles, loadingMore }: { tiles: Tile[]; loadingMore: boolean 
               >
                 <TileImage
                   variants={t.variants}
+                  animated={t.animated ?? false}
                   className={styles.tilePicture}
                   imgClassName={styles.tileImg}
                   aspectRatio={`${t.w} / ${t.h}`}

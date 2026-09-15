@@ -86,6 +86,8 @@ export function adminImageRoutes(deps: AdminDeps) {
               width: stored.width,
               height: stored.height,
               lqip: stored.lqip,
+              // null здесь осмысленный: перезаливка статикой снимает прежнюю анимацию.
+              anim: stored.anim,
             })
             if (!updated) throw new Error('image row vanished mid-upload')
             // Первая картинка работы → cover.

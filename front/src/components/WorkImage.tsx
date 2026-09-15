@@ -1,5 +1,10 @@
 // Картинка ленты модалки работы (спека §5/§8) — общий лист для обоих деревьев.
 // `<picture>` с источниками AVIF → WebP → JPEG-fallback; на время загрузки full-картинки
+//
+// Анимации (GIF / анимированный WebP, `image.animated`): кадры бэкенд переносит только в webp,
+// а у тяжёлых лент оставляет оригинальный GIF (`variants.full.gif`) — avif у таких картинок
+// ВСЕГДА статичный первый кадр, поэтому источник с ним не рендерим вовсе: браузер выбирает
+// первый поддержанный `<source>` и молча показал бы неподвижный кадр вместо анимации.
 // виден фон-плейсхолдер (thumb тайла из кэша / LQIP / нейтральный тон), затем картинка
 // плавно проявляется. Брендово-нейтрален: ни цветов, ни размеров не хардкодит — стили
 // приходят классами из дерева.
@@ -56,7 +61,8 @@ export function WorkImage({ image, className, imgClassName, placeholderSrc, lazy
       {...(placeholderGone ? { 'data-loaded': '' } : {})}
       data-test="work-picture"
     >
-      <source type="image/avif" srcSet={image.variants.full.avif} />
+      {image.variants.full.gif && <source type="image/gif" srcSet={image.variants.full.gif} />}
+      {!image.animated && <source type="image/avif" srcSet={image.variants.full.avif} />}
       <source type="image/webp" srcSet={image.variants.full.webp} />
       <img
         ref={imgRef}

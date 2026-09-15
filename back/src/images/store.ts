@@ -9,7 +9,12 @@
 // Иммутабельность/идемпотентность: key_base детерминирован по (workId,imageId), PUT
 // перезаписывает — повторная заливка той же картинки не плодит дублей.
 
-import { IMAGE_FORMATS, IMAGE_VARIANTS, type ImageFormat } from '../media-url.ts'
+import {
+  IMAGE_FORMATS,
+  IMAGE_VARIANTS,
+  type ImageAnim,
+  type ImageFormat,
+} from '../media-url.ts'
 import type { ObjectStore } from '../storage/s3.ts'
 import { processImage } from './pipeline.ts'
 
@@ -19,6 +24,8 @@ const CONTENT_TYPE: Record<ImageFormat, string> = {
   webp: 'image/webp',
   jpg: 'image/jpeg',
 }
+/** Ключ GIF-подстраховки: оригинальная лента кадров, если webp её не заменяет (см. media-url.ts). */
+const GIF_CONTENT_TYPE = 'image/gif'
 
 /** База ключа объекта в MinIO: `images/{workId}/{imageId}` (без варианта/расширения). */
 export function imageKeyBase(workId: number, imageId: number): string {
@@ -34,6 +41,8 @@ export interface StoredImage {
   height: number
   /** LQIP-плейсхолдер (data-URI), для `image.lqip`. */
   lqip: string
+  /** Носитель анимации для `image.anim` (`null` — статичная картинка). */
+  anim: ImageAnim | null
 }
 
 /**
@@ -57,7 +66,27 @@ export async function storeImage(
       uploads.push(store.put(key, processed.variants[variant][format], CONTENT_TYPE[format]))
     }
   }
+  // GIF-подстраховка: оригинальную ленту кладём рядом отдельным ключом. Перезаливка той же
+  // картинки другим файлом могла бы оставить `full.gif` от прошлой версии висеть (PUT
+  // перезаписывает только свои ключи), поэтому в webp-ветке ключ явно убираем.
+  const gifKey = `${keyBase}/full.gif`
+  uploads.push(
+    processed.anim === 'gif'
+      ? store.put(gifKey, toBytes(input), GIF_CONTENT_TYPE)
+      : store.delete(gifKey),
+  )
   await Promise.all(uploads)
 
-  return { key_base: keyBase, width: processed.width, height: processed.height, lqip: processed.lqip }
+  return {
+    key_base: keyBase,
+    width: processed.width,
+    height: processed.height,
+    lqip: processed.lqip,
+    anim: processed.anim,
+  }
+}
+
+/** Приводит вход к `Uint8Array` — заливаем ровно те байты, что прислали (без перекодирования). */
+function toBytes(input: Uint8Array | ArrayBuffer | Buffer): Uint8Array {
+  return input instanceof Uint8Array ? input : new Uint8Array(input)
 }

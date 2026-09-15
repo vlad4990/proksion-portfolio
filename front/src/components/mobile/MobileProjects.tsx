@@ -88,6 +88,7 @@ function Slot({ work, className, eager = false, caption = false }: SlotProps) {
     >
       <TileImage
         variants={work.variants}
+        animated={work.animated ?? false}
         className={styles.slotPicture}
         imgClassName={styles.slotImg}
         eager={eager}
@@ -348,6 +349,7 @@ function TileGrid({ tiles, eager }: { tiles: Tile[]; eager: boolean }) {
             >
               <TileImage
                 variants={t.variants}
+                animated={t.animated ?? false}
                 className={styles.tilePicture}
                 imgClassName={styles.tileImg}
                 aspectRatio={`${t.w} / ${t.h}`}

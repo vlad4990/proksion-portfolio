@@ -73,6 +73,7 @@ export function WorkLink({
     >
       <TileImage
         variants={work.variants}
+        animated={work.animated ?? false}
         className={fill ? `${styles.cover} ${styles.coverFill}` : styles.cover}
         imgClassName={fill ? styles.coverImgFill : styles.coverImg}
         {...(fill ? {} : { aspectRatio: `${work.w} / ${work.h}` })}
@@ -83,7 +84,12 @@ export function WorkLink({
         peeksReady &&
         peeks.map((p, i) => (
           <span key={i} className={styles.peek} aria-hidden="true" data-test="work-peek">
-            <TileImage variants={p.variants} className={styles.peekPicture} imgClassName={styles.peekImg} />
+            <TileImage
+              variants={p.variants}
+              animated={p.animated ?? false}
+              className={styles.peekPicture}
+              imgClassName={styles.peekImg}
+            />
           </span>
         ))}
       {children}
