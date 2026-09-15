@@ -17,7 +17,6 @@ import {
   EDUCATION_META,
   EXPERIENCE_BADGE,
   EXPERIENCE_HEADING,
-  EXPERIENCE_META,
   JOBS,
 } from '../../lib/about'
 import type { Education, Job } from '../../lib/about'
@@ -29,7 +28,8 @@ import styles from './MobileAbout.module.css'
 interface SectionHeadProps {
   title: string
   badge: string
-  meta: string
+  /** Без меты голова остаётся без второй строки (на мобайле её убрали у «ОПЫТА РАБОТЫ»). */
+  meta?: string
   /** Образование: бейдж стоит в строке титула — мета-строка длинная и занимает свою. */
   badgeInTitle?: boolean
 }
@@ -43,10 +43,12 @@ function SectionHead({ title, badge, meta, badgeInTitle = false }: SectionHeadPr
         <h2 className={styles.headTitle}>{title}</h2>
         {badgeInTitle && badgeNode}
       </div>
-      <div className={styles.headMetaRow}>
-        {!badgeInTitle && badgeNode}
-        <span className={styles.headMeta}>{meta}</span>
-      </div>
+      {(!badgeInTitle || meta) && (
+        <div className={styles.headMetaRow}>
+          {!badgeInTitle && badgeNode}
+          {meta && <span className={styles.headMeta}>{meta}</span>}
+        </div>
+      )}
     </div>
   )
 }
@@ -121,11 +123,9 @@ export function MobileAbout() {
         </div>
 
         <section className={styles.section} data-test="about-experience">
-          <SectionHead
-            title={EXPERIENCE_HEADING}
-            badge={EXPERIENCE_BADGE}
-            meta={EXPERIENCE_META}
-          />
+          {/* Мета «ХРОНОЛОГИЯ — НОВОЕ СВЕРХУ» — только на десктопе: на мобайле она
+              жалась к бейджу и читалась шумом (правка по замечанию заказчика). */}
+          <SectionHead title={EXPERIENCE_HEADING} badge={EXPERIENCE_BADGE} />
           <div className={styles.jobs}>
             {JOBS.map((job) => (
               <MobileJobEntry key={job.company} {...job} />

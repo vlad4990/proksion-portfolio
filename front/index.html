@@ -5,6 +5,14 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content="PROKSION — портфолио графического дизайнера Кристины." />
+    <!-- Цвет системного хрома браузера (верхняя панель Safari на iOS, шапка Chrome на
+         Android) — тот же --c-ink-1000, что и фон страницы: иначе полупрозрачная
+         панель iPhone показывала проскроллённый под неё контент. Литерал, а не токен:
+         meta читается до CSS и var() здесь не работает — держать в паре с --bg. -->
+    <meta name="theme-color" content="#141414" />
+    <!-- Standalone-режим (сайт добавлен на домашний экран): непрозрачный тёмный
+         статус-бар, а не translucent — контент под него подниматься не должен. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <!-- Превью ссылки в мессенджерах/соцсетях (og:image — абсолютный URL, относительные
          краулеры не разворачивают). -->
     <meta property="og:type" content="website" />
