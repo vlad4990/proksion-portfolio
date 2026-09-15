@@ -157,7 +157,9 @@
   font-weight: 700;
   font-size: var(--t-contact-arrow);
   line-height: 1;
-  text-align: right;
+  /* Глиф стал inline-SVG шириной 1em (shared/Arrow): в 52px-колонке его прижимает
+     к правому краю `justify-self`, прежний `text-align` на него уже не действует. */
+  justify-self: end;
   align-self: center;
   color: var(--c-ink-700);
   transform: translate(0, 0);

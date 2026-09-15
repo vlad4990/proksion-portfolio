@@ -19,6 +19,7 @@ import { ROUTE_TITLES, categoryTitle } from '../../seo'
 import { MobileTabBar } from './MobileTabBar'
 import { ProjectsFooter } from './ProjectsFooter'
 import edge from '../../styles/edgeFill.module.css'
+import { Arrow } from '../shared/Arrow'
 import styles from './MobileCategory.module.css'
 
 const BREAKPOINT_COLS = { default: 2 }
@@ -29,7 +30,11 @@ const SKELETON_HEIGHTS = [180, 140, 200, 160, 150, 190]
 const MORE_SKELETON_HEIGHTS = [160, 200]
 
 const ALL_CHIP_LABEL = 'ВСЕ'
-const CONTACT_LINK = 'НАПИСАТЬ ПО ПРОЕКТУ ↗'
+const CONTACT_LINK = (
+  <>
+    НАПИСАТЬ ПО ПРОЕКТУ <Arrow />
+  </>
+)
 
 const sectionNum = (sortOrder: number): string => String(sortOrder + 1).padStart(2, '0')
 

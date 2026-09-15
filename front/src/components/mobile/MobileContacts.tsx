@@ -1,6 +1,7 @@
 import { CONTACT_CHANNELS } from '../../lib/contacts'
 import { MobileTabBar } from './MobileTabBar'
 import edge from '../../styles/edgeFill.module.css'
+import { Arrow } from '../shared/Arrow'
 import styles from './MobileContacts.module.css'
 
 const ROWS = CONTACT_CHANNELS
@@ -33,7 +34,7 @@ export function MobileContacts() {
             >
               <div className={styles.row}>
                 <span className={styles.rowLabel}>{r.label}</span>
-                <span className={styles.rowValue}>{r.download ? `${r.value} →` : r.value}</span>
+                <span className={styles.rowValue}>{r.download ? <>{r.value} <Arrow dir="right" /></> : r.value}</span>
               </div>
             </a>
           ))}

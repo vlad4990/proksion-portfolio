@@ -24,6 +24,7 @@ import { cardWorks, splitShowcase, stripWorks } from '../../lib/showcase'
 import { ProjectsFooter } from './ProjectsFooter'
 import { WorkLink } from './WorkLink'
 import layout from '../../styles/layout.module.css'
+import { Arrow } from '../shared/Arrow'
 import styles from './ProjectsScreen.module.css'
 
 // Тексты hero — константы экрана (в БД их нет; дизайн-фрейм tVnqG).
@@ -35,8 +36,16 @@ const HERO_SUBTITLE =
 const STAT_YEARS = { value: '3 ГОДА', label: 'В КОММЕРЧЕСКОМ ДИЗАЙНЕ' }
 
 const ALL_CHIP_LABEL = 'ВСЕ'
-const ALL_WORKS_LINK = 'ВСЕ РАБОТЫ ↗'
-const CASE_LINK = 'СМОТРЕТЬ КЕЙС ↗'
+const ALL_WORKS_LINK = (
+  <>
+    ВСЕ РАБОТЫ <Arrow />
+  </>
+)
+const CASE_LINK = (
+  <>
+    СМОТРЕТЬ КЕЙС <Arrow />
+  </>
+)
 
 /** Колонки masonry тег-режима — те же тиры, что у листинга категории. */
 const BREAKPOINT_COLS = { default: 4, 1399: 3, 1099: 2 }
@@ -541,7 +550,7 @@ export function ProjectsScreen() {
               onClick={scrollToSections}
               data-test="projects-sections-hint"
             >
-              {formatSectionsCount(categories.length)} ↓
+              {formatSectionsCount(categories.length)} <Arrow dir="down" />
             </button>
           </div>
         )}
@@ -592,7 +601,7 @@ export function ProjectsScreen() {
             По этому тегу работ пока нет.
           </p>
           <Link to={tagHref()} className={styles.allLink} data-test="projects-reset">
-            ПОКАЗАТЬ ВСЕ РАБОТЫ ↗
+            ПОКАЗАТЬ ВСЕ РАБОТЫ <Arrow />
           </Link>
         </SectionShell>
       )}

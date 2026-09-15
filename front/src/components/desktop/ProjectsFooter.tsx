@@ -16,6 +16,7 @@ import {
   TELEGRAM,
 } from '../../lib/contacts'
 import layout from '../../styles/layout.module.css'
+import { Arrow } from '../shared/Arrow'
 import styles from './ProjectsFooter.module.css'
 
 export function ProjectsFooter() {
@@ -51,9 +52,7 @@ export function ProjectsFooter() {
               data-test="footer-telegram"
             >
               {FOOTER_TELEGRAM_LABEL}
-              <span className={styles.tgArrow} aria-hidden="true">
-                ↗
-              </span>
+              <Arrow className={styles.tgArrow} />
             </a>
           </div>
         </div>
@@ -72,7 +71,7 @@ export function ProjectsFooter() {
                 rel="noreferrer"
                 data-test="footer-social"
               >
-                {s.label} ↗
+                {s.label} <Arrow />
               </a>
             ))}
           </div>

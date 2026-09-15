@@ -21,6 +21,7 @@ import { cardWorks, chunk, isDenseStrip, splitShowcase, stripWorks } from '../..
 import { MobileTabBar } from './MobileTabBar'
 import { ProjectsFooter } from './ProjectsFooter'
 import edge from '../../styles/edgeFill.module.css'
+import { Arrow } from '../shared/Arrow'
 import styles from './MobileProjects.module.css'
 
 // Тексты hero — константы экрана (дизайн-фрейм N8NrSi; мобильный подзаголовок короче).
@@ -31,8 +32,16 @@ const HERO_SUBTITLE =
 const STAT_YEARS = { value: '3 ГОДА', label: 'В КОММЕРЧЕСКОМ ДИЗАЙНЕ' }
 
 const ALL_CHIP_LABEL = 'ВСЕ'
-const ALL_WORKS_LINK = 'ВСЕ РАБОТЫ ↗'
-const CASE_LINK = 'СМОТРЕТЬ КЕЙС ↗'
+const ALL_WORKS_LINK = (
+  <>
+    ВСЕ РАБОТЫ <Arrow />
+  </>
+)
+const CASE_LINK = (
+  <>
+    СМОТРЕТЬ КЕЙС <Arrow />
+  </>
+)
 
 const BREAKPOINT_COLS = { default: 2 }
 /** Порция работ секции в тег-режиме. */
@@ -512,7 +521,7 @@ export function MobileProjects() {
               По этому тегу работ пока нет.
             </p>
             <Link to={tagHref()} className={styles.allLink} data-test="projects-reset">
-              ПОКАЗАТЬ ВСЕ РАБОТЫ ↗
+              ПОКАЗАТЬ ВСЕ РАБОТЫ <Arrow />
             </Link>
           </SectionShell>
         )}

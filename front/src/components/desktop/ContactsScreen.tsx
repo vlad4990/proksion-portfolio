@@ -1,5 +1,6 @@
 import { CONTACT_CHANNELS, CURRENT_YEAR, type ContactChannel } from '../../lib/contacts'
 import layout from '../../styles/layout.module.css'
+import { Arrow } from '../shared/Arrow'
 import styles from './ContactsScreen.module.css'
 
 /** Строка канала = константа из lib/contacts.ts + порядковый номер («01»…«04»). */
@@ -24,7 +25,7 @@ function ContactRow({ index, label, value, href, download }: Row) {
       <span className={styles.index}>{index}</span>
       <span className={styles.label}>{label}</span>
       <span className={styles.value}>{value}</span>
-      <span className={styles.arrow}>↗</span>
+      <Arrow className={styles.arrow} />
     </a>
   )
 }

@@ -19,6 +19,7 @@ import { ROUTE_TITLES, categoryTitle } from '../../seo'
 import { ProjectsFooter } from './ProjectsFooter'
 import { WorkLink } from './WorkLink'
 import layout from '../../styles/layout.module.css'
+import { Arrow } from '../shared/Arrow'
 import styles from './CategoryScreen.module.css'
 
 /** Колонки masonry — те же тиры, что у токенов (совпадает с тег-режимом корневой). */
@@ -31,7 +32,11 @@ const SKELETON_HEIGHTS = [320, 240, 300, 200, 360, 260, 220, 340]
 const MORE_SKELETON_HEIGHTS = [280, 220, 320, 240]
 
 const ALL_CHIP_LABEL = 'ВСЕ'
-const CONTACT_LINK = 'НАПИСАТЬ ПО ПРОЕКТУ ↗'
+const CONTACT_LINK = (
+  <>
+    НАПИСАТЬ ПО ПРОЕКТУ <Arrow />
+  </>
+)
 
 /** Номер раздела в оверлайне — с ведущим нулём (позиция категории: 01, 02, …). */
 const sectionNum = (sortOrder: number): string => String(sortOrder + 1).padStart(2, '0')
